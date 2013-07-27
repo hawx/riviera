@@ -201,10 +201,7 @@ func fetchRiver(ctx *web.Context) string {
 
 	now := time.Now()
 
-	feeds := FetchList(
-		"http://emacsredux.com/atom.xml",
-		"http://daringfireball.net/index.xml",
-	)
+	feeds := FetchList()
 
 	elapsed := int(time.Since(now) / time.Second)
 	timeGMT := time.Now().UTC().Format("Mon, 2 Jan 2006 15:04:05 MST")
