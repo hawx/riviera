@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"log"
 	"path/filepath"
+	"os"
 )
 
 func asset(path string, ctx *web.Context) string {
@@ -37,7 +38,7 @@ func index(ctx *web.Context) string {
 }
 
 func getSubscriptions() []string {
-	subs, err := opml.Load("subscriptions.xml")
+	subs, err := opml.Load(opmlPath)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -60,7 +61,14 @@ func fetchRiver(ctx *web.Context) string {
 	return river.Build(callback, getSubscriptions()...)
 }
 
+var opmlPath string
+
 func main() {
+	if len(os.Args) < 2 {
+		log.Fatal("Usage: riviera <opmlPath>")
+	}
+	opmlPath = os.Args[1]
+
 	web.Get("/css/(.*.css)", style)
 	web.Get("/js/(.*.js)", script)
 	web.Get("/images/(.*)", image)
