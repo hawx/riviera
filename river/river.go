@@ -52,7 +52,12 @@ func Fetch(cutOff time.Duration, urls ...string) Feeds {
 		wg.Add(1)
 		go func(url string) {
 			defer wg.Done()
-			updatedFeeds = append(updatedFeeds, fetchFromUrl(url, cutOff)...)
+			updatedChannels := fetchFromUrl(url, cutOff)
+			for _, channel := range updatedChannels {
+				if len(channel.Items) > 0 {
+					updatedFeeds = append(updatedFeeds, channel)
+				}
+			}
 		}(url)
 	}
 
