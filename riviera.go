@@ -95,7 +95,7 @@ func parseTime(dateStr string) (*time.Time, error) {
 
 	for _, format := range formats {
 		parsed, err := time.Parse(format, dateStr)
-		if err != nil && parsed.Year() > 1 {
+		if err == nil && parsed.Year() > 1 {
 			return &parsed, nil
 		}
 	}
