@@ -5,7 +5,7 @@ subscriptions in opml format.
 
 ``` bash
 $ go install github.com/hawx/riviera
-$ riviera subscriptions.xml
+$ riviera --opml subscriptions.xml
 XXXX/XX/XX XX:XX:XX web.go serving 0.0.0.0:9999
 ```
 
