@@ -1,14 +1,13 @@
 package main
 
 import (
+	"github.com/hawx/riviera/opml"
+	"github.com/hawx/riviera/river"
 	"github.com/hoisie/web"
 
 	"io/ioutil"
 	"log"
 	"path/filepath"
-
-	"./river"
-	"./opml"
 )
 
 func asset(path string, ctx *web.Context) string {
@@ -53,7 +52,9 @@ func getSubscriptions() []string {
 
 func fetchRiver(ctx *web.Context) string {
 	callback, ok := ctx.Params["callback"]
-	if !ok { callback = "onGetRiverStream" }
+	if !ok {
+		callback = "onGetRiverStream"
+	}
 
 	ctx.ContentType("js")
 	return river.Build(callback, getSubscriptions()...)
