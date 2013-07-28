@@ -5,10 +5,13 @@ import (
 	"github.com/hawx/riviera/river"
 	"github.com/hoisie/web"
 
+	"flag"
+	"fmt"
 	"io/ioutil"
 	"log"
-	"path/filepath"
 	"os"
+	"path/filepath"
+	"time"
 )
 
 func asset(path string, ctx *web.Context) string {
@@ -58,16 +61,47 @@ func fetchRiver(ctx *web.Context) string {
 	}
 
 	ctx.ContentType("js")
-	return river.Build(callback, getSubscriptions()...)
+
+	duration, err := time.ParseDuration(cutOff)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return river.Build(callback, duration, getSubscriptions()...)
 }
 
-var opmlPath string
+var opmlPath, cutOff string
+
+func printHelp() {
+	fmt.Println(
+		"Usage: riviera [options]\n",
+		"\n",
+		"  Riviera is a river of news feed reader\n",
+		"\n",
+		"    --opml <path>      # Path to opml file containing feeds to read\n",
+		"\n",
+		"    --cutoff <secs>    # Time to ignore items after (default: 24h)\n",
+		"    --bind <host>      # Host to bind to (default: 0.0.0.0)\n",
+		"    --port <num>       # Port to bind to (default: 9999)\n",
+		"\n",
+		"    --help             # Display help message\n",
+	)
+}
 
 func main() {
-	if len(os.Args) < 2 {
-		log.Fatal("Usage: riviera <opmlPath>")
+	flag.StringVar(&opmlPath, "opml", "", "")
+	flag.StringVar(&cutOff, "cutoff", "24h", "")
+
+	bind := flag.String("bind", "0.0.0.0", "")
+	port := flag.String("port", "9999", "")
+	help := flag.Bool("help", false, "")
+
+	flag.Parse()
+
+	if opmlPath == "" || *help {
+		printHelp()
+		os.Exit(0)
 	}
-	opmlPath = os.Args[1]
 
 	web.Get("/css/(.*.css)", style)
 	web.Get("/js/(.*.js)", script)
@@ -75,5 +109,5 @@ func main() {
 	web.Get("/river.js", fetchRiver)
 	web.Get("/?", index)
 
-	web.Run("0.0.0.0:9999")
+	web.Run(*bind + ":" + *port)
 }

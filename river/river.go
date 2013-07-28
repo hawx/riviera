@@ -16,10 +16,10 @@ import (
 
 const DOCS = "http://scripting.com/stories/2010/12/06/innovationRiverOfNewsInJso.html"
 
-func Build(callback string, urls ...string) string {
+func Build(callback string, cutOff time.Duration, urls ...string) string {
 	start := time.Now()
 
-	updatedFeeds := Fetch(urls...)
+	updatedFeeds := Fetch(cutOff, urls...)
 
 	elapsed := time.Since(start).Seconds()
 	now := time.Now()
@@ -44,7 +44,7 @@ func Build(callback string, urls ...string) string {
 	return fmt.Sprintf("%s(%s)", callback, string(b))
 }
 
-func Fetch(urls ...string) Feeds {
+func Fetch(cutOff time.Duration, urls ...string) Feeds {
 	var wg sync.WaitGroup
 	updatedFeeds := []Feed{}
 
@@ -52,7 +52,7 @@ func Fetch(urls ...string) Feeds {
 		wg.Add(1)
 		go func(url string) {
 			defer wg.Done()
-			updatedFeeds = append(updatedFeeds, fetchFromUrl(url)...)
+			updatedFeeds = append(updatedFeeds, fetchFromUrl(url, cutOff)...)
 		}(url)
 	}
 
@@ -63,7 +63,7 @@ func Fetch(urls ...string) Feeds {
 	}
 }
 
-func fetchFromUrl(url string) []Feed {
+func fetchFromUrl(url string, cutOff time.Duration) []Feed {
 	updatedFeeds := []Feed{}
 
 	feed := new(rss.Feed)
@@ -100,7 +100,7 @@ func fetchFromUrl(url string) []Feed {
 		}
 
 		for _, item := range channel.Items {
-			if old(item.PubDate) {
+			if old(item.PubDate, cutOff) {
 				break
 			}
 
@@ -157,13 +157,13 @@ func parseTime(dateStr string) (*time.Time, error) {
 	return nil, errors.New("Time could not be parsed: " + dateStr)
 }
 
-func old(pubDate string) bool {
+func old(pubDate string, cutOff time.Duration) bool {
 	date, err := parseTime(pubDate)
 	if err != nil {
 		log.Print(err)
 		return false
 	}
 
-	lastWeek := time.Now().Add(-24 * time.Hour)
+	lastWeek := time.Now().Add(-cutOff)
 	return date.Before(lastWeek)
 }
