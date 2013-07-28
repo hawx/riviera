@@ -7,6 +7,7 @@ import (
 
 	"encoding/json"
 	"errors"
+	"path/filepath"
 	"io/ioutil"
 	"log"
 	"sync"
@@ -174,26 +175,30 @@ func Fetch(url string) []Feed {
 	return updatedFeeds
 }
 
-func asset(path, contentType string, ctx *web.Context) string {
-	content, err := ioutil.ReadFile(path)
+func asset(path string, ctx *web.Context) string {
+	content, err := ioutil.ReadFile("assets/" + path)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	ctx.ContentType(contentType)
+	ctx.ContentType(filepath.Ext(path)[1:])
 	return string(content)
 }
 
 func style(ctx *web.Context, path string) string {
-	return asset("css/"+path, "css", ctx)
+	return asset("css/"+path, ctx)
 }
 
 func script(ctx *web.Context, path string) string {
-	return asset("js/"+path, "js", ctx)
+	return asset("js/"+path, ctx)
+}
+
+func image(ctx *web.Context, path string) string {
+	return asset("images/"+path, ctx)
 }
 
 func index(ctx *web.Context) string {
-	return asset("index.html", "html", ctx)
+	return asset("index.html", ctx)
 }
 
 func fetchRiver(ctx *web.Context) string {
@@ -228,7 +233,9 @@ func fetchRiver(ctx *web.Context) string {
 func main() {
 	web.Get("/css/(.*.css)", style)
 	web.Get("/js/(.*.js)", script)
+	web.Get("/images/(.*)", image)
 	web.Get("/river.js", fetchRiver)
 	web.Get("/?", index)
+
 	web.Run("0.0.0.0:9999")
 }
