@@ -12,6 +12,8 @@ import (
 	"log"
 	"sync"
 	"time"
+
+	"./opml"
 )
 
 const DOCS = "http://scripting.com/stories/2010/12/06/innovationRiverOfNewsInJso.html"
@@ -105,7 +107,7 @@ func old(pubDate string) bool {
 	date, err := parseTime(pubDate)
 	if err != nil {
 		log.Print(err)
-		return true
+		return false
 	}
 
 	lastWeek := time.Now().Add(-7 * 24 * time.Hour)
@@ -121,7 +123,7 @@ func Fetch(url string) []Feed {
 
 	err := feed.Fetch(url, nil)
 	if err != nil {
-		log.Fatalf("[e] %s: %s\n", url, err)
+		log.Fatalf("%s: %s\n", url, err)
 	}
 
 	id := 0
@@ -201,12 +203,26 @@ func index(ctx *web.Context) string {
 	return asset("index.html", ctx)
 }
 
+func getSubscriptions() []string {
+	subs, err := opml.Load("subscriptions.xml")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	urls := []string{}
+	for _, outline := range subs.Body.Outline {
+		urls = append(urls, outline.XmlUrl)
+	}
+
+	return urls
+}
+
 func fetchRiver(ctx *web.Context) string {
 	ctx.ContentType("js")
 
 	now := time.Now()
 
-	feeds := FetchList()
+	feeds := FetchList(getSubscriptions()...)
 
 	elapsed := int(time.Since(now) / time.Second)
 	timeGMT := time.Now().UTC().Format("Mon, 2 Jan 2006 15:04:05 MST")
