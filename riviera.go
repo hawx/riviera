@@ -10,17 +10,17 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
-	"path/filepath"
+	"path"
 	"time"
 )
 
-func asset(path string, ctx *web.Context) string {
-	content, err := ioutil.ReadFile("assets/" + path)
+func asset(localPath string, ctx *web.Context) string {
+	content, err := ioutil.ReadFile(path.Join(assetPath, localPath))
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	ctx.ContentType(filepath.Ext(path)[1:])
+	ctx.ContentType(path.Ext(localPath)[1:])
 	return string(content)
 }
 
@@ -70,7 +70,7 @@ func fetchRiver(ctx *web.Context) string {
 	return river.Build(callback, duration, getSubscriptions()...)
 }
 
-var opmlPath, cutOff string
+var assetPath, opmlPath, cutOff string
 
 func printHelp() {
 	fmt.Println(
@@ -79,6 +79,7 @@ func printHelp() {
 		"  Riviera is a river of news feed reader\n",
 		"\n",
 		"    --opml <path>      # Path to opml file containing feeds to read\n",
+		"    --assets <path>    # Path to asset files\n",
 		"\n",
 		"    --cutoff <secs>    # Time to ignore items after (default: 24h)\n",
 		"    --bind <host>      # Host to bind to (default: 0.0.0.0)\n",
@@ -89,6 +90,7 @@ func printHelp() {
 }
 
 func main() {
+	flag.StringVar(&assetPath, "assets", ".", "")
 	flag.StringVar(&opmlPath, "opml", "", "")
 	flag.StringVar(&cutOff, "cutoff", "24h", "")
 
