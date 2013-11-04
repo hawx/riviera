@@ -23,8 +23,8 @@ func Build(callback string, cutOff time.Duration, urls ...string) string {
 
 	elapsed := time.Since(start).Seconds()
 	now := time.Now()
-	timeGMT := now.UTC().Format(time.RFC1123)
-	timeNow := now.Format(time.RFC1123)
+	timeGMT := now.UTC().Format(time.RFC1123Z)
+	timeNow := now.Format(time.RFC1123Z)
 
 	metadata := Metadata{
 		Docs:      DOCS,
@@ -52,6 +52,7 @@ func Fetch(cutOff time.Duration, urls ...string) Feeds {
 		wg.Add(1)
 		go func(url string) {
 			defer wg.Done()
+
 			updatedChannels := fetchFromUrl(url, cutOff)
 			for _, channel := range updatedChannels {
 				if len(channel.Items) > 0 {
@@ -105,14 +106,16 @@ func fetchFromUrl(url string, cutOff time.Duration) []Feed {
 		}
 
 		for _, item := range channel.Items {
-			if old(item.PubDate, cutOff) {
+			var pubDate = parseTime(item.PubDate)
+
+			if old(pubDate, cutOff) {
 				break
 			}
 
 			i := Item{
 				Body:      stripAndCrop(item.Description),
 				PermaLink: item.Links[0].Href, // either this is wrong
-				PubDate:   item.PubDate,
+        PubDate:   pubDate.Format(time.RFC1123Z)
 				Title:     item.Title,
 				Link:      item.Links[0].Href, // or this is wrong
 				Id:        id,
@@ -162,13 +165,7 @@ func parseTime(dateStr string) (*time.Time, error) {
 	return nil, errors.New("Time could not be parsed: " + dateStr)
 }
 
-func old(pubDate string, cutOff time.Duration) bool {
-	date, err := parseTime(pubDate)
-	if err != nil {
-		log.Print(err)
-		return false
-	}
-
+func old(pubDate time, cutOff time.Duration) bool {
 	lastWeek := time.Now().Add(-cutOff)
-	return date.Before(lastWeek)
+	return pubDate.Before(lastWeek)
 }
