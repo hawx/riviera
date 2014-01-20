@@ -3,41 +3,48 @@ package main
 import (
 	"github.com/hawx/riviera/opml"
 	"github.com/hawx/riviera/river"
-	"github.com/hoisie/web"
 
 	"flag"
 	"fmt"
 	"io/ioutil"
 	"log"
+	"net/http"
 	"os"
 	"path"
+	"strings"
 	"time"
 )
 
-func asset(localPath string, ctx *web.Context) string {
-	content, err := ioutil.ReadFile(path.Join(assetPath, localPath))
+type assetHandler struct {
+	path string
+}
+
+func AssetHandler(dir string) http.Handler {
+	return &assetHandler{path: path.Join(assetPath, dir)}
+}
+
+// http.Handler
+func (h *assetHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	p := r.URL.Path
+	if strings.HasPrefix(p, "/") { p = p[1:] }
+
+	filePath := h.path
+	if len(p) > 0 {
+		filePath = path.Join(assetPath, p)
+	}
+
+	content, err := ioutil.ReadFile(filePath)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	ctx.ContentType(path.Ext(localPath)[1:])
-	return string(content)
-}
+	if len(p) > 0 {
+		w.Header().Set("Content-Type", path.Ext(p)[1:])
+	} else {
+		w.Header().Set("Content-Type", "text/html")
+	}
 
-func style(ctx *web.Context, path string) string {
-	return asset("css/"+path, ctx)
-}
-
-func script(ctx *web.Context, path string) string {
-	return asset("js/"+path, ctx)
-}
-
-func image(ctx *web.Context, path string) string {
-	return asset("images/"+path, ctx)
-}
-
-func index(ctx *web.Context) string {
-	return asset("index.html", ctx)
+	fmt.Fprintln(w, string(content))
 }
 
 func getSubscriptions() []string {
@@ -54,20 +61,28 @@ func getSubscriptions() []string {
 	return urls
 }
 
-func fetchRiver(ctx *web.Context) string {
-	callback, ok := ctx.Params["callback"]
-	if !ok {
-		callback = "onGetRiverStream"
-	}
+var riverJs string
+var fetching bool
+var lastFetched time.Time
 
-	ctx.ContentType("js")
+func fetchRiver() {
+	var refreshPoint = time.Now().Add(time.Duration(-15) * time.Minute)
+	if fetching || lastFetched.After(refreshPoint) {
+		log.Println("feeds still fresh")
+		return
+	}
+	fetching = true
+	lastFetched = time.Now()
 
 	duration, err := time.ParseDuration(cutOff)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	return river.Build(callback, duration, getSubscriptions()...)
+	riverJs = river.Build(duration, getSubscriptions()...)
+	log.Println("fetched feeds")
+
+	fetching = false
 }
 
 var assetPath, opmlPath, cutOff string
@@ -94,7 +109,6 @@ func main() {
 	flag.StringVar(&opmlPath, "opml", "", "")
 	flag.StringVar(&cutOff, "cutoff", "24h", "")
 
-	bind := flag.String("bind", "0.0.0.0", "")
 	port := flag.String("port", "9999", "")
 	help := flag.Bool("help", false, "")
 
@@ -105,11 +119,28 @@ func main() {
 		os.Exit(0)
 	}
 
-	web.Get("/css/(.*.css)", style)
-	web.Get("/js/(.*.js)", script)
-	web.Get("/images/(.*)", image)
-	web.Get("/river.js", fetchRiver)
-	web.Get("/?", index)
+	log.Println("starting")
+	fetchRiver()
 
-	web.Run(*bind + ":" + *port)
+	http.Handle("/css/", AssetHandler("css"))
+	http.Handle("/js/", AssetHandler("js"))
+	http.Handle("/images/", AssetHandler("images"))
+
+	http.HandleFunc("/river.js", func(w http.ResponseWriter, r *http.Request) {
+		fetchRiver()
+
+		callback := r.FormValue("callback")
+		if callback == "" {
+			callback = "onGetRiverStream"
+		}
+
+		w.Header().Set("Content-Type", "application/javascript")
+
+		fmt.Fprintf(w, "%s(%s)", callback, riverJs)
+	})
+
+	http.Handle("/", AssetHandler("index.html"))
+
+	log.Println("listening on port :" + *port)
+	log.Fatal(http.ListenAndServe(":" + *port, nil))
 }

@@ -8,7 +8,6 @@ import (
 
 	"encoding/json"
 	"errors"
-	"fmt"
 	"log"
 	"sync"
 	"time"
@@ -16,7 +15,7 @@ import (
 
 const DOCS = "http://scripting.com/stories/2010/12/06/innovationRiverOfNewsInJso.html"
 
-func Build(callback string, cutOff time.Duration, urls ...string) string {
+func Build(cutOff time.Duration, urls ...string) string {
 	start := time.Now()
 
 	updatedFeeds := Fetch(cutOff, urls...)
@@ -41,7 +40,7 @@ func Build(callback string, cutOff time.Duration, urls ...string) string {
 
 	b, _ := json.Marshal(wrapper)
 
-	return fmt.Sprintf("%s(%s)", callback, string(b))
+	return string(b)
 }
 
 func Fetch(cutOff time.Duration, urls ...string) Feeds {
@@ -106,7 +105,10 @@ func fetchFromUrl(url string, cutOff time.Duration) []Feed {
 		}
 
 		for _, item := range channel.Items {
-			var pubDate = parseTime(item.PubDate)
+			pubDate, err := parseTime(item.PubDate)
+			if err != nil {
+				log.Fatal(err)
+			}
 
 			if old(pubDate, cutOff) {
 				break
@@ -115,7 +117,7 @@ func fetchFromUrl(url string, cutOff time.Duration) []Feed {
 			i := Item{
 				Body:      stripAndCrop(item.Description),
 				PermaLink: item.Links[0].Href, // either this is wrong
-        PubDate:   pubDate.Format(time.RFC1123Z)
+        PubDate:   pubDate.Format(time.RFC1123Z),
 				Title:     item.Title,
 				Link:      item.Links[0].Href, // or this is wrong
 				Id:        id,
@@ -165,7 +167,7 @@ func parseTime(dateStr string) (*time.Time, error) {
 	return nil, errors.New("Time could not be parsed: " + dateStr)
 }
 
-func old(pubDate time, cutOff time.Duration) bool {
+func old(pubDate *time.Time, cutOff time.Duration) bool {
 	lastWeek := time.Now().Add(-cutOff)
 	return pubDate.Before(lastWeek)
 }
