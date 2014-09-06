@@ -16,6 +16,33 @@ import (
 
 const DOCS = "http://scripting.com/stories/2010/12/06/innovationRiverOfNewsInJso.html"
 
+func FromFeeds(feeds []Feed) string {
+	updatedFeeds := Feeds{feeds}
+	start := time.Now()
+
+	elapsed := time.Since(start).Seconds()
+	now := time.Now()
+	timeGMT := now.UTC().Format(time.RFC1123Z)
+	timeNow := now.Format(time.RFC1123Z)
+
+	metadata := Metadata{
+		Docs:      DOCS,
+		WhenGMT:   timeGMT,
+		WhenLocal: timeNow,
+		Version:   "3",
+		Secs:      elapsed,
+	}
+
+	wrapper := Wrapper{
+		Metadata:     metadata,
+		UpdatedFeeds: updatedFeeds,
+	}
+
+	b, _ := json.Marshal(wrapper)
+
+	return string(b)
+}
+
 func Build(cutOff time.Duration, urls ...string) string {
 	start := time.Now()
 
@@ -149,30 +176,6 @@ func convertItem(item *rss.Item, cutOff time.Duration) *Item {
 
 	return i
 }
-
-
-// func PollFeed(uri string, timeout int) {
-// 	feed := rss.New(timeout, true, chanHandler, itemHandler)
-
-// 	for {
-// 		if err := feed.Fetch(uri, nil); err != nil {
-// 			fmt.Fprintf(os.Stderr, "[e] %s: %s", uri, err)
-//                         return
-// 		}
-
-// 		<-time.After(time.Duration(feed.SecondsTillUpdate() * 1e9))
-// 	}
-// }
-
-// func channelHandler(feed *rss.Feed, newchannels []*rss.Channel) {
-// 	fmt.Printf("%d new channel(s) in %s\n", len(newchannels), feed.Url)
-// }
-
-// func itemHandler(feed *rss.Feed, ch *rss.Channel, newitems []*rss.Item) {
-// 	fmt.Printf("%d new item(s) in %s\n", len(newitems), feed.Url)
-// }
-
-
 
 // Strips html markup, then limits to 280 characters. If the original text was
 // longer than 280 chars, three periods are appended.
