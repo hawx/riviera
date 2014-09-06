@@ -5,18 +5,35 @@ package river
 import (
 	rss "github.com/jteeuwen/go-pkg-rss"
 	"github.com/kennygrant/sanitize"
-	uuid "github.com/nu7hatch/gouuid"
-
+	"github.com/nu7hatch/gouuid"
 	"encoding/json"
 	"errors"
 	"log"
-	"sync"
 	"time"
 )
 
 const DOCS = "http://scripting.com/stories/2010/12/06/innovationRiverOfNewsInJso.html"
 
-func FromFeeds(feeds []Feed) string {
+type River interface {
+	Latest() []Feed
+	Close()
+}
+
+func New(uris []string, cutOff time.Duration) River {
+	rivers := map[string]River{}
+
+	for _, uri := range uris {
+		rivers[uri] = newPoller(uri, cutOff)
+	}
+
+	return &collater{rivers}
+}
+
+func Build(river River) string {
+	return fromFeeds(river.Latest())
+}
+
+func fromFeeds(feeds []Feed) string {
 	updatedFeeds := Feeds{feeds}
 	start := time.Now()
 
@@ -41,83 +58,6 @@ func FromFeeds(feeds []Feed) string {
 	b, _ := json.Marshal(wrapper)
 
 	return string(b)
-}
-
-func Build(cutOff time.Duration, urls ...string) string {
-	start := time.Now()
-
-	updatedFeeds := Fetch(cutOff, urls...)
-
-	elapsed := time.Since(start).Seconds()
-	now := time.Now()
-	timeGMT := now.UTC().Format(time.RFC1123Z)
-	timeNow := now.Format(time.RFC1123Z)
-
-	metadata := Metadata{
-		Docs:      DOCS,
-		WhenGMT:   timeGMT,
-		WhenLocal: timeNow,
-		Version:   "3",
-		Secs:      elapsed,
-	}
-
-	wrapper := Wrapper{
-		Metadata:     metadata,
-		UpdatedFeeds: updatedFeeds,
-	}
-
-	b, _ := json.Marshal(wrapper)
-
-	return string(b)
-}
-
-func Fetch(cutOff time.Duration, urls ...string) Feeds {
-	var wg sync.WaitGroup
-	updatedFeeds := []Feed{}
-
-	for _, url := range urls {
-		wg.Add(1)
-		go func(url string) {
-			defer wg.Done()
-
-			updatedChannels := fetchFromUrl(url, cutOff)
-			for _, channel := range updatedChannels {
-				if len(channel.Items) > 0 {
-					updatedFeeds = append(updatedFeeds, channel)
-				}
-			}
-		}(url)
-	}
-
-	wg.Wait()
-
-	return Feeds{
-		UpdatedFeeds: updatedFeeds,
-	}
-}
-
-func fetchFromUrl(url string, cutOff time.Duration) []Feed {
-	updatedFeeds := []Feed{}
-
-	feed := new(rss.Feed)
-	feed.CacheTimeout = 15
-	feed.Type = "none"
-
-	err := feed.Fetch(url, nil)
-	if err != nil {
-		log.Fatalf("%s: %s\n", url, err)
-	}
-
-	for _, channel := range feed.Channels {
-		updatedFeed := convertChannel(channel, url, cutOff)
-		updatedFeeds = append(updatedFeeds, *updatedFeed)
-	}
-
-	return updatedFeeds
-}
-
-func Subscribe(url string, cutOff time.Duration) {
-
 }
 
 func convertChannel(channel *rss.Channel, url string, cutOff time.Duration) *Feed {

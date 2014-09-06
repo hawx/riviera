@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"os"
 	"path"
+	"time"
 )
 
 func getSubscriptions() []string {
@@ -58,7 +59,12 @@ func main() {
 		os.Exit(0)
 	}
 
-	feeds := river.New(getSubscriptions())
+	duration, err := time.ParseDuration(*cutOff)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	feeds := river.New(getSubscriptions(), duration)
 
 	for _, name := range []string{"", "css/", "js/", "images/"} {
 		http.Handle("/" + name, http.StripPrefix("/" + name, http.FileServer(http.Dir(path.Join(*assetPath, name)))))
@@ -71,7 +77,7 @@ func main() {
 		}
 
 		w.Header().Set("Content-Type", "application/javascript")
-		fmt.Fprintf(w, "%s(%s)", callback, river.FromFeeds(feeds.Latest()))
+		fmt.Fprintf(w, "%s(%s)", callback, river.Build(feeds))
 	})
 
 	log.Println("listening on port :" + *port)

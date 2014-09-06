@@ -6,51 +6,17 @@ import (
 	"log"
 )
 
-type River interface {
-	Latest() []Feed
-	Close()
-}
-
-type collater struct {
-	rivers  map[string] River
-}
-
-func New(uris []string) River {
-	rivers := map[string]River{}
-
-	for _, uri := range uris {
-		rivers[uri] = newPoller(uri)
-	}
-
-	return &collater{rivers}
-}
-
-func (r *collater) Latest() []Feed {
-	feeds := []Feed{}
-
-	for _, river := range r.rivers {
-		feeds = append(feeds, river.Latest()...)
-	}
-
-	return feeds
-}
-
-func (r *collater) Close() {
-	for _, river := range r.rivers {
-		river.Close()
-	}
-}
-
 type poller struct {
 	uri    string
 	latest []Feed
+	cutOff time.Duration
 	quit   chan struct{}
 	feed   *rss.Feed
 }
 
-func newPoller(uri string) River {
+func newPoller(uri string, cutOff time.Duration) River {
 	q := make(chan struct{})
-	p := &poller{uri, []Feed{}, q, nil}
+	p := &poller{uri, []Feed{}, cutOff, q, nil}
 	p.feed = rss.New(5, true, p.chanHandler, p.itemHandler)
 	go p.poll()
 	return p
@@ -81,7 +47,7 @@ func (w *poller) chanHandler(feed *rss.Feed, newchannels []*rss.Channel) {
 }
 
 func (w *poller) itemHandler(feed *rss.Feed, ch *rss.Channel, newitems []*rss.Item) {
-	f := *convertChannel(ch, w.uri, time.Duration(24 * time.Hour))
+	f := *convertChannel(ch, w.uri, w.cutOff)
 	log.Println(len(f.Items), "new item(s) in", w.uri)
 	w.latest = []Feed{f}
 }
