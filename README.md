@@ -2,10 +2,10 @@
 
 A [river.js][] generator written in Go.
 
-First install `riviera`,
+First get `riviera`,
 
 ``` bash
-$ go install github.com/hawx/riviera
+$ go get github.com/hawx/riviera
 ```
 
 Then you will need to put [necolas/newsriver-ui][newsriver-ui] somewhere,
@@ -33,7 +33,7 @@ to
 <script>
   var River = River || {};
   River.settings = {
-    url : 'http://localhost:9999/river.js',
+    url : 'http://localhost:8080/river.js',
     callback : 'onGetRiverStream',
     social : false
   };
@@ -46,9 +46,8 @@ Finally run it, pointing it towards your opml subscription list and the folder
 of assets.
 
 ``` bash
-$ go install github.com/hawx/riviera
 $ riviera --opml subscriptions.xml --assets newsriver-ui
-XXXX/XX/XX XX:XX:XX web.go serving 0.0.0.0:9999
+XXXX/XX/XX XX:XX:XX web.go serving 0.0.0.0:8080
 ```
 
 [river.js]:     http://riverjs.org
