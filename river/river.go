@@ -5,6 +5,7 @@ package river
 import (
 	rss "github.com/jteeuwen/go-pkg-rss"
 	"github.com/kennygrant/sanitize"
+	uuid "github.com/nu7hatch/gouuid"
 
 	"encoding/json"
 	"errors"
@@ -80,61 +81,98 @@ func fetchFromUrl(url string, cutOff time.Duration) []Feed {
 		log.Fatalf("%s: %s\n", url, err)
 	}
 
-	id := 0
 	for _, channel := range feed.Channels {
-		timeNow := time.Now().Format(time.RFC1123)
-
-		updatedFeed := Feed{
-			FeedUrl:         url,
-			FeedTitle:       channel.Title,
-			FeedDescription: channel.Description,
-			WhenLastUpdate:  timeNow,
-			Items:           []Item{},
-		}
-
-		for _, link := range channel.Links {
-			if updatedFeed.FeedUrl != "" && updatedFeed.WebsiteUrl != "" {
-				break
-			}
-
-			if link.Rel == "self" {
-				updatedFeed.FeedUrl = link.Href
-			} else {
-				updatedFeed.WebsiteUrl = link.Href
-			}
-		}
-
-		for _, item := range channel.Items {
-			pubDate, err := parseTime(item.PubDate)
-			if err != nil {
-				log.Fatal(err)
-			}
-
-			if old(pubDate, cutOff) {
-				break
-			}
-
-			i := Item{
-				Body:      stripAndCrop(item.Description),
-				PermaLink: item.Links[0].Href, // either this is wrong
-        PubDate:   pubDate.Format(time.RFC1123Z),
-				Title:     item.Title,
-				Link:      item.Links[0].Href, // or this is wrong
-				Id:        id,
-			}
-
-			if feed.Type == "atom" {
-				i.Body = stripAndCrop(item.Content.Text)
-			}
-
-			updatedFeed.Items = append(updatedFeed.Items, i)
-			id++
-		}
-		updatedFeeds = append(updatedFeeds, updatedFeed)
+		updatedFeed := convertChannel(channel, url, cutOff)
+		updatedFeeds = append(updatedFeeds, *updatedFeed)
 	}
 
 	return updatedFeeds
 }
+
+func Subscribe(url string, cutOff time.Duration) {
+
+}
+
+func convertChannel(channel *rss.Channel, url string, cutOff time.Duration) *Feed {
+	f := &Feed{
+  	FeedUrl: url,
+	  FeedTitle: channel.Title,
+	  FeedDescription: channel.Description,
+	  WhenLastUpdate: time.Now().Format(time.RFC1123),
+	  Items: []Item{},
+	}
+
+	for _, link := range channel.Links {
+		if f.FeedUrl != "" && f.WebsiteUrl != "" { break }
+
+		if link.Rel == "self" {
+			f.FeedUrl = link.Href
+		} else {
+			f.WebsiteUrl = link.Href
+		}
+	}
+
+	for _, item := range channel.Items {
+		i := convertItem(item, cutOff)
+		if i == nil { break }
+		f.Items = append(f.Items, *i)
+	}
+
+	return f
+}
+
+func convertItem(item *rss.Item, cutOff time.Duration) *Item {
+	pubDate, err := parseTime(item.PubDate)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	if old(pubDate, cutOff) { return nil }
+
+	id, _ := uuid.NewV4()
+
+	i := &Item{
+    Body:      stripAndCrop(item.Description),
+    PubDate:   pubDate.Format(time.RFC1123Z),
+	  Title:     item.Title,
+  	Id:        id.String(),
+	}
+
+	if len(item.Links) > 0 {
+		i.PermaLink = item.Links[0].Href
+		i.Link = item.Links[0].Href
+	}
+
+	if item.Content != nil {
+		i.Body = stripAndCrop(item.Content.Text)
+	}
+
+	return i
+}
+
+
+// func PollFeed(uri string, timeout int) {
+// 	feed := rss.New(timeout, true, chanHandler, itemHandler)
+
+// 	for {
+// 		if err := feed.Fetch(uri, nil); err != nil {
+// 			fmt.Fprintf(os.Stderr, "[e] %s: %s", uri, err)
+//                         return
+// 		}
+
+// 		<-time.After(time.Duration(feed.SecondsTillUpdate() * 1e9))
+// 	}
+// }
+
+// func channelHandler(feed *rss.Feed, newchannels []*rss.Channel) {
+// 	fmt.Printf("%d new channel(s) in %s\n", len(newchannels), feed.Url)
+// }
+
+// func itemHandler(feed *rss.Feed, ch *rss.Channel, newitems []*rss.Item) {
+// 	fmt.Printf("%d new item(s) in %s\n", len(newitems), feed.Url)
+// }
+
+
 
 // Strips html markup, then limits to 280 characters. If the original text was
 // longer than 280 chars, three periods are appended.

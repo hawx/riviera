@@ -3,7 +3,6 @@ package main
 import (
 	"github.com/hawx/riviera/opml"
 	"github.com/hawx/riviera/river"
-
 	"flag"
 	"fmt"
 	"io/ioutil"
@@ -120,14 +119,16 @@ func main() {
 	}
 
 	log.Println("starting")
-	fetchRiver()
+	go fetchRiver()
 
 	http.Handle("/css/", AssetHandler("css"))
 	http.Handle("/js/", AssetHandler("js"))
 	http.Handle("/images/", AssetHandler("images"))
 
 	http.HandleFunc("/river.js", func(w http.ResponseWriter, r *http.Request) {
-		fetchRiver()
+		if (!fetching) {
+			go fetchRiver()
+		}
 
 		callback := r.FormValue("callback")
 		if callback == "" {

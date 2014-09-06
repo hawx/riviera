@@ -41,7 +41,7 @@ type Item struct {
 
 	// Id is a number assigned to the item by the aggregator. Usuaully it is
 	// increment by one for each item, but that's not guaranteed.
-	Id        int    `json:"id,string"`
+	Id        string `json:"id"`
 
 	// I am, at least for the moment, not including the optional elements that
 	// river.js allows.
