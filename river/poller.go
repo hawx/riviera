@@ -6,24 +6,21 @@ import (
 	"log"
 )
 
-type poller struct {
-	uri    string
-	latest []Feed
-	quit   chan struct{}
-	feed   *rss.Feed
-	cutOff time.Duration
-	seen   map[string] struct{}
+type River interface {
+	Latest() <-chan Feed
 }
 
-func newPoller(uri string, cutOff time.Duration) River {
-	q := make(chan struct{})
+type poller struct {
+	uri    string
+	feed   *rss.Feed
+	in     chan Feed
+}
+
+func newPoller(uri string) River {
 	p := &poller{
 	  uri: uri,
-	  latest: []Feed{},
-	  quit: q,
 	  feed: nil,
-	  cutOff: cutOff,
-	  seen: map[string] struct{}{},
+	  in: make(chan Feed),
 	}
 
 	p.feed = rss.New(5, true, p.chanHandler, p.itemHandler)
@@ -34,12 +31,10 @@ func newPoller(uri string, cutOff time.Duration) River {
 func (w *poller) poll() {
 	w.fetch()
 
-loop:
 	for {
 		select {
-		case <-w.quit:
-			break loop
-		case <-time.After(time.Duration(w.feed.SecondsTillUpdate()) * time.Second):
+		// case <-time.After(time.Duration(w.feed.SecondsTillUpdate()) * time.Second):
+		case <-time.After(5 * time.Second):
 			w.fetch()
 		}
 	}
@@ -61,10 +56,8 @@ func (w *poller) itemHandler(feed *rss.Feed, ch *rss.Channel, newitems []*rss.It
 		converted := convertItem(item)
 
 		if converted == nil { continue }
-		if _, seen := w.seen[converted.Id]; seen { continue }
 
 		items = append(items, *converted)
-		w.seen[converted.Id] = struct{}{}
 	}
 
 	log.Println(len(items), "new item(s) in", feed.Url)
@@ -82,28 +75,25 @@ func (w *poller) itemHandler(feed *rss.Feed, ch *rss.Channel, newitems []*rss.It
 		}
 	}
 
-	w.latest = append(w.latest, Feed{
+	toSend := Feed{
   	FeedUrl: feedUrl,
     WebsiteUrl: websiteUrl,
 	  FeedTitle: ch.Title,
   	FeedDescription: ch.Description,
 	  WhenLastUpdate: RssTime{time.Now()},
 	  Items: items,
-	})
-}
-
-func (w *poller) Latest() []Feed {
-	filtered := []Feed{}
-	for _, feed := range w.latest {
-		if feed.WhenLastUpdate.After(time.Now().Add(w.cutOff)) {
-			filtered = append(filtered, feed)
-		}
 	}
 
-	w.latest = filtered
-	return w.latest
+	w.in <- toSend
 }
 
-func (w *poller) Close() {
-	w.quit <- struct{}{}
+func (w *poller) Latest() <-chan Feed {
+	c := make(chan Feed)
+	go func() {
+		for {
+			in := <-w.in
+			c <- in
+		}
+	}()
+	return c
 }

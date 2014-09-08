@@ -1,38 +1,30 @@
 package river
 
-import "sort"
-
-type collater struct {
-	rivers  map[string] River
+type Aggregator interface {
+	Latest() []Feed
 }
 
-func (r *collater) Latest() []Feed {
-	feeds := []Feed{}
+type aggregator struct {
+	rivers  []River
+	latest  []Feed
+}
 
-	for _, river := range r.rivers {
-		feeds = append(feeds, river.Latest()...)
+func newAggregator(rivers []River) Aggregator {
+	agg := &aggregator{rivers, []Feed{}}
+	go agg.aggregate()
+	return agg
+}
+
+func (c *aggregator) aggregate() {
+	for _, r := range c.rivers {
+		go func(in <-chan Feed) {
+			for v := range in {
+				c.latest = append([]Feed{v}, c.latest...)
+			}
+		}(r.Latest())
 	}
-
-	sort.Sort(ByWhenLastUpdate(feeds))
-	return feeds
 }
 
-func (r *collater) Close() {
-	for _, river := range r.rivers {
-		river.Close()
-	}
-}
-
-type ByWhenLastUpdate []Feed
-
-func (a ByWhenLastUpdate) Len() int {
-	return len(a)
-}
-
-func (a ByWhenLastUpdate) Swap(i, j int) {
-	a[i], a[j] = a[j], a[i]
-}
-
-func (a ByWhenLastUpdate) Less(i, j int) bool {
-	return a[i].WhenLastUpdate.Time.After(a[j].WhenLastUpdate.Time)
+func (r *aggregator) Latest() []Feed {
+	return r.latest
 }

@@ -9,27 +9,18 @@ import (
 
 const DOCS = "http://scripting.com/stories/2010/12/06/innovationRiverOfNewsInJso.html"
 
-type River interface {
-	Latest() []Feed
-	Close()
-}
+func New(uris []string, cutOff time.Duration) Aggregator {
+	rivers := make([]River, len(uris))
 
-func New(uris []string, cutOff time.Duration) River {
-	rivers := map[string]River{}
-
-	for _, uri := range uris {
-		rivers[uri] = newPoller(uri, cutOff)
+	for i, uri := range uris {
+		rivers[i] = newPoller(uri)
 	}
 
-	return &collater{rivers}
+	return newAggregator(rivers)
 }
 
-func Build(river River) string {
-	return fromFeeds(river.Latest())
-}
-
-func fromFeeds(feeds []Feed) string {
-	updatedFeeds := Feeds{feeds}
+func Build(river Aggregator) string {
+	updatedFeeds := Feeds{river.Latest()}
 	now := time.Now()
 
 	metadata := Metadata{
@@ -46,6 +37,5 @@ func fromFeeds(feeds []Feed) string {
 	}
 
 	b, _ := json.MarshalIndent(wrapper, "", "  ")
-
 	return string(b)
 }
