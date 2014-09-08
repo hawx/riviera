@@ -17,13 +17,11 @@ type poller struct {
 }
 
 func newPoller(uri string) River {
-	p := &poller{
-	  uri: uri,
-	  feed: nil,
-	  in: make(chan Feed),
-	}
-
+	p := &poller{}
+	p.uri = uri
+	p.in = make(chan Feed)
 	p.feed = rss.New(5, true, p.chanHandler, p.itemHandler)
+
 	go p.poll()
 	return p
 }
@@ -33,8 +31,7 @@ func (w *poller) poll() {
 
 	for {
 		select {
-		// case <-time.After(time.Duration(w.feed.SecondsTillUpdate()) * time.Second):
-		case <-time.After(5 * time.Second):
+		case <-time.After(time.Duration(w.feed.SecondsTillUpdate()) * time.Second):
 			w.fetch()
 		}
 	}
@@ -46,18 +43,16 @@ func (w *poller) fetch() {
 	}
 }
 
-func (w *poller) chanHandler(feed *rss.Feed, newchannels []*rss.Channel) {
-	// ignore
-}
+func (w *poller) chanHandler(feed *rss.Feed, newchannels []*rss.Channel) {}
 
 func (w *poller) itemHandler(feed *rss.Feed, ch *rss.Channel, newitems []*rss.Item) {
 	items := []Item{}
 	for _, item := range newitems {
 		converted := convertItem(item)
 
-		if converted == nil { continue }
-
-		items = append(items, *converted)
+		if converted != nil {
+			items = append(items, *converted)
+		}
 	}
 
 	log.Println(len(items), "new item(s) in", feed.Url)
@@ -75,7 +70,7 @@ func (w *poller) itemHandler(feed *rss.Feed, ch *rss.Channel, newitems []*rss.It
 		}
 	}
 
-	toSend := Feed{
+	w.in <- Feed{
   	FeedUrl: feedUrl,
     WebsiteUrl: websiteUrl,
 	  FeedTitle: ch.Title,
@@ -83,17 +78,8 @@ func (w *poller) itemHandler(feed *rss.Feed, ch *rss.Channel, newitems []*rss.It
 	  WhenLastUpdate: RssTime{time.Now()},
 	  Items: items,
 	}
-
-	w.in <- toSend
 }
 
 func (w *poller) Latest() <-chan Feed {
-	c := make(chan Feed)
-	go func() {
-		for {
-			in := <-w.in
-			c <- in
-		}
-	}()
-	return c
+	return w.in
 }
