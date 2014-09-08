@@ -35,7 +35,7 @@ func printHelp() {
 		"    --opml <path>      # Path to opml file containing feeds to read\n",
 		"    --assets <path>    # Path to asset files\n",
 		"\n",
-		"    --cutoff <secs>    # Time to ignore items after (default: 24h)\n",
+		"    --cutoff <secs>    # Time to ignore items after (default: -24h)\n",
 		"    --bind <host>      # Host to bind to (default: 0.0.0.0)\n",
 		"    --port <num>       # Port to bind to (default: 9999)\n",
 		"\n",
@@ -46,7 +46,7 @@ func printHelp() {
 var (
 	assetPath = flag.String("assets", ".", "")
 	opmlPath = flag.String("opml", "", "")
-	cutOff = flag.String("cutoff", "24h", "")
+	cutOff = flag.String("cutoff", "-24h", "")
 	port = flag.String("port", "8080", "")
 	help = flag.Bool("help", false, "")
 )
