@@ -7,8 +7,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"os"
-	"path"
 	"time"
 )
 
@@ -44,7 +42,6 @@ func printHelp() {
 }
 
 var (
-	assetPath = flag.String("assets", ".", "")
 	opmlPath = flag.String("opml", "", "")
 	cutOff = flag.String("cutoff", "-24h", "")
 	port = flag.String("port", "8080", "")
@@ -56,7 +53,7 @@ func main() {
 
 	if *opmlPath == "" || *help {
 		printHelp()
-		os.Exit(0)
+		return
 	}
 
 	duration, err := time.ParseDuration(*cutOff)
@@ -65,10 +62,6 @@ func main() {
 	}
 
 	feeds := river.New(getSubscriptions(), duration)
-
-	for _, name := range []string{"", "css/", "js/", "images/"} {
-		http.Handle("/" + name, http.StripPrefix("/" + name, http.FileServer(http.Dir(path.Join(*assetPath, name)))))
-	}
 
 	http.HandleFunc("/river.js", func(w http.ResponseWriter, r *http.Request) {
 		callback := r.FormValue("callback")

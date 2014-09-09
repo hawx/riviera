@@ -9,17 +9,17 @@ import (
 
 const DOCS = "http://scripting.com/stories/2010/12/06/innovationRiverOfNewsInJso.html"
 
-func New(uris []string, cutOff time.Duration) Aggregator {
-	rivers := make([]River, len(uris))
+func New(uris []string, cutOff time.Duration) Confluence {
+	streams := make([]Tributary, len(uris))
 
 	for i, uri := range uris {
-		rivers[i] = newPoller(uri)
+		streams[i] = newTributary(uri)
 	}
 
-	return newAggregator(rivers)
+	return newConfluence(streams)
 }
 
-func Build(river Aggregator) string {
+func Build(river Confluence) string {
 	updatedFeeds := Feeds{river.Latest()}
 	now := time.Now()
 
