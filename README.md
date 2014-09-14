@@ -14,6 +14,8 @@ $ riviera --opml subscriptions.xml
 XXXX/XX/XX XX:XX:XX web.go serving 0.0.0.0:8080
 ```
 
+It will pull every feed, and then keep them updated.
+
 ---
 
 You will now need a front-end to consume the river, I use

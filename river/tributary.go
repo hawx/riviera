@@ -1,40 +1,54 @@
 package river
 
 import (
-	rss "github.com/jteeuwen/go-pkg-rss"
+	rss "github.com/hawx/go-pkg-rss"
+	"github.com/hawx/riviera/river/database"
 	"time"
 	"log"
 )
 
 type Tributary interface {
 	Latest() <-chan Feed
+	Uri() string
+	Kill()
 }
 
 type tributary struct {
 	uri    string
 	feed   *rss.Feed
 	in     chan Feed
+	quit   chan struct{}
 }
 
-func newTributary(uri string) Tributary {
+func newTributary(store database.Bucket, uri string) Tributary {
 	p := &tributary{}
 	p.uri = uri
+	p.feed = rss.New(5, true, p.chanHandler, p.itemHandler, store)
 	p.in = make(chan Feed)
-	p.feed = rss.New(5, true, p.chanHandler, p.itemHandler)
+	p.quit = make(chan struct{})
 
 	go p.poll()
 	return p
 }
 
+func (t *tributary) Uri() string {
+	return t.uri
+}
+
 func (w *tributary) poll() {
 	w.fetch()
 
+loop:
 	for {
 		select {
+		case <-w.quit:
+			break loop
 		case <-time.After(time.Duration(w.feed.SecondsTillUpdate()) * time.Second):
 			w.fetch()
 		}
 	}
+
+	log.Println("stopped fetching", w.uri)
 }
 
 func (w *tributary) fetch() {
@@ -82,4 +96,9 @@ func (w *tributary) itemHandler(feed *rss.Feed, ch *rss.Channel, newitems []*rss
 
 func (w *tributary) Latest() <-chan Feed {
 	return w.in
+}
+
+func (w *tributary) Kill() {
+	close(w.in)
+	close(w.quit)
 }

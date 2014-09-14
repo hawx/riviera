@@ -1,7 +1,7 @@
 package river
 
 import (
-	rss "github.com/jteeuwen/go-pkg-rss"
+	rss "github.com/hawx/go-pkg-rss"
 	"github.com/kennygrant/sanitize"
 )
 

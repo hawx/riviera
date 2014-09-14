@@ -3,17 +3,18 @@
 package river
 
 import (
+	"github.com/hawx/riviera/river/database"
 	"encoding/json"
 	"time"
 )
 
 const DOCS = "http://scripting.com/stories/2010/12/06/innovationRiverOfNewsInJso.html"
 
-func New(uris []string, cutOff time.Duration) Confluence {
+func New(uris []string, store database.Master, cutOff time.Duration) Confluence {
 	streams := make([]Tributary, len(uris))
 
 	for i, uri := range uris {
-		streams[i] = newTributary(uri)
+		streams[i] = newTributary(store.Bucket(uri), uri)
 	}
 
 	return newConfluence(streams)
@@ -38,4 +39,12 @@ func Build(river Confluence) string {
 
 	b, _ := json.MarshalIndent(wrapper, "", "  ")
 	return string(b)
+}
+
+func Add(river Confluence, store database.Master, uri string) {
+	river.Add(newTributary(store.Bucket(uri), uri))
+}
+
+func Remove(river Confluence, uri string) bool {
+	return river.Remove(uri)
 }
