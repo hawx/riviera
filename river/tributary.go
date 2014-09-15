@@ -2,13 +2,15 @@ package river
 
 import (
 	rss "github.com/hawx/go-pkg-rss"
+	"github.com/hawx/riviera/river/models"
 	"github.com/hawx/riviera/river/database"
+	"net/http"
 	"time"
 	"log"
 )
 
 type Tributary interface {
-	Latest() <-chan Feed
+	Latest() <-chan models.Feed
 	Uri() string
 	Kill()
 }
@@ -16,7 +18,7 @@ type Tributary interface {
 type tributary struct {
 	uri    string
 	feed   *rss.Feed
-	in     chan Feed
+	in     chan models.Feed
 	quit   chan struct{}
 }
 
@@ -24,7 +26,7 @@ func newTributary(store database.Bucket, uri string) Tributary {
 	p := &tributary{}
 	p.uri = uri
 	p.feed = rss.New(5, true, p.chanHandler, p.itemHandler, store)
-	p.in = make(chan Feed)
+	p.in = make(chan models.Feed)
 	p.quit = make(chan struct{})
 
 	go p.poll()
@@ -52,7 +54,7 @@ loop:
 }
 
 func (w *tributary) fetch() {
-	if err := w.feed.Fetch(w.uri, nil); err != nil {
+	if err := w.feed.FetchClient(w.uri, &http.Client{Timeout: time.Minute}, nil); err != nil {
 		log.Println("error fetching", w.uri + ":", err)
 	}
 }
@@ -60,7 +62,7 @@ func (w *tributary) fetch() {
 func (w *tributary) chanHandler(feed *rss.Feed, newchannels []*rss.Channel) {}
 
 func (w *tributary) itemHandler(feed *rss.Feed, ch *rss.Channel, newitems []*rss.Item) {
-	items := []Item{}
+	items := []models.Item{}
 	for _, item := range newitems {
 		converted := convertItem(item)
 
@@ -84,17 +86,17 @@ func (w *tributary) itemHandler(feed *rss.Feed, ch *rss.Channel, newitems []*rss
 		}
 	}
 
-	w.in <- Feed{
+	w.in <- models.Feed{
   	FeedUrl: feedUrl,
     WebsiteUrl: websiteUrl,
 	  FeedTitle: ch.Title,
   	FeedDescription: ch.Description,
-	  WhenLastUpdate: RssTime{time.Now()},
+	  WhenLastUpdate: models.RssTime{time.Now()},
 	  Items: items,
 	}
 }
 
-func (w *tributary) Latest() <-chan Feed {
+func (w *tributary) Latest() <-chan models.Feed {
 	return w.in
 }
 

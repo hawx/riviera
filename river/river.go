@@ -3,6 +3,7 @@
 package river
 
 import (
+	"github.com/hawx/riviera/river/models"
 	"github.com/hawx/riviera/river/database"
 	"encoding/json"
 	"time"
@@ -10,29 +11,40 @@ import (
 
 const DOCS = "http://scripting.com/stories/2010/12/06/innovationRiverOfNewsInJso.html"
 
-func New(uris []string, store database.Master, cutOff time.Duration) Confluence {
+type River interface {
+	Build() string
+	Add(uri string)
+	Remove(uri string) bool
+}
+
+type river struct {
+	confluence Confluence
+	store      database.Master
+}
+
+func New(store database.Master, cutOff time.Duration, uris []string) River {
 	streams := make([]Tributary, len(uris))
 
 	for i, uri := range uris {
 		streams[i] = newTributary(store.Bucket(uri), uri)
 	}
 
-	return newConfluence(streams)
+	return &river{newConfluence(store.River(), streams), store}
 }
 
-func Build(river Confluence) string {
-	updatedFeeds := Feeds{river.Latest()}
+func (r *river) Build() string {
+	updatedFeeds := models.Feeds{r.confluence.Latest()}
 	now := time.Now()
 
-	metadata := Metadata{
+	metadata := models.Metadata{
 		Docs:      DOCS,
-	  WhenGMT:   RssTime{now.UTC()},
-		WhenLocal: RssTime{now},
+	  WhenGMT:   models.RssTime{now.UTC()},
+		WhenLocal: models.RssTime{now},
 		Version:   "3",
 		Secs:      0,
 	}
 
-	wrapper := Wrapper{
+	wrapper := models.Wrapper{
 		Metadata:     metadata,
 		UpdatedFeeds: updatedFeeds,
 	}
@@ -41,10 +53,10 @@ func Build(river Confluence) string {
 	return string(b)
 }
 
-func Add(river Confluence, store database.Master, uri string) {
-	river.Add(newTributary(store.Bucket(uri), uri))
+func (r *river) Add(uri string) {
+	r.confluence.Add(newTributary(r.store.Bucket(uri), uri))
 }
 
-func Remove(river Confluence, uri string) bool {
-	return river.Remove(uri)
+func (r *river) Remove(uri string) bool {
+	return r.confluence.Remove(uri)
 }

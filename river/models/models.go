@@ -1,4 +1,4 @@
-package river
+package models
 
 import "time"
 
@@ -76,4 +76,18 @@ func (t RssTime) MarshalText() ([]byte, error) {
 
 func (t RssTime) MarshalJSON() ([]byte, error) {
 	return []byte(`"` + t.Format(time.RFC1123Z) + `"`), nil
+}
+
+func (t *RssTime) UnmarshalText(data []byte) error {
+	g, err := time.Parse(time.RFC1123Z, string(data))
+	if err != nil { return err }
+	*t = RssTime{g}
+	return nil
+}
+
+func (t *RssTime) UnmarshalJSON(data []byte) error {
+	g, err := time.Parse(`"`+time.RFC1123Z+`"`, string(data))
+	if err != nil { return err }
+	*t = RssTime{g}
+	return nil
 }

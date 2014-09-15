@@ -1,20 +1,25 @@
 package river
 
-import "time"
+import (
+	"github.com/hawx/riviera/river/database"
+	"github.com/hawx/riviera/river/models"
+	"time"
+)
 
 type Confluence interface {
-	Latest() []Feed
+	Latest() []models.Feed
 	Add(Tributary)
 	Remove(string) bool
 }
 
 type confluence struct {
+	store   database.River
 	streams []Tributary
-	latest  []Feed
+	latest  []models.Feed
 }
 
-func newConfluence(streams []Tributary) Confluence {
-	c := &confluence{streams, []Feed{}}
+func newConfluence(store database.River, streams []Tributary) Confluence {
+	c := &confluence{store, streams, store.Today()}
 	for _, r := range streams {
 		c.run(r)
 	}
@@ -22,16 +27,17 @@ func newConfluence(streams []Tributary) Confluence {
 }
 
 func (c *confluence) run(r Tributary) {
-	go func(in <-chan Feed) {
+	go func(in <-chan models.Feed) {
 		for v := range in {
-			c.latest = append([]Feed{v}, c.latest...)
+			c.latest = append([]models.Feed{v}, c.latest...)
+			c.store.Add(v)
 		}
 	}(r.Latest())
 }
 
-func (c *confluence) Latest() []Feed {
+func (c *confluence) Latest() []models.Feed {
 	yesterday := time.Now().Add(-24 * time.Hour)
-	newLatest := []Feed{}
+	newLatest := []models.Feed{}
 
 	for _, feed := range c.latest {
 		if feed.WhenLastUpdate.After(yesterday) {

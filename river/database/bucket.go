@@ -33,7 +33,6 @@ func (d *bucket) Get(key string) bool {
 func (d *bucket) Set(key string) {
 	d.db.Update(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte(d.name))
-		err := b.Put([]byte(key), in)
-		return err
+		return b.Put([]byte(key), in)
 	})
 }

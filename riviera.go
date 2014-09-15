@@ -64,7 +64,7 @@ func main() {
 		urls = append(urls, outline.XmlUrl)
 	}
 
-	feeds := river.New(urls, store, duration)
+	feeds := river.New(store, duration, urls)
 
 	http.HandleFunc("/river.js", func(w http.ResponseWriter, r *http.Request) {
 		callback := r.FormValue("callback")
@@ -73,19 +73,19 @@ func main() {
 		}
 
 		w.Header().Set("Content-Type", "application/javascript")
-		fmt.Fprintf(w, "%s(%s)", callback, river.Build(feeds))
+		fmt.Fprintf(w, "%s(%s)", callback, feeds.Build())
 	})
 
 	http.HandleFunc("/-/subscribe", func(w http.ResponseWriter, r *http.Request) {
 		url := r.FormValue("url")
-		river.Add(feeds, store, url)
+		feeds.Add(url)
 		subs.Body.Outline = append(subs.Body.Outline, opml.Outline{XmlUrl: url})
 		subs.Save(*opmlPath)
 		w.WriteHeader(204)
 	})
 
 	http.HandleFunc("/-/unsubscribe", func(w http.ResponseWriter, r *http.Request) {
-		if river.Remove(feeds, r.FormValue("url")) {
+		if feeds.Remove(r.FormValue("url")) {
 			w.WriteHeader(204)
 		} else {
 			w.WriteHeader(400)
