@@ -21,6 +21,7 @@ authentication so should be hidden from the public. At some point I am planning
 to create a separate admin interface using these. For now they are,
 
 ```
+/-/list
 /-/subscribe?url=...
 /-/unsubscribe?url=...
 ```

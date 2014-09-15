@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"flag"
 	"fmt"
 	"github.com/hawx/riviera/opml"
@@ -21,8 +22,7 @@ func printHelp() {
 		"    --db <path>        # Path to database\n",
 		"\n",
 		"    --cutoff <secs>    # Time to ignore items after (default: -24h)\n",
-		"    --bind <host>      # Host to bind to (default: 0.0.0.0)\n",
-		"    --port <num>       # Port to bind to (default: 9999)\n",
+		"    --port <num>       # Port to bind to (default: 8080)\n",
 		"\n",
 		"    --help             # Display help message\n",
 	)
@@ -74,6 +74,17 @@ func main() {
 
 		w.Header().Set("Content-Type", "application/javascript")
 		fmt.Fprintf(w, "%s(%s)", callback, feeds.Build())
+	})
+
+	http.HandleFunc("/-/list", func(w http.ResponseWriter, r *http.Request) {
+		list := []string{}
+		for _, outline := range subs.Body.Outline {
+			list = append(list, outline.XmlUrl)
+		}
+		data, _ := json.Marshal(list)
+
+		w.Header().Set("Content-Type", "application/json")
+		fmt.Fprint(w, string(data))
 	})
 
 	http.HandleFunc("/-/subscribe", func(w http.ResponseWriter, r *http.Request) {
