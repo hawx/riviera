@@ -1,11 +1,11 @@
 package main
 
 import (
+	"flag"
+	"fmt"
 	"github.com/hawx/riviera/opml"
 	"github.com/hawx/riviera/river"
 	"github.com/hawx/riviera/river/database"
-	"flag"
-	"fmt"
 	"log"
 	"net/http"
 	"time"
@@ -93,5 +93,5 @@ func main() {
 	})
 
 	log.Println("listening on port :" + *port)
-	log.Fatal(http.ListenAndServe(":" + *port, nil))
+	log.Fatal(http.ListenAndServe(":"+*port, nil))
 }

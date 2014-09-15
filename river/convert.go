@@ -2,19 +2,21 @@ package river
 
 import (
 	rss "github.com/hawx/go-pkg-rss"
-	"github.com/kennygrant/sanitize"
 	"github.com/hawx/riviera/river/models"
+	"github.com/kennygrant/sanitize"
 )
 
 func convertItem(item *rss.Item) *models.Item {
 	pubDate, err := item.ParsedPubDate()
-	if err != nil { return nil }
+	if err != nil {
+		return nil
+	}
 
 	i := &models.Item{
-    Body:      stripAndCrop(item.Description),
-    PubDate:   models.RssTime{pubDate},
-	  Title:     item.Title,
-    Id:        item.Key(),
+		Body:    stripAndCrop(item.Description),
+		PubDate: models.RssTime{pubDate},
+		Title:   item.Title,
+		Id:      item.Key(),
 	}
 
 	if len(item.Links) > 0 {

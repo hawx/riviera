@@ -1,9 +1,9 @@
 package database
 
 import (
-	"github.com/hawx/riviera/river/models"
-	"github.com/boltdb/bolt"
 	"encoding/json"
+	"github.com/boltdb/bolt"
+	"github.com/hawx/riviera/river/models"
 	"time"
 )
 
@@ -45,8 +45,8 @@ func (d *river) Today() []models.Feed {
 		return nil
 	})
 
-	for i := 0; i < len(feeds) / 2; i++ {
-		feeds[i], feeds[len(feeds) - i - 1] = feeds[len(feeds) - i - 1], feeds[i]
+	for i := 0; i < len(feeds)/2; i++ {
+		feeds[i], feeds[len(feeds)-i-1] = feeds[len(feeds)-i-1], feeds[i]
 	}
 
 	return feeds

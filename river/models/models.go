@@ -32,7 +32,7 @@ type Item struct {
 	// Body is the description from the feed, with html markup stripped, and
 	// limited to 280 characters. If the original text was more than the maximum
 	// length, three periods are added to the end.
-	Body      string  `json:"body"`
+	Body string `json:"body"`
 
 	// Permalink, PubDate, Title and Link are straightforward copies of what
 	// appeared in the feed.
@@ -43,7 +43,7 @@ type Item struct {
 
 	// Id is a number assigned to the item by the aggregator. Usuaully it is
 	// incremented by one for each item, but that's not guaranteed.
-	Id        string  `json:"id"`
+	Id string `json:"id"`
 
 	// I am, at least for the moment, not including the optional elements that
 	// river.js allows.
@@ -51,19 +51,19 @@ type Item struct {
 
 type Metadata struct {
 	// Docs is a link to a web page that documents the format.
-	Docs      string   `json:"docs"`
+	Docs string `json:"docs"`
 
 	// WhenGMT says when the file was built in a universal time.
-	WhenGMT   RssTime  `json:"whenGMT"`
+	WhenGMT RssTime `json:"whenGMT"`
 
 	// WhenLocal says when the file was built in local time.
-	WhenLocal RssTime  `json:"whenLocal"`
+	WhenLocal RssTime `json:"whenLocal"`
 
 	// Version is 3.
-	Version   string   `json:"version"`
+	Version string `json:"version"`
 
 	// Secs is the number of seconds it took to build the file.
-	Secs      float64  `json:"secs,string"`
+	Secs float64 `json:"secs,string"`
 }
 
 type RssTime struct {
@@ -80,14 +80,18 @@ func (t RssTime) MarshalJSON() ([]byte, error) {
 
 func (t *RssTime) UnmarshalText(data []byte) error {
 	g, err := time.Parse(time.RFC1123Z, string(data))
-	if err != nil { return err }
+	if err != nil {
+		return err
+	}
 	*t = RssTime{g}
 	return nil
 }
 
 func (t *RssTime) UnmarshalJSON(data []byte) error {
 	g, err := time.Parse(`"`+time.RFC1123Z+`"`, string(data))
-	if err != nil { return err }
+	if err != nil {
+		return err
+	}
 	*t = RssTime{g}
 	return nil
 }

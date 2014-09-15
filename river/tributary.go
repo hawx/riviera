@@ -2,11 +2,11 @@ package river
 
 import (
 	rss "github.com/hawx/go-pkg-rss"
-	"github.com/hawx/riviera/river/models"
 	"github.com/hawx/riviera/river/database"
+	"github.com/hawx/riviera/river/models"
+	"log"
 	"net/http"
 	"time"
-	"log"
 )
 
 type Tributary interface {
@@ -16,10 +16,10 @@ type Tributary interface {
 }
 
 type tributary struct {
-	uri    string
-	feed   *rss.Feed
-	in     chan models.Feed
-	quit   chan struct{}
+	uri  string
+	feed *rss.Feed
+	in   chan models.Feed
+	quit chan struct{}
 }
 
 func newTributary(store database.Bucket, uri string) Tributary {
@@ -55,7 +55,7 @@ loop:
 
 func (w *tributary) fetch() {
 	if err := w.feed.FetchClient(w.uri, &http.Client{Timeout: time.Minute}, nil); err != nil {
-		log.Println("error fetching", w.uri + ":", err)
+		log.Println("error fetching", w.uri+":", err)
 	}
 }
 
@@ -72,12 +72,16 @@ func (w *tributary) itemHandler(feed *rss.Feed, ch *rss.Channel, newitems []*rss
 	}
 
 	log.Println(len(items), "new item(s) in", feed.Url)
-	if len(items) == 0 { return }
+	if len(items) == 0 {
+		return
+	}
 
 	feedUrl := feed.Url
 	websiteUrl := ""
 	for _, link := range ch.Links {
-		if feedUrl != "" && websiteUrl != "" { break }
+		if feedUrl != "" && websiteUrl != "" {
+			break
+		}
 
 		if link.Rel == "self" {
 			feedUrl = link.Href
@@ -87,12 +91,12 @@ func (w *tributary) itemHandler(feed *rss.Feed, ch *rss.Channel, newitems []*rss
 	}
 
 	w.in <- models.Feed{
-  	FeedUrl: feedUrl,
-    WebsiteUrl: websiteUrl,
-	  FeedTitle: ch.Title,
-  	FeedDescription: ch.Description,
-	  WhenLastUpdate: models.RssTime{time.Now()},
-	  Items: items,
+		FeedUrl:         feedUrl,
+		WebsiteUrl:      websiteUrl,
+		FeedTitle:       ch.Title,
+		FeedDescription: ch.Description,
+		WhenLastUpdate:  models.RssTime{time.Now()},
+		Items:           items,
 	}
 }
 

@@ -3,9 +3,9 @@
 package river
 
 import (
-	"github.com/hawx/riviera/river/models"
-	"github.com/hawx/riviera/river/database"
 	"encoding/json"
+	"github.com/hawx/riviera/river/database"
+	"github.com/hawx/riviera/river/models"
 	"time"
 )
 
@@ -38,7 +38,7 @@ func (r *river) Build() string {
 
 	metadata := models.Metadata{
 		Docs:      DOCS,
-	  WhenGMT:   models.RssTime{now.UTC()},
+		WhenGMT:   models.RssTime{now.UTC()},
 		WhenLocal: models.RssTime{now},
 		Version:   "3",
 		Secs:      0,

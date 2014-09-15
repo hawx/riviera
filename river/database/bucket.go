@@ -1,8 +1,8 @@
 package database
 
 import (
-	rss "github.com/hawx/go-pkg-rss"
 	"github.com/boltdb/bolt"
+	rss "github.com/hawx/go-pkg-rss"
 )
 
 type Bucket interface {
