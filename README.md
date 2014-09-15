@@ -16,6 +16,17 @@ XXXX/XX/XX XX:XX:XX web.go serving 0.0.0.0:8080
 
 It will pull every feed, and then keep them updated.
 
+There are two urls that can be used to add/remove feeds. They have no
+authentication so should be hidden from the public. At some point I am planning
+to create a separate admin interface using these. For now they are,
+
+```
+/-/subscribe?url=...
+/-/unsubscribe?url=...
+```
+
+These may change.
+
 ---
 
 You will now need a front-end to consume the river, I use
