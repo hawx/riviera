@@ -96,7 +96,18 @@ func main() {
 	})
 
 	http.HandleFunc("/-/unsubscribe", func(w http.ResponseWriter, r *http.Request) {
-		if feeds.Remove(r.FormValue("url")) {
+		url := r.FormValue("url")
+
+		body := []opml.Outline{}
+		for _, outline := range subs.Body.Outline {
+			if outline.XmlUrl != url {
+				body = append(body, outline)
+			}
+		}
+		subs.Body.Outline = body
+		subs.Save(*opmlPath)
+
+		if feeds.Remove(url) {
 			w.WriteHeader(204)
 		} else {
 			w.WriteHeader(400)

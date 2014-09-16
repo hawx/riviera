@@ -23,11 +23,11 @@ type Body struct {
 }
 
 type Outline struct {
-	// Text    string `xml:"text,attr"`
-	// Title   string `xml:"title,attr"`
-	// Type    string `xml:"type,attr"`
-	XmlUrl string `xml:"xmlUrl,attr"`
-	// HtmlUrl string `xml:"htmlUrl,attr"`
+	Text    string `xml:"text,attr,omitempty"`
+	Title   string `xml:"title,attr,omitempty"`
+	Type    string `xml:"type,attr,omitempty"`
+	XmlUrl string `xml:"xmlUrl,attr,omitempty"`
+	HtmlUrl string `xml:"htmlUrl,attr,omitempty"`
 }
 
 func Parse(data []byte) (*Opml, error) {
