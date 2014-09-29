@@ -3,9 +3,10 @@
 package river
 
 import (
-	"encoding/json"
 	"github.com/hawx/riviera/river/database"
 	"github.com/hawx/riviera/river/models"
+
+	"encoding/json"
 	"time"
 )
 
@@ -29,7 +30,7 @@ func New(store database.Master, cutOff time.Duration, uris []string) River {
 		streams[i] = newTributary(store.Bucket(uri), uri)
 	}
 
-	return &river{newConfluence(store.River(), streams), store}
+	return &river{newConfluence(store.River(), streams, cutOff), store}
 }
 
 func (r *river) Build() string {

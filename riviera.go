@@ -1,12 +1,13 @@
 package main
 
 import (
-	"encoding/json"
-	"flag"
-	"fmt"
 	"github.com/hawx/riviera/opml"
 	"github.com/hawx/riviera/river"
 	"github.com/hawx/riviera/river/database"
+
+	"encoding/json"
+	"flag"
+	"fmt"
 	"log"
 	"net/http"
 	"time"

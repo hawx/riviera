@@ -16,10 +16,11 @@ type confluence struct {
 	store   database.River
 	streams []Tributary
 	latest  []models.Feed
+	cutOff  time.Duration
 }
 
-func newConfluence(store database.River, streams []Tributary) Confluence {
-	c := &confluence{store, streams, store.Today()}
+func newConfluence(store database.River, streams []Tributary, cutOff time.Duration) Confluence {
+	c := &confluence{store, streams, store.Today(), cutOff}
 	for _, r := range streams {
 		c.run(r)
 	}
@@ -36,7 +37,7 @@ func (c *confluence) run(r Tributary) {
 }
 
 func (c *confluence) Latest() []models.Feed {
-	yesterday := time.Now().Add(-24 * time.Hour)
+	yesterday := time.Now().Add(c.cutOff)
 	newLatest := []models.Feed{}
 
 	for _, feed := range c.latest {
