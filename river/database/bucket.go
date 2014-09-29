@@ -16,7 +16,7 @@ type bucket struct {
 
 var in []byte = []byte("in")
 
-func (d *bucket) Get(key string) bool {
+func (d *bucket) Contains(key string) bool {
 	ok := false
 
 	d.db.View(func(tx *bolt.Tx) error {
@@ -27,12 +27,14 @@ func (d *bucket) Get(key string) bool {
 		return nil
 	})
 
-	return ok
-}
+	if ok {
+		return true
+	}
 
-func (d *bucket) Set(key string) {
 	d.db.Update(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte(d.name))
 		return b.Put([]byte(key), in)
 	})
+
+	return false
 }
