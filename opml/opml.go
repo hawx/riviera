@@ -26,7 +26,7 @@ type Outline struct {
 	Text    string `xml:"text,attr,omitempty"`
 	Title   string `xml:"title,attr,omitempty"`
 	Type    string `xml:"type,attr,omitempty"`
-	XmlUrl string `xml:"xmlUrl,attr,omitempty"`
+	XmlUrl  string `xml:"xmlUrl,attr,omitempty"`
 	HtmlUrl string `xml:"htmlUrl,attr,omitempty"`
 }
 

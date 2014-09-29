@@ -1,9 +1,10 @@
 package river
 
 import (
-	rss "github.com/hawx/go-pkg-rss"
+	"github.com/hawx/go-pkg-rss"
 	"github.com/hawx/riviera/river/database"
 	"github.com/hawx/riviera/river/models"
+
 	"log"
 	"net/http"
 	"time"
@@ -17,7 +18,7 @@ type Tributary interface {
 
 type tributary struct {
 	uri  string
-	feed *rss.Feed
+	feed *feeder.Feed
 	in   chan models.Feed
 	quit chan struct{}
 }
@@ -25,7 +26,7 @@ type tributary struct {
 func newTributary(store database.Bucket, uri string) Tributary {
 	p := &tributary{}
 	p.uri = uri
-	p.feed = rss.New(5, true, p.chanHandler, p.itemHandler, store)
+	p.feed = feeder.New(5, true, p.chanHandler, p.itemHandler, store)
 	p.in = make(chan models.Feed)
 	p.quit = make(chan struct{})
 
@@ -59,9 +60,9 @@ func (w *tributary) fetch() {
 	}
 }
 
-func (w *tributary) chanHandler(feed *rss.Feed, newchannels []*rss.Channel) {}
+func (w *tributary) chanHandler(feed *feeder.Feed, newchannels []*feeder.Channel) {}
 
-func (w *tributary) itemHandler(feed *rss.Feed, ch *rss.Channel, newitems []*rss.Item) {
+func (w *tributary) itemHandler(feed *feeder.Feed, ch *feeder.Channel, newitems []*feeder.Item) {
 	items := []models.Item{}
 	for _, item := range newitems {
 		converted := convertItem(item)

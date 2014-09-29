@@ -1,9 +1,10 @@
 package database
 
 import (
-	"encoding/json"
 	"github.com/boltdb/bolt"
 	"github.com/hawx/riviera/river/models"
+
+	"encoding/json"
 	"time"
 )
 

@@ -3,6 +3,7 @@ package river
 import (
 	"github.com/hawx/riviera/river/database"
 	"github.com/hawx/riviera/river/models"
+
 	"time"
 )
 

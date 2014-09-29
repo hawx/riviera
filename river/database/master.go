@@ -1,8 +1,9 @@
 package database
 
 import (
-	"fmt"
 	"github.com/boltdb/bolt"
+
+	"fmt"
 )
 
 type Master interface {

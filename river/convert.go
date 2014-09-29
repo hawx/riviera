@@ -1,12 +1,12 @@
 package river
 
 import (
-	rss "github.com/hawx/go-pkg-rss"
+	"github.com/hawx/go-pkg-rss"
 	"github.com/hawx/riviera/river/models"
 	"github.com/kennygrant/sanitize"
 )
 
-func convertItem(item *rss.Item) *models.Item {
+func convertItem(item *feeder.Item) *models.Item {
 	pubDate, err := item.ParsedPubDate()
 	if err != nil {
 		return nil
