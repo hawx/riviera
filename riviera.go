@@ -9,6 +9,7 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"net"
 	"net/http"
 	"time"
 )
@@ -24,6 +25,7 @@ func printHelp() {
 		"\n",
 		"    --cutoff <secs>    # Time to ignore items after (default: -24h)\n",
 		"    --port <num>       # Port to bind to (default: 8080)\n",
+		"    --socket <path>    # Serve using unix socket instead\n",
 		"\n",
 		"    --help             # Display help message\n",
 	)
@@ -34,6 +36,7 @@ var (
 	opmlPath = flag.String("opml", "", "")
 	cutOff   = flag.String("cutoff", "-24h", "")
 	port     = flag.String("port", "8080", "")
+	socket   = flag.String("socket", "", "")
 	help     = flag.Bool("help", false, "")
 )
 
@@ -115,6 +118,16 @@ func main() {
 		}
 	})
 
-	log.Println("listening on port :" + *port)
-	log.Fatal(http.ListenAndServe(":"+*port, nil))
+	if *socket == "" {
+		log.Println("listening on port :" + *port)
+		log.Fatal(http.ListenAndServe(":"+*port, nil))
+	} else {
+		l, err := net.Listen("unix", *socket)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		log.Println("listening on", *socket)
+		log.Fatal(http.Serve(l, nil))
+	}
 }
