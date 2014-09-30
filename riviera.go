@@ -26,7 +26,7 @@ func printHelp() {
 		"    --db <path>        # Path to database\n",
 		"\n",
 		"    --cutoff <dur>     # Time to ignore items after (default: -24h)\n",
-		"    --refresh <dur>    # Time to refresh feeds after (default: 10m)\n",
+		"    --refresh <dur>    # Time to refresh feeds after (default: 15m)\n",
 		"    --port <num>       # Port to bind to (default: 8080)\n",
 		"    --socket <path>    # Serve using unix socket instead\n",
 		"\n",
@@ -39,7 +39,7 @@ var (
 	dbPath   = flag.String("db", "./db", "")
 
 	cutOff   = flag.String("cutoff", "-24h", "")
-	refresh  = flag.String("refresh", "10m", "")
+	refresh  = flag.String("refresh", "15m", "")
 	port     = flag.String("port", "8080", "")
 	socket   = flag.String("socket", "", "")
 
