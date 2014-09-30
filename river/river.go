@@ -19,18 +19,19 @@ type River interface {
 }
 
 type river struct {
-	confluence Confluence
-	store      database.Master
+	confluence   Confluence
+	store        database.Master
+	cacheTimeout time.Duration
 }
 
-func New(store database.Master, cutOff time.Duration, uris []string) River {
+func New(store database.Master, cutOff, cacheTimeout time.Duration, uris []string) River {
 	streams := make([]Tributary, len(uris))
 
 	for i, uri := range uris {
-		streams[i] = newTributary(store.Bucket(uri), uri)
+		streams[i] = newTributary(store.Bucket(uri), uri, cacheTimeout)
 	}
 
-	return &river{newConfluence(store.River(), streams, cutOff), store}
+	return &river{newConfluence(store.River(), streams, cutOff), store, cacheTimeout}
 }
 
 func (r *river) Build() string {
@@ -55,7 +56,7 @@ func (r *river) Build() string {
 }
 
 func (r *river) Add(uri string) {
-	r.confluence.Add(newTributary(r.store.Bucket(uri), uri))
+	r.confluence.Add(newTributary(r.store.Bucket(uri), uri, r.cacheTimeout))
 }
 
 func (r *river) Remove(uri string) bool {

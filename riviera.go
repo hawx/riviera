@@ -25,7 +25,8 @@ func printHelp() {
 		"    --opml <path>      # Path to opml file containing feeds to read\n",
 		"    --db <path>        # Path to database\n",
 		"\n",
-		"    --cutoff <secs>    # Time to ignore items after (default: -24h)\n",
+		"    --cutoff <dur>     # Time to ignore items after (default: -24h)\n",
+		"    --refresh <dur>    # Time to refresh feeds after (default: 10m)\n",
 		"    --port <num>       # Port to bind to (default: 8080)\n",
 		"    --socket <path>    # Serve using unix socket instead\n",
 		"\n",
@@ -34,11 +35,14 @@ func printHelp() {
 }
 
 var (
-	dbPath   = flag.String("db", "./db", "")
 	opmlPath = flag.String("opml", "", "")
+	dbPath   = flag.String("db", "./db", "")
+
 	cutOff   = flag.String("cutoff", "-24h", "")
+	refresh  = flag.String("refresh", "10m", "")
 	port     = flag.String("port", "8080", "")
 	socket   = flag.String("socket", "", "")
+
 	help     = flag.Bool("help", false, "")
 )
 
@@ -51,6 +55,11 @@ func main() {
 	}
 
 	duration, err := time.ParseDuration(*cutOff)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	cacheTimeout, err := time.ParseDuration(*refresh)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -71,7 +80,7 @@ func main() {
 		urls = append(urls, outline.XmlUrl)
 	}
 
-	feeds := river.New(store, duration, urls)
+	feeds := river.New(store, duration, cacheTimeout, urls)
 
 	http.HandleFunc("/river.js", func(w http.ResponseWriter, r *http.Request) {
 		callback := r.FormValue("callback")

@@ -23,10 +23,10 @@ type tributary struct {
 	quit chan struct{}
 }
 
-func newTributary(store database.Bucket, uri string) Tributary {
+func newTributary(store database.Bucket, uri string, cacheTimeout time.Duration) Tributary {
 	p := &tributary{}
 	p.uri = uri
-	p.feed = feeder.New(5, true, p.chanHandler, p.itemHandler, store)
+	p.feed = feeder.New(cacheTimeout, true, p.chanHandler, p.itemHandler, store)
 	p.in = make(chan models.Feed)
 	p.quit = make(chan struct{})
 
@@ -46,7 +46,8 @@ loop:
 		select {
 		case <-w.quit:
 			break loop
-		case <-time.After(time.Duration(w.feed.SecondsTillUpdate()) * time.Second):
+		case <-time.After(w.feed.DurationTillUpdate()):
+			log.Println("fetching", w.uri)
 			w.fetch()
 		}
 	}
