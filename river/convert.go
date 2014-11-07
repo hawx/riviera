@@ -22,6 +22,13 @@ func convertItem(item *feeder.Item) *models.Item {
 	if len(item.Links) > 0 {
 		i.PermaLink = item.Links[0].Href
 		i.Link = item.Links[0].Href
+
+		for _, link := range item.Links {
+			if link.Rel == "alternate" {
+				i.PermaLink = link.Href
+				i.Link = link.Href
+			}
+		}
 	}
 
 	if item.Content != nil {
