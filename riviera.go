@@ -1,18 +1,17 @@
 package main
 
 import (
-	"github.com/hawx/riviera/opml"
 	"github.com/hawx/riviera/river"
 	"github.com/hawx/riviera/river/database"
+	"github.com/hawx/riviera/subscriptions"
+
+	"github.com/hawx/serve"
 
 	"encoding/json"
 	"flag"
 	"fmt"
 	"log"
-	"net"
 	"net/http"
-	"os"
-	"os/signal"
 	"time"
 )
 
@@ -38,12 +37,12 @@ var (
 	opmlPath = flag.String("opml", "", "")
 	dbPath   = flag.String("db", "./db", "")
 
-	cutOff   = flag.String("cutoff", "-24h", "")
-	refresh  = flag.String("refresh", "15m", "")
-	port     = flag.String("port", "8080", "")
-	socket   = flag.String("socket", "", "")
+	cutOff  = flag.String("cutoff", "-24h", "")
+	refresh = flag.String("refresh", "15m", "")
+	port    = flag.String("port", "8080", "")
+	socket  = flag.String("socket", "", "")
 
-	help     = flag.Bool("help", false, "")
+	help = flag.Bool("help", false, "")
 )
 
 func main() {
@@ -64,7 +63,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	subs, err := opml.Load(*opmlPath)
+	subs, err := subscriptions.Load(*opmlPath)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -75,12 +74,7 @@ func main() {
 	}
 	defer store.Close()
 
-	urls := []string{}
-	for _, outline := range subs.Body.Outline {
-		urls = append(urls, outline.XmlUrl)
-	}
-
-	feeds := river.New(store, duration, cacheTimeout, urls)
+	feeds := river.New(store, duration, cacheTimeout, subs.List())
 
 	http.HandleFunc("/river.js", func(w http.ResponseWriter, r *http.Request) {
 		callback := r.FormValue("callback")
@@ -93,10 +87,7 @@ func main() {
 	})
 
 	http.HandleFunc("/-/list", func(w http.ResponseWriter, r *http.Request) {
-		list := []string{}
-		for _, outline := range subs.Body.Outline {
-			list = append(list, outline.XmlUrl)
-		}
+		list := subs.List()
 		data, _ := json.Marshal(list)
 
 		w.Header().Set("Content-Type", "application/json")
@@ -106,22 +97,14 @@ func main() {
 	http.HandleFunc("/-/subscribe", func(w http.ResponseWriter, r *http.Request) {
 		url := r.FormValue("url")
 		feeds.Add(url)
-		subs.Body.Outline = append(subs.Body.Outline, opml.Outline{XmlUrl: url})
-		subs.Save(*opmlPath)
+		subs.Add(url)
 		w.WriteHeader(204)
 	})
 
 	http.HandleFunc("/-/unsubscribe", func(w http.ResponseWriter, r *http.Request) {
 		url := r.FormValue("url")
 
-		body := []opml.Outline{}
-		for _, outline := range subs.Body.Outline {
-			if outline.XmlUrl != url {
-				body = append(body, outline)
-			}
-		}
-		subs.Body.Outline = body
-		subs.Save(*opmlPath)
+		subs.Remove(url)
 
 		if feeds.Remove(url) {
 			w.WriteHeader(204)
@@ -130,28 +113,5 @@ func main() {
 		}
 	})
 
-	if *socket == "" {
-		go func() {
-			log.Println("listening on port :" + *port)
-			log.Fatal(http.ListenAndServe(":"+*port, nil))
-		}()
-	} else {
-		l, err := net.Listen("unix", *socket)
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		defer l.Close()
-
-		go func() {
-			log.Println("listening on", *socket)
-			log.Fatal(http.Serve(l, nil))
-		}()
-	}
-
-	c := make(chan os.Signal, 1)
-	signal.Notify(c, os.Interrupt, os.Kill)
-
-	s := <-c
-	log.Printf("caught %s: shutting down", s)
+	serve.Serve(*port, *socket, http.DefaultServeMux)
 }
