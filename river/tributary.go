@@ -5,8 +5,12 @@ import (
 	"github.com/hawx/riviera/river/database"
 	"github.com/hawx/riviera/river/models"
 
+	_ "code.google.com/p/go-charset/data"
+	"code.google.com/p/go-charset/charset"
+
 	"log"
 	"net/http"
+	"io"
 	"time"
 )
 
@@ -55,8 +59,12 @@ loop:
 	log.Println("stopped fetching", w.uri)
 }
 
+func CharsetReader(name string, r io.Reader) (io.Reader, error) {
+	return charset.NewReader(name, r)
+}
+
 func (w *tributary) fetch() {
-	if err := w.feed.FetchClient(w.uri, &http.Client{Timeout: time.Minute}, nil); err != nil {
+	if err := w.feed.FetchClient(w.uri, &http.Client{Timeout: time.Minute}, CharsetReader); err != nil {
 		log.Println("error fetching", w.uri+":", err)
 	}
 }
