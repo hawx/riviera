@@ -1,16 +1,16 @@
 package river
 
 import (
-	"github.com/hawx/go-pkg-rss"
+	"github.com/hawx/riviera/feed"
 	"github.com/hawx/riviera/river/database"
 	"github.com/hawx/riviera/river/models"
 
-	_ "code.google.com/p/go-charset/data"
 	"code.google.com/p/go-charset/charset"
+	_ "code.google.com/p/go-charset/data"
 
+	"io"
 	"log"
 	"net/http"
-	"io"
 	"time"
 )
 
@@ -22,7 +22,7 @@ type Tributary interface {
 
 type tributary struct {
 	uri  string
-	feed *feeder.Feed
+	feed *feed.Feed
 	in   chan models.Feed
 	quit chan struct{}
 }
@@ -30,7 +30,7 @@ type tributary struct {
 func newTributary(store database.Bucket, uri string, cacheTimeout time.Duration) Tributary {
 	p := &tributary{}
 	p.uri = uri
-	p.feed = feeder.New(cacheTimeout, true, p.chanHandler, p.itemHandler, store)
+	p.feed = feed.New(cacheTimeout, true, p.chanHandler, p.itemHandler, store)
 	p.in = make(chan models.Feed)
 	p.quit = make(chan struct{})
 
@@ -69,9 +69,9 @@ func (w *tributary) fetch() {
 	}
 }
 
-func (w *tributary) chanHandler(feed *feeder.Feed, newchannels []*feeder.Channel) {}
+func (w *tributary) chanHandler(feed *feed.Feed, newchannels []*feed.Channel) {}
 
-func (w *tributary) itemHandler(feed *feeder.Feed, ch *feeder.Channel, newitems []*feeder.Item) {
+func (w *tributary) itemHandler(feed *feed.Feed, ch *feed.Channel, newitems []*feed.Item) {
 	items := []models.Item{}
 	for _, item := range newitems {
 		converted := convertItem(item)

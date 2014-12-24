@@ -1,7 +1,7 @@
 package river
 
 import (
-	"github.com/hawx/go-pkg-rss"
+	"github.com/hawx/riviera/feed"
 	"github.com/hawx/riviera/river/models"
 	"github.com/kennygrant/sanitize"
 
@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-func convertItem(item *feeder.Item) *models.Item {
+func convertItem(item *feed.Item) *models.Item {
 	pubDate, err := item.ParsedPubDate()
 	if err != nil {
 		log.Println(err)

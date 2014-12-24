@@ -2,11 +2,11 @@ package database
 
 import (
 	"github.com/boltdb/bolt"
-	"github.com/hawx/go-pkg-rss"
+	"github.com/hawx/riviera/feed"
 )
 
 type Bucket interface {
-	feeder.Database
+	feed.Database
 }
 
 type bucket struct {
