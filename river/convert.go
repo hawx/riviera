@@ -4,12 +4,16 @@ import (
 	"github.com/hawx/go-pkg-rss"
 	"github.com/hawx/riviera/river/models"
 	"github.com/kennygrant/sanitize"
+
+	"log"
+	"time"
 )
 
 func convertItem(item *feeder.Item) *models.Item {
 	pubDate, err := item.ParsedPubDate()
 	if err != nil {
-		return nil
+		log.Println(err)
+		pubDate = time.Now()
 	}
 
 	i := &models.Item{
