@@ -28,6 +28,7 @@ func printHelp() {
 		"    --refresh <dur>    # Time to refresh feeds after (default: 15m)\n",
 		"    --port <num>       # Port to bind to (default: 8080)\n",
 		"    --socket <path>    # Serve using unix socket instead\n",
+		"    --with-admin       # Allow access to admin routes, /-\n",
 		"\n",
 		"    --help             # Display help message\n",
 	)
@@ -37,10 +38,11 @@ var (
 	opmlPath = flag.String("opml", "", "")
 	dbPath   = flag.String("db", "./db", "")
 
-	cutOff  = flag.String("cutoff", "-24h", "")
-	refresh = flag.String("refresh", "15m", "")
-	port    = flag.String("port", "8080", "")
-	socket  = flag.String("socket", "", "")
+	cutOff    = flag.String("cutoff", "-24h", "")
+	refresh   = flag.String("refresh", "15m", "")
+	port      = flag.String("port", "8080", "")
+	socket    = flag.String("socket", "", "")
+	withAdmin = flag.Bool("with-admin", false, "")
 
 	help = flag.Bool("help", false, "")
 )
@@ -86,32 +88,34 @@ func main() {
 		fmt.Fprintf(w, "%s(%s)", callback, feeds.Build())
 	})
 
-	http.HandleFunc("/-/list", func(w http.ResponseWriter, r *http.Request) {
-		list := subs.List()
-		data, _ := json.Marshal(list)
+	if *withAdmin {
+		http.HandleFunc("/-/list", func(w http.ResponseWriter, r *http.Request) {
+			list := subs.List()
+			data, _ := json.Marshal(list)
 
-		w.Header().Set("Content-Type", "application/json")
-		fmt.Fprint(w, string(data))
-	})
+			w.Header().Set("Content-Type", "application/json")
+			fmt.Fprint(w, string(data))
+		})
 
-	http.HandleFunc("/-/subscribe", func(w http.ResponseWriter, r *http.Request) {
-		url := r.FormValue("url")
-		feeds.Add(url)
-		subs.Add(url)
-		w.WriteHeader(204)
-	})
-
-	http.HandleFunc("/-/unsubscribe", func(w http.ResponseWriter, r *http.Request) {
-		url := r.FormValue("url")
-
-		subs.Remove(url)
-
-		if feeds.Remove(url) {
+		http.HandleFunc("/-/subscribe", func(w http.ResponseWriter, r *http.Request) {
+			url := r.FormValue("url")
+			feeds.Add(url)
+			subs.Add(url)
 			w.WriteHeader(204)
-		} else {
-			w.WriteHeader(400)
-		}
-	})
+		})
+
+		http.HandleFunc("/-/unsubscribe", func(w http.ResponseWriter, r *http.Request) {
+			url := r.FormValue("url")
+
+			subs.Remove(url)
+
+			if feeds.Remove(url) {
+				w.WriteHeader(204)
+			} else {
+				w.WriteHeader(400)
+			}
+		})
+	}
 
 	serve.Serve(*port, *socket, http.DefaultServeMux)
 }
