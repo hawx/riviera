@@ -1,8 +1,8 @@
 package database
 
 import (
-	"github.com/boltdb/bolt"
 	"github.com/hawx/riviera/river/models"
+	"github.com/hawx/riviera/database"
 
 	"encoding/json"
 	"time"
@@ -14,30 +14,25 @@ type River interface {
 }
 
 type river struct {
-	db *bolt.DB
+	database.Bucket
 }
 
-const riverBucket = "river"
-
 func (d *river) Add(feed models.Feed) {
-	d.db.Update(func(tx *bolt.Tx) error {
-		b := tx.Bucket([]byte(riverBucket))
-
+	d.Update(func(tx database.Tx) error {
 		key := feed.WhenLastUpdate.UTC().Format(time.RFC3339) + " " + feed.FeedUrl
 		value, _ := json.Marshal(feed)
 
-		return b.Put([]byte(key), value)
+		return tx.Put([]byte(key), value)
 	})
 }
 
 func (d *river) Today() []models.Feed {
 	feeds := []models.Feed{}
 
-	d.db.View(func(tx *bolt.Tx) error {
-		c := tx.Bucket([]byte(riverBucket)).Cursor()
+	d.View(func(tx database.Tx) error {
 		min := time.Now().UTC().Add(-24 * time.Hour).Format(time.RFC3339)
 
-		for k, v := c.Seek([]byte(min)); k != nil; k, v = c.Next() {
+		for _, v := range tx.After([]byte(min)) {
 			var feed models.Feed
 			json.Unmarshal(v, &feed)
 			feeds = append(feeds, feed)

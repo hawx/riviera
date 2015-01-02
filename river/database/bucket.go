@@ -1,7 +1,7 @@
 package database
 
 import (
-	"github.com/boltdb/bolt"
+	"github.com/hawx/riviera/database"
 	"github.com/hawx/riviera/feed"
 )
 
@@ -10,8 +10,7 @@ type Bucket interface {
 }
 
 type bucket struct {
-	name string
-	db   *bolt.DB
+	database.Bucket
 }
 
 var in []byte = []byte("in")
@@ -19,9 +18,8 @@ var in []byte = []byte("in")
 func (d *bucket) Contains(key string) bool {
 	ok := false
 
-	d.db.View(func(tx *bolt.Tx) error {
-		b := tx.Bucket([]byte(d.name))
-		if b.Get([]byte(key)) != nil {
+	d.View(func(tx database.Tx) error {
+		if tx.Get([]byte(key)) != nil {
 			ok = true
 		}
 		return nil
@@ -31,9 +29,8 @@ func (d *bucket) Contains(key string) bool {
 		return true
 	}
 
-	d.db.Update(func(tx *bolt.Tx) error {
-		b := tx.Bucket([]byte(d.name))
-		return b.Put([]byte(key), in)
+	d.Update(func(tx database.Tx) error {
+		return tx.Put([]byte(key), in)
 	})
 
 	return false
