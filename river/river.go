@@ -1,5 +1,5 @@
-// Package river implements a functions for generating river.js files. See
-// riverjs.org for more information on the format.
+// Package river generates river.js files. See riverjs.org for more information
+// on the format.
 package river
 
 import (

@@ -1,5 +1,5 @@
-// Package opml implements a functions capable of parsing opml files containing
-// a list of feed subscriptions.
+// Package opml implements functions capable of parsing opml files containing a
+// list of feed subscriptions.
 package opml
 
 import (
