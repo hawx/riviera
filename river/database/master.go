@@ -1,7 +1,7 @@
 package database
 
 import (
-	"github.com/hawx/riviera/database"
+	"github.com/hawx/riviera/data"
 )
 
 type Master interface {
@@ -11,11 +11,11 @@ type Master interface {
 }
 
 type master struct {
-	db database.Database
+	db data.Database
 }
 
 func Open(path string) (Master, error) {
-	db, err := database.Open(path)
+	db, err := data.Open(path)
 	if err != nil {
 		return nil, err
 	}

@@ -1,7 +1,7 @@
 package database
 
 import (
-	"github.com/hawx/riviera/database"
+	"github.com/hawx/riviera/data"
 	"github.com/hawx/riviera/feed"
 )
 
@@ -10,7 +10,7 @@ type Bucket interface {
 }
 
 type bucket struct {
-	database.Bucket
+	data.Bucket
 }
 
 var in []byte = []byte("in")
@@ -18,7 +18,7 @@ var in []byte = []byte("in")
 func (d *bucket) Contains(key string) bool {
 	ok := false
 
-	d.View(func(tx database.Tx) error {
+	d.View(func(tx data.Tx) error {
 		if tx.Get([]byte(key)) != nil {
 			ok = true
 		}
@@ -29,7 +29,7 @@ func (d *bucket) Contains(key string) bool {
 		return true
 	}
 
-	d.Update(func(tx database.Tx) error {
+	d.Update(func(tx data.Tx) error {
 		return tx.Put([]byte(key), in)
 	})
 

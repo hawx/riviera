@@ -1,7 +1,7 @@
-// Package database provides an interface for saving and retrieving data from a
+// Package data provides an interface for saving and retrieving data from a
 // key-value database arranged into buckets. It uses boltdb as its persistence
 // layer.
-package database
+package data
 
 import (
 	"github.com/boltdb/bolt"

@@ -2,7 +2,7 @@ package database
 
 import (
 	"github.com/hawx/riviera/river/models"
-	"github.com/hawx/riviera/database"
+	"github.com/hawx/riviera/data"
 
 	"encoding/json"
 	"time"
@@ -14,11 +14,11 @@ type River interface {
 }
 
 type river struct {
-	database.Bucket
+	data.Bucket
 }
 
 func (d *river) Add(feed models.Feed) {
-	d.Update(func(tx database.Tx) error {
+	d.Update(func(tx data.Tx) error {
 		key := feed.WhenLastUpdate.UTC().Format(time.RFC3339) + " " + feed.FeedUrl
 		value, _ := json.Marshal(feed)
 
@@ -29,7 +29,7 @@ func (d *river) Add(feed models.Feed) {
 func (d *river) Today() []models.Feed {
 	feeds := []models.Feed{}
 
-	d.View(func(tx database.Tx) error {
+	d.View(func(tx data.Tx) error {
 		min := time.Now().UTC().Add(-24 * time.Hour).Format(time.RFC3339)
 
 		for _, v := range tx.After([]byte(min)) {
