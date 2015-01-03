@@ -3,7 +3,8 @@
 package river
 
 import (
-	"github.com/hawx/riviera/river/database"
+	"github.com/hawx/riviera/data"
+	"github.com/hawx/riviera/river/persistence"
 	"github.com/hawx/riviera/river/models"
 
 	"encoding/json"
@@ -20,18 +21,20 @@ type River interface {
 
 type river struct {
 	confluence   Confluence
-	store        database.Master
+	store        data.Database
 	cacheTimeout time.Duration
 }
 
-func New(store database.Master, cutOff, cacheTimeout time.Duration, uris []string) River {
+func New(store data.Database, cutOff, cacheTimeout time.Duration, uris []string) River {
 	streams := make([]Tributary, len(uris))
 
 	for i, uri := range uris {
-		streams[i] = newTributary(store.Bucket(uri), uri, cacheTimeout)
+		bucket, _ := persistence.NewBucket(store, uri)
+		streams[i] = newTributary(bucket, uri, cacheTimeout)
 	}
 
-	return &river{newConfluence(store.River(), streams, cutOff), store, cacheTimeout}
+	r, _ := persistence.NewRiver(store)
+	return &river{newConfluence(r, streams, cutOff), store, cacheTimeout}
 }
 
 func (r *river) Build() string {
@@ -56,7 +59,9 @@ func (r *river) Build() string {
 }
 
 func (r *river) Add(uri string) {
-	r.confluence.Add(newTributary(r.store.Bucket(uri), uri, r.cacheTimeout))
+	b, _ := persistence.NewBucket(r.store, uri)
+
+	r.confluence.Add(newTributary(b, uri, r.cacheTimeout))
 }
 
 func (r *river) Remove(uri string) bool {

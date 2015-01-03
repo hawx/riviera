@@ -2,7 +2,7 @@ package river
 
 import (
 	"github.com/hawx/riviera/feed"
-	"github.com/hawx/riviera/river/database"
+	"github.com/hawx/riviera/river/persistence"
 	"github.com/hawx/riviera/river/models"
 
 	"code.google.com/p/go-charset/charset"
@@ -27,7 +27,7 @@ type tributary struct {
 	quit chan struct{}
 }
 
-func newTributary(store database.Bucket, uri string, cacheTimeout time.Duration) Tributary {
+func newTributary(store persistence.Bucket, uri string, cacheTimeout time.Duration) Tributary {
 	p := &tributary{}
 	p.uri = uri
 	p.feed = feed.New(cacheTimeout, true, p.chanHandler, p.itemHandler, store)

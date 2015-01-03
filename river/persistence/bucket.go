@@ -1,4 +1,4 @@
-package database
+package persistence
 
 import (
 	"github.com/hawx/riviera/data"
@@ -14,6 +14,15 @@ type bucket struct {
 }
 
 var in []byte = []byte("in")
+
+func NewBucket(database data.Database, name string) (Bucket, error) {
+	b, err := database.Bucket([]byte(name))
+	if err != nil {
+		return nil, err
+	}
+
+	return &bucket{b}, nil
+}
 
 func (d *bucket) Contains(key string) bool {
 	ok := false

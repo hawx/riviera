@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/hawx/riviera/river"
-	"github.com/hawx/riviera/river/database"
+	"github.com/hawx/riviera/data"
 	"github.com/hawx/riviera/subscriptions"
 
 	"github.com/hawx/serve"
@@ -70,7 +70,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	store, err := database.Open(*dbPath)
+	store, err := data.Open(*dbPath)
 	if err != nil {
 		log.Fatal(err)
 	}

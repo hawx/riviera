@@ -1,7 +1,7 @@
 package river
 
 import (
-	"github.com/hawx/riviera/river/database"
+	"github.com/hawx/riviera/river/persistence"
 	"github.com/hawx/riviera/river/models"
 
 	"time"
@@ -14,13 +14,13 @@ type Confluence interface {
 }
 
 type confluence struct {
-	store   database.River
+	store   persistence.River
 	streams []Tributary
 	latest  []models.Feed
 	cutOff  time.Duration
 }
 
-func newConfluence(store database.River, streams []Tributary, cutOff time.Duration) Confluence {
+func newConfluence(store persistence.River, streams []Tributary, cutOff time.Duration) Confluence {
 	c := &confluence{store, streams, store.Today(), cutOff}
 	for _, r := range streams {
 		c.run(r)

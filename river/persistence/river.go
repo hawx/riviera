@@ -1,4 +1,4 @@
-package database
+package persistence
 
 import (
 	"github.com/hawx/riviera/river/models"
@@ -15,6 +15,17 @@ type River interface {
 
 type river struct {
 	data.Bucket
+}
+
+var riverBucketName = []byte("river")
+
+func NewRiver(database data.Database) (River, error) {
+	b, err := database.Bucket(riverBucketName)
+	if err != nil {
+		return nil, err
+	}
+
+	return &river{b}, nil
 }
 
 func (d *river) Add(feed models.Feed) {
