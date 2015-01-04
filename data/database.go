@@ -33,8 +33,15 @@ type Tx interface {
 	// Put sets the value associated with a key.
 	Put(key, value []byte) error
 
-	// After returns all values listed after the key given to the last value.
+	// Delete removes the value associated with a key.
+	Delete(key []byte) error
+
+	// After returns all values listed after the key given to the last value, in
+	// sorted key order.
 	After(start []byte) [][]byte
+
+	// All returns all values listed in sorted key order.
+	All() [][]byte
 }
 
 
@@ -101,11 +108,26 @@ func (this tx) Put(key, value []byte) error {
 	return this.b.Put(key, value)
 }
 
+func (this tx) Delete(key []byte) error {
+	return this.b.Delete(key)
+}
+
 func (this tx) After(start []byte) [][]byte {
 	r := [][]byte{}
 	c := this.b.Cursor()
 
 	for k, v := c.Seek(start); k != nil; k, v = c.Next() {
+		r = append(r, v)
+	}
+
+	return r
+}
+
+func (this tx) All() [][]byte {
+	r := [][]byte{}
+	c := this.b.Cursor()
+
+	for k, v := c.First(); k != nil; k, v = c.Next() {
 		r = append(r, v)
 	}
 

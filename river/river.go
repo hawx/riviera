@@ -28,24 +28,21 @@ type river struct {
 func New(store data.Database, subs subscriptions.List, cutOff, cacheTimeout time.Duration) River {
 	streams := []Tributary{}
 
-	for _, uri := range subs.List() {
-		bucket, _ := persistence.NewBucket(store, uri)
-		streams = append(streams, newTributary(bucket, uri, cacheTimeout))
+	for _, sub := range subs.List() {
+		bucket, _ := persistence.NewBucket(store, sub.Uri)
+		streams = append(streams, newTributary(bucket, sub.Uri, cacheTimeout))
 	}
 
 	r, _ := persistence.NewRiver(store)
 	riv := &river{newConfluence(r, streams, cutOff), store, cacheTimeout}
 
-	go func() {
-		evs := subs.Events()
-		for {
-			ev := <-evs
-			switch ev.Type {
-			case subscriptions.Add: riv.Add(ev.Uri)
-		  case subscriptions.Remove: riv.Remove(ev.Uri)
-			}
-		}
-	}()
+	subs.OnAdd(func(uri string) {
+		riv.Add(uri)
+	})
+
+	subs.OnRemove(func(uri string) {
+		riv.Remove(uri)
+	})
 
 	return riv
 }

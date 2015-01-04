@@ -1,76 +1,116 @@
 package subscriptions
 
 import (
+	"github.com/hawx/riviera/data"
 	"github.com/hawx/riviera/subscriptions/opml"
+
+	"encoding/json"
 )
 
 type Subscriptions interface {
-	List() []string
+	List() []Subscription
+	Import(*opml.Opml)
 	Add(string)
 	Remove(string)
-	Events() <-chan Event
+	OnAdd(Callback)
+	OnRemove(Callback)
 }
 
 type List interface {
-	List() []string
-	Events() <-chan Event
+	List() []Subscription
+	OnAdd(Callback)
+	OnRemove(Callback)
 }
 
-type Event struct {
-	Type EventType
-	Uri  string
+type Callback func(string)
+
+type Subscription struct {
+	// Uri the subscription was created with, never changed
+	Uri string `json:"uri"`
+
+	FeedUrl         string `json:"feedUrl"`
+	WebsiteUrl      string `json:"websiteUrl"`
+	FeedTitle       string `json:"feedTitle"`
+	FeedDescription string `json:"feedDescription"`
 }
 
-type EventType int
-
-const (
-	Add = iota
-	Remove
-)
-
-type subscriptions struct {
-	path   string
-	subs   *opml.Opml
-	events chan Event
+type subs struct {
+	data.Bucket
+	onAdd    []Callback
+	onRemove []Callback
 }
 
-func Load(path string) (Subscriptions, error) {
-	subs, err := opml.Load(path)
+var subscriptionsBucketName = []byte("subscriptions")
+
+func Open(db data.Database) (Subscriptions, error) {
+	b, err := db.Bucket(subscriptionsBucketName)
 	if err != nil {
 		return nil, err
 	}
 
-	return &subscriptions{path, subs, make(chan Event)}, nil
+	return &subs{b, []Callback{}, []Callback{}}, nil
 }
 
-func (s *subscriptions) List() []string {
-	urls := []string{}
-	for _, outline := range s.subs.Body.Outline {
-		urls = append(urls, outline.XmlUrl)
+func (s *subs) Import(outline *opml.Opml) {
+	for _, e := range outline.Body.Outline {
+		s.Add(e.XmlUrl)
 	}
-
-	return urls
 }
 
-func (s *subscriptions) Add(url string) {
-	s.subs.Body.Outline = append(s.subs.Body.Outline, opml.Outline{XmlUrl: url})
-	s.subs.Save(s.path)
-	s.events <- Event{Add, url}
-}
-
-func (s *subscriptions) Remove(url string) {
-	body := []opml.Outline{}
-	for _, outline := range s.subs.Body.Outline {
-		if outline.XmlUrl != url {
-			body = append(body, outline)
+func (s *subs) List() []Subscription {
+	subscriptions := []Subscription{}
+	s.View(func(tx data.Tx) error {
+		for _, e := range tx.All() {
+			var s Subscription
+			json.Unmarshal(e, &s)
+			subscriptions = append(subscriptions, s)
 		}
-	}
+		return nil
+	})
 
-	s.subs.Body.Outline = body
-	s.subs.Save(s.path)
-	s.events <- Event{Remove, url}
+	return subscriptions
 }
 
-func (s *subscriptions) Events() <-chan Event {
-	return s.events
+func (s *subs) Add(uri string) {
+	s.Update(func(tx data.Tx) error {
+		value, _ := json.Marshal(Subscription{Uri: uri})
+
+		return tx.Put([]byte(uri), []byte(value))
+	})
+
+	for _, f := range s.onAdd {
+		f(uri)
+	}
+}
+
+func (s *subs) Remove(uri string) {
+	s.Update(func(tx data.Tx) error {
+		return tx.Delete([]byte(uri))
+	})
+
+	for _, f := range s.onRemove {
+		f(uri)
+	}
+}
+
+func (s *subs) OnAdd(f Callback) {
+	s.onAdd = append(s.onAdd, f)
+}
+
+func (s *subs) OnRemove(f Callback) {
+	s.onRemove = append(s.onRemove, f)
+}
+
+func AsOpml(s Subscriptions) opml.Opml {
+	l := opml.Opml{
+		Version: "1.1",
+		Head:    opml.Head{Title: "Subscriptions"},
+		Body:    opml.Body{Outline: []opml.Outline{}},
+	}
+
+	for _, e := range s.List() {
+		l.Body.Outline = append(l.Body.Outline, opml.Outline{XmlUrl: e.Uri})
+	}
+
+	return l
 }

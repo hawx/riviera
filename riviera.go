@@ -4,6 +4,7 @@ import (
 	"github.com/hawx/riviera/river"
 	"github.com/hawx/riviera/data"
 	"github.com/hawx/riviera/subscriptions"
+	"github.com/hawx/riviera/subscriptions/opml"
 
 	"github.com/hawx/serve"
 
@@ -21,7 +22,7 @@ func printHelp() {
 		"\n",
 		"  Riviera is a river of news feed generator\n",
 		"\n",
-		"    --opml <path>      # Path to opml file containing feeds to read\n",
+		"    --opml <path>      # Path to opml file containing feeds to import\n",
 		"    --db <path>        # Path to database\n",
 		"\n",
 		"    --cutoff <dur>     # Time to ignore items after (default: -24h)\n",
@@ -52,7 +53,7 @@ const DEFAULT_CALLBACK = "onGetRiverStream"
 func main() {
 	flag.Parse()
 
-	if *opmlPath == "" || *help {
+	if *help {
 		printHelp()
 		return
 	}
@@ -67,16 +68,27 @@ func main() {
 		log.Fatal(err)
 	}
 
-	subs, err := subscriptions.Load(*opmlPath)
-	if err != nil {
-		log.Fatal(err)
-	}
-
 	store, err := data.Open(*dbPath)
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer store.Close()
+
+	subs, err := subscriptions.Open(store)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	if *opmlPath != "" {
+		outline, err := opml.Load(*opmlPath)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		subs.Import(outline)
+		log.Printf("imported %s\n", *opmlPath)
+		return
+	}
 
 	feeds := river.New(store, subs, duration, cacheTimeout)
 
