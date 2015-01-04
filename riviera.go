@@ -78,7 +78,7 @@ func main() {
 	}
 	defer store.Close()
 
-	feeds := river.New(store, duration, cacheTimeout, subs.List())
+	feeds := river.New(store, subs, duration, cacheTimeout)
 
 	http.HandleFunc("/river.js", func(w http.ResponseWriter, r *http.Request) {
 		callback := r.FormValue("callback")
@@ -104,21 +104,14 @@ func main() {
 
 		http.HandleFunc("/-/subscribe", func(w http.ResponseWriter, r *http.Request) {
 			url := r.FormValue("url")
-			feeds.Add(url)
 			subs.Add(url)
 			w.WriteHeader(204)
 		})
 
 		http.HandleFunc("/-/unsubscribe", func(w http.ResponseWriter, r *http.Request) {
 			url := r.FormValue("url")
-
 			subs.Remove(url)
-
-			if feeds.Remove(url) {
-				w.WriteHeader(204)
-			} else {
-				w.WriteHeader(400)
-			}
+			w.WriteHeader(204)
 		})
 	}
 

@@ -4,6 +4,7 @@ package river
 
 import (
 	"github.com/hawx/riviera/data"
+	"github.com/hawx/riviera/subscriptions"
 	"github.com/hawx/riviera/river/persistence"
 	"github.com/hawx/riviera/river/models"
 
@@ -16,8 +17,6 @@ const DOCS = "http://scripting.com/stories/2010/12/06/innovationRiverOfNewsInJso
 
 type River interface {
 	WriteTo(io.Writer) error
-	Add(uri string)
-	Remove(uri string) bool
 }
 
 type river struct {
@@ -26,16 +25,29 @@ type river struct {
 	cacheTimeout time.Duration
 }
 
-func New(store data.Database, cutOff, cacheTimeout time.Duration, uris []string) River {
-	streams := make([]Tributary, len(uris))
+func New(store data.Database, subs subscriptions.List, cutOff, cacheTimeout time.Duration) River {
+	streams := []Tributary{}
 
-	for i, uri := range uris {
+	for _, uri := range subs.List() {
 		bucket, _ := persistence.NewBucket(store, uri)
-		streams[i] = newTributary(bucket, uri, cacheTimeout)
+		streams = append(streams, newTributary(bucket, uri, cacheTimeout))
 	}
 
 	r, _ := persistence.NewRiver(store)
-	return &river{newConfluence(r, streams, cutOff), store, cacheTimeout}
+	riv := &river{newConfluence(r, streams, cutOff), store, cacheTimeout}
+
+	go func() {
+		evs := subs.Events()
+		for {
+			ev := <-evs
+			switch ev.Type {
+			case subscriptions.Add: riv.Add(ev.Uri)
+		  case subscriptions.Remove: riv.Remove(ev.Uri)
+			}
+		}
+	}()
+
+	return riv
 }
 
 func (r *river) WriteTo(w io.Writer) error {
