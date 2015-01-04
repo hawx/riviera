@@ -9,12 +9,13 @@ import (
 
 	"encoding/json"
 	"time"
+	"io"
 )
 
 const DOCS = "http://scripting.com/stories/2010/12/06/innovationRiverOfNewsInJso.html"
 
 type River interface {
-	Build() string
+	WriteTo(io.Writer) error
 	Add(uri string)
 	Remove(uri string) bool
 }
@@ -37,7 +38,7 @@ func New(store data.Database, cutOff, cacheTimeout time.Duration, uris []string)
 	return &river{newConfluence(r, streams, cutOff), store, cacheTimeout}
 }
 
-func (r *river) Build() string {
+func (r *river) WriteTo(w io.Writer) error {
 	updatedFeeds := models.Feeds{r.confluence.Latest()}
 	now := time.Now()
 
@@ -54,8 +55,7 @@ func (r *river) Build() string {
 		UpdatedFeeds: updatedFeeds,
 	}
 
-	b, _ := json.MarshalIndent(wrapper, "", "  ")
-	return string(b)
+	return json.NewEncoder(w).Encode(wrapper)
 }
 
 func (r *river) Add(uri string) {

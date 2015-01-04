@@ -19,7 +19,7 @@ func printHelp() {
 	fmt.Println(
 		"Usage: riviera [options]\n",
 		"\n",
-		"  Riviera is a river of news feed reader\n",
+		"  Riviera is a river of news feed generator\n",
 		"\n",
 		"    --opml <path>      # Path to opml file containing feeds to read\n",
 		"    --db <path>        # Path to database\n",
@@ -46,6 +46,8 @@ var (
 
 	help = flag.Bool("help", false, "")
 )
+
+const DEFAULT_CALLBACK = "onGetRiverStream"
 
 func main() {
 	flag.Parse()
@@ -81,11 +83,14 @@ func main() {
 	http.HandleFunc("/river.js", func(w http.ResponseWriter, r *http.Request) {
 		callback := r.FormValue("callback")
 		if callback == "" {
-			callback = "onGetRiverStream"
+			callback = DEFAULT_CALLBACK
 		}
 
 		w.Header().Set("Content-Type", "application/javascript")
-		fmt.Fprintf(w, "%s(%s)", callback, feeds.Build())
+
+		fmt.Fprintf(w, "%s(", callback)
+		feeds.WriteTo(w)
+		fmt.Fprintf(w, ")")
 	})
 
 	if *withAdmin {
