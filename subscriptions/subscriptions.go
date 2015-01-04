@@ -11,18 +11,21 @@ type Subscriptions interface {
 	List() []Subscription
 	Import(*opml.Opml)
 	Add(string)
+	Refresh(Subscription)
 	Remove(string)
 	OnAdd(Callback)
-	OnRemove(Callback)
+	OnRemove(Callback2)
 }
 
 type List interface {
 	List() []Subscription
+	Refresh(Subscription)
 	OnAdd(Callback)
-	OnRemove(Callback)
+	OnRemove(Callback2)
 }
 
-type Callback func(string)
+type Callback func(Subscription)
+type Callback2 func(string)
 
 type Subscription struct {
 	// Uri the subscription was created with, never changed
@@ -37,7 +40,7 @@ type Subscription struct {
 type subs struct {
 	data.Bucket
 	onAdd    []Callback
-	onRemove []Callback
+	onRemove []Callback2
 }
 
 var subscriptionsBucketName = []byte("subscriptions")
@@ -48,7 +51,7 @@ func Open(db data.Database) (Subscriptions, error) {
 		return nil, err
 	}
 
-	return &subs{b, []Callback{}, []Callback{}}, nil
+	return &subs{b, []Callback{}, []Callback2{}}, nil
 }
 
 func (s *subs) Import(outline *opml.Opml) {
@@ -72,15 +75,24 @@ func (s *subs) List() []Subscription {
 }
 
 func (s *subs) Add(uri string) {
+	sub := Subscription{Uri: uri}
 	s.Update(func(tx data.Tx) error {
-		value, _ := json.Marshal(Subscription{Uri: uri})
+		value, _ := json.Marshal(sub)
 
-		return tx.Put([]byte(uri), []byte(value))
+		return tx.Put([]byte(uri), value)
 	})
 
 	for _, f := range s.onAdd {
-		f(uri)
+		f(sub)
 	}
+}
+
+func (s *subs) Refresh(sub Subscription) {
+	s.Update(func(tx data.Tx) error {
+		value, _ := json.Marshal(sub)
+
+		return tx.Put([]byte(sub.Uri), value)
+	})
 }
 
 func (s *subs) Remove(uri string) {
@@ -97,7 +109,7 @@ func (s *subs) OnAdd(f Callback) {
 	s.onAdd = append(s.onAdd, f)
 }
 
-func (s *subs) OnRemove(f Callback) {
+func (s *subs) OnRemove(f Callback2) {
 	s.onRemove = append(s.onRemove, f)
 }
 

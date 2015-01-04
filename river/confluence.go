@@ -29,12 +29,10 @@ func newConfluence(store persistence.River, streams []Tributary, cutOff time.Dur
 }
 
 func (c *confluence) run(r Tributary) {
-	go func(in <-chan models.Feed) {
-		for v := range in {
-			c.latest = append([]models.Feed{v}, c.latest...)
-			c.store.Add(v)
-		}
-	}(r.Latest())
+	r.OnUpdate(func(feed models.Feed) {
+		c.latest = append([]models.Feed{feed}, c.latest...)
+		c.store.Add(feed)
+	})
 }
 
 func (c *confluence) Latest() []models.Feed {

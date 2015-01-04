@@ -23,21 +23,33 @@ type river struct {
 	confluence   Confluence
 	store        data.Database
 	cacheTimeout time.Duration
+	subs         subscriptions.List
 }
 
 func New(store data.Database, subs subscriptions.List, cutOff, cacheTimeout time.Duration) River {
 	streams := []Tributary{}
 
 	for _, sub := range subs.List() {
+		sub := sub
 		bucket, _ := persistence.NewBucket(store, sub.Uri)
-		streams = append(streams, newTributary(bucket, sub.Uri, cacheTimeout))
+		tributary := newTributary(bucket, sub.Uri, cacheTimeout)
+		tributary.OnUpdate(func(feed models.Feed) {
+			sub.FeedUrl = feed.FeedUrl
+			sub.WebsiteUrl = feed.WebsiteUrl
+			sub.FeedTitle = feed.FeedTitle
+			sub.FeedDescription = feed.FeedDescription
+
+			subs.Refresh(sub)
+		})
+		streams = append(streams, tributary)
 	}
 
 	r, _ := persistence.NewRiver(store)
-	riv := &river{newConfluence(r, streams, cutOff), store, cacheTimeout}
+	confluence := newConfluence(r, streams, cutOff)
+	riv := &river{confluence, store, cacheTimeout, subs}
 
-	subs.OnAdd(func(uri string) {
-		riv.Add(uri)
+	subs.OnAdd(func(sub subscriptions.Subscription) {
+		riv.Add(sub)
 	})
 
 	subs.OnRemove(func(uri string) {
@@ -67,10 +79,20 @@ func (r *river) WriteTo(w io.Writer) error {
 	return json.NewEncoder(w).Encode(wrapper)
 }
 
-func (r *river) Add(uri string) {
-	b, _ := persistence.NewBucket(r.store, uri)
+func (r *river) Add(sub subscriptions.Subscription) {
+	b, _ := persistence.NewBucket(r.store, sub.Uri)
 
-	r.confluence.Add(newTributary(b, uri, r.cacheTimeout))
+	tributary := newTributary(b, sub.Uri, r.cacheTimeout)
+	tributary.OnUpdate(func(feed models.Feed) {
+		sub.FeedUrl = feed.FeedUrl
+		sub.WebsiteUrl = feed.WebsiteUrl
+		sub.FeedTitle = feed.FeedTitle
+		sub.FeedDescription = feed.FeedDescription
+
+		r.subs.Refresh(sub)
+	})
+
+	r.confluence.Add(tributary)
 }
 
 func (r *river) Remove(uri string) bool {

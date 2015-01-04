@@ -2,8 +2,8 @@ package river
 
 import (
 	"github.com/hawx/riviera/feed"
-	"github.com/hawx/riviera/river/persistence"
 	"github.com/hawx/riviera/river/models"
+	"github.com/hawx/riviera/river/persistence"
 
 	"code.google.com/p/go-charset/charset"
 	_ "code.google.com/p/go-charset/data"
@@ -15,27 +15,31 @@ import (
 )
 
 type Tributary interface {
-	Latest() <-chan models.Feed
+	OnUpdate(func(models.Feed))
 	Uri() string
 	Kill()
 }
 
 type tributary struct {
-	uri  string
-	feed *feed.Feed
-	in   chan models.Feed
-	quit chan struct{}
+	uri      string
+	feed     *feed.Feed
+	onUpdate []func(models.Feed)
+	quit     chan struct{}
 }
 
 func newTributary(store persistence.Bucket, uri string, cacheTimeout time.Duration) Tributary {
 	p := &tributary{}
 	p.uri = uri
 	p.feed = feed.New(cacheTimeout, true, p.chanHandler, p.itemHandler, store)
-	p.in = make(chan models.Feed)
+	p.onUpdate = []func(models.Feed){}
 	p.quit = make(chan struct{})
 
 	go p.poll()
 	return p
+}
+
+func (t *tributary) OnUpdate(f func(models.Feed)) {
+	t.onUpdate = append(t.onUpdate, f)
 }
 
 func (t *tributary) Uri() string {
@@ -100,21 +104,22 @@ func (w *tributary) itemHandler(feed *feed.Feed, ch *feed.Channel, newitems []*f
 		}
 	}
 
-	w.in <- models.Feed{
+	w.notify(models.Feed{
 		FeedUrl:         feedUrl,
 		WebsiteUrl:      websiteUrl,
 		FeedTitle:       ch.Title,
 		FeedDescription: ch.Description,
 		WhenLastUpdate:  models.RssTime{time.Now()},
 		Items:           items,
+	})
+}
+
+func (w *tributary) notify(feed models.Feed) {
+	for _, f := range w.onUpdate {
+		f(feed)
 	}
 }
 
-func (w *tributary) Latest() <-chan models.Feed {
-	return w.in
-}
-
 func (w *tributary) Kill() {
-	close(w.in)
 	close(w.quit)
 }
