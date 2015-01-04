@@ -90,7 +90,8 @@ func main() {
 		return
 	}
 
-	feeds := river.New(store, subs, duration, cacheTimeout)
+	feeds := river.New(store, duration, cacheTimeout)
+	feeds.SubscribeTo(subs)
 
 	http.HandleFunc("/river.js", func(w http.ResponseWriter, r *http.Request) {
 		callback := r.FormValue("callback")

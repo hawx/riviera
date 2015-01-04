@@ -13,19 +13,16 @@ type Subscriptions interface {
 	Add(string)
 	Refresh(Subscription)
 	Remove(string)
-	OnAdd(Callback)
-	OnRemove(Callback2)
+	OnAdd(func(Subscription))
+	OnRemove(func(string))
 }
 
 type List interface {
 	List() []Subscription
 	Refresh(Subscription)
-	OnAdd(Callback)
-	OnRemove(Callback2)
+	OnAdd(func(Subscription))
+	OnRemove(func(string))
 }
-
-type Callback func(Subscription)
-type Callback2 func(string)
 
 type Subscription struct {
 	// Uri the subscription was created with, never changed
@@ -39,8 +36,8 @@ type Subscription struct {
 
 type subs struct {
 	data.Bucket
-	onAdd    []Callback
-	onRemove []Callback2
+	onAdd    []func(Subscription)
+	onRemove []func(string)
 }
 
 var subscriptionsBucketName = []byte("subscriptions")
@@ -51,7 +48,7 @@ func Open(db data.Database) (Subscriptions, error) {
 		return nil, err
 	}
 
-	return &subs{b, []Callback{}, []Callback2{}}, nil
+	return &subs{b, []func(Subscription){}, []func(string){}}, nil
 }
 
 func (s *subs) Import(outline *opml.Opml) {
@@ -105,11 +102,11 @@ func (s *subs) Remove(uri string) {
 	}
 }
 
-func (s *subs) OnAdd(f Callback) {
+func (s *subs) OnAdd(f func(Subscription)) {
 	s.onAdd = append(s.onAdd, f)
 }
 
-func (s *subs) OnRemove(f Callback2) {
+func (s *subs) OnRemove(f func(string)) {
 	s.onRemove = append(s.onRemove, f)
 }
 

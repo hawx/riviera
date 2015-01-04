@@ -17,6 +17,7 @@ const DOCS = "http://scripting.com/stories/2010/12/06/innovationRiverOfNewsInJso
 
 type River interface {
 	WriteTo(io.Writer) error
+	SubscribeTo(subscriptions.List)
 }
 
 type river struct {
@@ -26,37 +27,27 @@ type river struct {
 	subs         subscriptions.List
 }
 
-func New(store data.Database, subs subscriptions.List, cutOff, cacheTimeout time.Duration) River {
-	streams := []Tributary{}
+func New(store data.Database, cutOff, cacheTimeout time.Duration) River {
+	r, _ := persistence.NewRiver(store)
+	confluence := newConfluence(r, []Tributary{}, cutOff)
+
+	return &river{confluence, store, cacheTimeout, nil}
+}
+
+func (r *river) SubscribeTo(subs subscriptions.List) {
+	r.subs = subs
 
 	for _, sub := range subs.List() {
-		sub := sub
-		bucket, _ := persistence.NewBucket(store, sub.Uri)
-		tributary := newTributary(bucket, sub.Uri, cacheTimeout)
-		tributary.OnUpdate(func(feed models.Feed) {
-			sub.FeedUrl = feed.FeedUrl
-			sub.WebsiteUrl = feed.WebsiteUrl
-			sub.FeedTitle = feed.FeedTitle
-			sub.FeedDescription = feed.FeedDescription
-
-			subs.Refresh(sub)
-		})
-		streams = append(streams, tributary)
+		r.Add(sub)
 	}
 
-	r, _ := persistence.NewRiver(store)
-	confluence := newConfluence(r, streams, cutOff)
-	riv := &river{confluence, store, cacheTimeout, subs}
-
 	subs.OnAdd(func(sub subscriptions.Subscription) {
-		riv.Add(sub)
+		r.Add(sub)
 	})
 
 	subs.OnRemove(func(uri string) {
-		riv.Remove(uri)
+		r.Remove(uri)
 	})
-
-	return riv
 }
 
 func (r *river) WriteTo(w io.Writer) error {
