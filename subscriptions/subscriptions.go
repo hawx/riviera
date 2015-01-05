@@ -9,7 +9,7 @@ import (
 
 type Subscriptions interface {
 	List() []Subscription
-	Import(*opml.Opml)
+	Import(opml.Opml)
 	Add(string)
 	Refresh(Subscription)
 	Remove(string)
@@ -42,6 +42,8 @@ type subs struct {
 
 var subscriptionsBucketName = []byte("subscriptions")
 
+// Open loads the Subscriptions from a Database, or initialises an empty set if
+// they do not exist.
 func Open(db data.Database) (Subscriptions, error) {
 	b, err := db.Bucket(subscriptionsBucketName)
 	if err != nil {
@@ -51,8 +53,8 @@ func Open(db data.Database) (Subscriptions, error) {
 	return &subs{b, []func(Subscription){}, []func(string){}}, nil
 }
 
-func (s *subs) Import(outline *opml.Opml) {
-	for _, e := range outline.Body.Outline {
+func (s *subs) Import(doc opml.Opml) {
+	for _, e := range doc.Body.Outline {
 		s.Add(e.XmlUrl)
 	}
 }
@@ -110,6 +112,7 @@ func (s *subs) OnRemove(f func(string)) {
 	s.onRemove = append(s.onRemove, f)
 }
 
+// AsOpml returns a representation of the Subscriptions as an OMPL document.
 func AsOpml(s Subscriptions) opml.Opml {
 	l := opml.Opml{
 		Version: "1.1",
@@ -118,7 +121,14 @@ func AsOpml(s Subscriptions) opml.Opml {
 	}
 
 	for _, e := range s.List() {
-		l.Body.Outline = append(l.Body.Outline, opml.Outline{XmlUrl: e.Uri})
+		l.Body.Outline = append(l.Body.Outline, opml.Outline{
+			Type:        "rss",
+			Text:        e.FeedTitle,
+			XmlUrl:      e.Uri,
+			Description: e.FeedDescription,
+			HtmlUrl:     e.WebsiteUrl,
+			Title:       e.FeedTitle,
+		})
 	}
 
 	return l

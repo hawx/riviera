@@ -106,6 +106,11 @@ func main() {
 		fmt.Fprintf(w, ")")
 	})
 
+	http.HandleFunc("/subscriptions.opml", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "text/xml")
+		subscriptions.AsOpml(subs).WriteTo(w)
+	})
+
 	if *withAdmin {
 		http.HandleFunc("/-/list", func(w http.ResponseWriter, r *http.Request) {
 			list := subs.List()
