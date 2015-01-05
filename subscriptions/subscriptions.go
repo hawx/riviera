@@ -25,7 +25,7 @@ type List interface {
 }
 
 type Subscription struct {
-	// Uri the subscription was created with, never changed
+	// Uri the subscription was created with, never changed!
 	Uri string `json:"uri"`
 
 	FeedUrl         string `json:"feedUrl"`

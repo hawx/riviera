@@ -29,7 +29,7 @@ type river struct {
 
 func New(store data.Database, cutOff, cacheTimeout time.Duration) River {
 	r, _ := persistence.NewRiver(store)
-	confluence := newConfluence(r, []Tributary{}, cutOff)
+	confluence := newConfluence(r, cutOff)
 
 	return &river{confluence, store, cacheTimeout, nil}
 }

@@ -20,19 +20,8 @@ type confluence struct {
 	cutOff  time.Duration
 }
 
-func newConfluence(store persistence.River, streams []Tributary, cutOff time.Duration) Confluence {
-	c := &confluence{store, streams, store.Today(), cutOff}
-	for _, r := range streams {
-		c.run(r)
-	}
-	return c
-}
-
-func (c *confluence) run(r Tributary) {
-	r.OnUpdate(func(feed models.Feed) {
-		c.latest = append([]models.Feed{feed}, c.latest...)
-		c.store.Add(feed)
-	})
+func newConfluence(store persistence.River, cutOff time.Duration) Confluence {
+	return &confluence{store, []Tributary{}, store.Today(), cutOff}
 }
 
 func (c *confluence) Latest() []models.Feed {
@@ -51,7 +40,11 @@ func (c *confluence) Latest() []models.Feed {
 
 func (c *confluence) Add(stream Tributary) {
 	c.streams = append(c.streams, stream)
-	c.run(stream)
+
+	stream.OnUpdate(func(feed models.Feed) {
+		c.latest = append([]models.Feed{feed}, c.latest...)
+		c.store.Add(feed)
+	})
 }
 
 func (c *confluence) Remove(uri string) bool {
