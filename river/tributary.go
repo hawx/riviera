@@ -14,12 +14,6 @@ import (
 	"time"
 )
 
-type Tributary interface {
-	OnUpdate(func(models.Feed))
-	Uri() string
-	Kill()
-}
-
 type tributary struct {
 	uri      string
 	feed     *feed.Feed
@@ -27,7 +21,7 @@ type tributary struct {
 	quit     chan struct{}
 }
 
-func newTributary(store persistence.Bucket, uri string, cacheTimeout time.Duration) Tributary {
+func newTributary(store persistence.Bucket, uri string, cacheTimeout time.Duration) *tributary {
 	p := &tributary{}
 	p.uri = uri
 	p.feed = feed.New(cacheTimeout, true, p.chanHandler, p.itemHandler, store)

@@ -7,21 +7,15 @@ import (
 	"time"
 )
 
-type Confluence interface {
-	Latest() []models.Feed
-	Add(Tributary)
-	Remove(string) bool
-}
-
 type confluence struct {
 	store   persistence.River
-	streams []Tributary
+	streams []*tributary
 	latest  []models.Feed
 	cutOff  time.Duration
 }
 
-func newConfluence(store persistence.River, cutOff time.Duration) Confluence {
-	return &confluence{store, []Tributary{}, store.Latest(cutOff), cutOff}
+func newConfluence(store persistence.River, cutOff time.Duration) *confluence {
+	return &confluence{store, []*tributary{}, store.Latest(cutOff), cutOff}
 }
 
 func (c *confluence) Latest() []models.Feed {
@@ -38,7 +32,7 @@ func (c *confluence) Latest() []models.Feed {
 	return c.latest
 }
 
-func (c *confluence) Add(stream Tributary) {
+func (c *confluence) Add(stream *tributary) {
 	c.streams = append(c.streams, stream)
 
 	stream.OnUpdate(func(feed models.Feed) {
@@ -48,7 +42,7 @@ func (c *confluence) Add(stream Tributary) {
 }
 
 func (c *confluence) Remove(uri string) bool {
-	streams := []Tributary{}
+	streams := []*tributary{}
 	ok := false
 
 	for _, stream := range c.streams {

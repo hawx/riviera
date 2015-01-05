@@ -21,7 +21,7 @@ type River interface {
 }
 
 type river struct {
-	confluence   Confluence
+	confluence   *confluence
 	store        data.Database
 	cacheTimeout time.Duration
 	subs         subscriptions.List
