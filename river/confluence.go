@@ -21,7 +21,7 @@ type confluence struct {
 }
 
 func newConfluence(store persistence.River, cutOff time.Duration) Confluence {
-	return &confluence{store, []Tributary{}, store.Today(), cutOff}
+	return &confluence{store, []Tributary{}, store.Latest(cutOff), cutOff}
 }
 
 func (c *confluence) Latest() []models.Feed {

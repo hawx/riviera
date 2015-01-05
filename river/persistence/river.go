@@ -10,7 +10,7 @@ import (
 
 type River interface {
 	Add(models.Feed)
-	Today() []models.Feed
+	Latest(time.Duration) []models.Feed
 }
 
 type river struct {
@@ -37,11 +37,11 @@ func (d *river) Add(feed models.Feed) {
 	})
 }
 
-func (d *river) Today() []models.Feed {
+func (d *river) Latest(cutOff time.Duration) []models.Feed {
 	feeds := []models.Feed{}
 
 	d.View(func(tx data.Tx) error {
-		min := time.Now().UTC().Add(-24 * time.Hour).Format(time.RFC3339)
+		min := time.Now().UTC().Add(cutOff).Format(time.RFC3339)
 
 		for _, v := range tx.After([]byte(min)) {
 			var feed models.Feed
