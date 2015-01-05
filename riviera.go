@@ -113,11 +113,8 @@ func main() {
 
 	if *withAdmin {
 		http.HandleFunc("/-/list", func(w http.ResponseWriter, r *http.Request) {
-			list := subs.List()
-			data, _ := json.Marshal(list)
-
 			w.Header().Set("Content-Type", "application/json")
-			fmt.Fprint(w, string(data))
+			json.NewEncoder(w).Encode(subs.List())
 		})
 
 		http.HandleFunc("/-/subscribe", func(w http.ResponseWriter, r *http.Request) {
