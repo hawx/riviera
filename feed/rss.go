@@ -159,7 +159,8 @@ func (this *Feed) readRss2(doc *xmlx.Document) (err error) {
 
 			guid := item.S(ns, "guid")
 			if len(guid) > 0 {
-				i.Guid = &guid
+				g := item.SelectNode(ns, "guid")
+				i.Guid = &Guid{Guid: guid, IsPermaLink: g.As("", "isPermaLink") == "true"}
 			}
 
 			i.PubDate = item.S(ns, "pubDate")
