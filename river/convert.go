@@ -23,6 +23,11 @@ func convertItem(item *feed.Item) *models.Item {
 		Id:      item.Key(),
 	}
 
+	if item.Guid != nil && item.Guid.IsPermaLink {
+		i.PermaLink = item.Guid.Guid
+		i.Link = item.Guid.Guid
+	}
+
 	if len(item.Links) > 0 {
 		i.PermaLink = item.Links[0].Href
 		i.Link = item.Links[0].Href

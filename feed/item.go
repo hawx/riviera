@@ -6,6 +6,11 @@ import (
 	"time"
 )
 
+type Guid struct {
+	Guid        string
+	IsPermaLink bool
+}
+
 type Item struct {
 	// RSS and Shared fields
 	Title       string
@@ -15,7 +20,7 @@ type Item struct {
 	Categories  []*Category
 	Comments    string
 	Enclosures  []*Enclosure
-	Guid        *string
+	Guid        *Guid
 	PubDate     string
 	Source      *Source
 
@@ -34,8 +39,8 @@ func (i *Item) ParsedPubDate() (time.Time, error) {
 
 func (i *Item) Key() string {
 	switch {
-	case i.Guid != nil && len(*i.Guid) != 0:
-		return *i.Guid
+	case i.Guid != nil && len(i.Guid.Guid) != 0:
+		return i.Guid.Guid
 	case len(i.Id) != 0:
 		return i.Id
 	case len(i.Title) > 0 && len(i.PubDate) > 0:
