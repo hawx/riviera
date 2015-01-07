@@ -4,36 +4,61 @@ A [river.js][] generator written in Go.
 
 ``` bash
 $ go get github.com/hawx/riviera
+$ riviera
+XXXX/XX/XX XX:XX:XX listening on port :8080
+...
 ```
 
-This serves a single file `/river.js` showing a river for the feeds listed in
+The app serves two files by default:
+
+- `/river.js`
+- `/subscriptions.opml`
+
+If the `--with-admin` flag is passed, the following routes are also exposed:
+
+- `/-/list`
+- `/-/subscribe`
+- `/-/unsubscribe`
+
+All data is stored in a local database with path specified by the `--db` flag,
+by default at `./db`.
+
+
+## Importing existing subscriptions
+
+You can import an [opml][] file containing a list of subscriptions by
+using the `--opml` flag. For example, if my list is stored in
 `subscriptions.xml`:
 
 ``` bash
 $ riviera --opml subscriptions.xml
-XXXX/XX/XX XX:XX:XX web.go serving 0.0.0.0:8080
+XXXX/XX/XX XX:XX:XX imported subscriptions.xml
+$ riviera
+XXXX/XX/XX XX:XX:XX listening on port :8080
+...
 ```
 
-It will pull every feed, and then keep them updated.
+## Admin
 
+The admin routes have no authentication, so should be hidden from the
+public. This is the reason they must be explicitly enabled. There is an admin
+interface that uses these at [riviera-admin][]. Though the routes may change
+slightly in the future, it is unlikely from this point on that backwards
+incompatible changes will be made. So here is a short description:
 
-## Admin routes
+<dl>
+  <dt><code>/-/list</code></dt>
+  <dd>List returns a json representation of the feeds subscribed to.</dd>
+  <dt><code>/-/subscribe?url=...</code></dt>
+  <dd>Subscribes to the url passed as the parameter. Riviera will then
+  immediately fetch the feed and add the latest items to the river.</dd>
+  <dt><code>/unsubscribe?url=...</code></dt>
+  <dd>Unsubscribes from the url passed. This does not remove past items so you
+  will potentially have to wait until the cut-off period has been exceeded
+  before all items disappear.</dd>
+</dl>
 
-There are routes for administering a running river, these must be enabled with
-the `--with-admin` flag. They have no authentication so should be hidden from
-the public. There is an admin interface that uses these at
-[riviera-admin][]. For now they are,
-
-```
-/-/list
-/-/subscribe?url=...
-/-/unsubscribe?url=...
-```
-
-These may change.
-
-
-## Reading the feed
+## Reading
 
 You will now need a front-end to consume the river, I currently use [rivelin][]
 but did use [necolas/newsriver-ui][newsriver-ui] before. In either case you will
@@ -41,7 +66,9 @@ need to follow the instructions given and put the correct url to the `river.js`
 file generated. For instance, if you ran riviera at `http://example.com` the
 file is generated at `http://example.com/river.js`.
 
+
 [river.js]:      http://riverjs.org
 [riviera-admin]: https://github.com/hawx/riviera-admin
 [rivelin]:       https://github.com/hawx/rivelin
 [newsriver-ui]:  https://github.com/necolas/newsriver-ui
+[opml]:          http://en.wikipedia.org/wiki/OPML
