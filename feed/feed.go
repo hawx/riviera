@@ -33,6 +33,7 @@ import (
 	"strconv"
 	"strings"
 	"time"
+	"io"
 )
 
 type ChannelHandler func(f *Feed, newchannels []*Channel)
@@ -40,23 +41,19 @@ type ItemHandler func(f *Feed, ch *Channel, newitems []*Item)
 
 type Feed struct {
 	// Custom cache timeout.
-	CacheTimeout time.Duration
-
-	// Make sure we adhere to the cache timeout specified in the feed. If
-	// our CacheTimeout is higher than that, we will use that instead.
-	EnforceCacheLimit bool
+	cacheTimeout time.Duration
 
 	// Type of feed. Rss, Atom, etc
-	Type string
+	format string
 
 	// Version of the feed. Major and Minor.
-	Version [2]int
+	version [2]int
 
 	// Channels with content.
-	Channels []*Channel
+	channels []*Channel
 
 	// Url from which this feed was created.
-	Url string
+	url string
 
 	// Known containing a list of known Items and Channels for this instance
 	known Database
@@ -74,11 +71,10 @@ type Feed struct {
 	lastupdate time.Time
 }
 
-func New(cachetimeout time.Duration, enforcecachelimit bool, ch ChannelHandler, ih ItemHandler, database Database) *Feed {
+func New(cachetimeout time.Duration, ch ChannelHandler, ih ItemHandler, database Database) *Feed {
 	v := new(Feed)
-	v.CacheTimeout = cachetimeout
-	v.EnforceCacheLimit = enforcecachelimit
-	v.Type = "none"
+	v.cacheTimeout = cachetimeout
+	v.format = "none"
 	v.known = database
 	v.chanhandler = ch
 	v.itemhandler = ih
@@ -92,30 +88,33 @@ func New(cachetimeout time.Duration, enforcecachelimit bool, ch ChannelHandler, 
 // routine when dealing with non-utf8 input. Supply 'nil' to use the
 // default from Go's xml package.
 //
-// This is equivalent to calling FetchClient with http.DefaultClient
-func (this *Feed) Fetch(uri string, charset xmlx.CharsetFunc) (err error) {
-	return this.FetchClient(uri, http.DefaultClient, charset)
-}
-
-// Fetch retrieves the feed's latest content if necessary.
-//
-// The charset parameter overrides the xml decoder's CharsetReader.
-// This allows us to specify a custom character encoding conversion
-// routine when dealing with non-utf8 input. Supply 'nil' to use the
-// default from Go's xml package.
-//
 // The client parameter allows the use of arbitrary network connections, for
 // example the Google App Engine "URL Fetch" service.
-func (this *Feed) FetchClient(uri string, client *http.Client, charset xmlx.CharsetFunc) (err error) {
+func (this *Feed) Fetch(uri string, client *http.Client, charset xmlx.CharsetFunc) (int, error) {
 	if !this.CanUpdate() {
-		return
+		return -1, nil
 	}
 
-	this.Url = uri
-	doc := xmlx.New()
+	this.url = uri
 
-	if err = doc.LoadUriClient(uri, client, charset); err != nil {
-		return
+	r, err := client.Get(uri)
+	if err != nil {
+		return -1, err
+	}
+	defer r.Body.Close()
+
+	if r.StatusCode != http.StatusOK {
+		return r.StatusCode, nil
+	}
+
+	return r.StatusCode, this.load(r.Body, charset)
+}
+
+func (this *Feed) load(r io.Reader, charset xmlx.CharsetFunc) error {
+	doc := xmlx.New()
+	err := doc.LoadStream(r, charset)
+	if err != nil {
+		return err
 	}
 
 	return this.makeFeed(doc)
@@ -127,9 +126,8 @@ func (this *Feed) FetchClient(uri string, client *http.Client, charset xmlx.Char
 // This allows us to specify a custom character encoding conversion
 // routine when dealing with non-utf8 input. Supply 'nil' to use the
 // default from Go's xml package.
-
-func (this *Feed) FetchBytes(uri string, content []byte, charset xmlx.CharsetFunc) (err error) {
-	this.Url = uri
+func (this *Feed) fetchBytes(uri string, content []byte, charset xmlx.CharsetFunc) (err error) {
+	this.url = uri
 
 	doc := xmlx.New()
 
@@ -143,20 +141,20 @@ func (this *Feed) FetchBytes(uri string, content []byte, charset xmlx.CharsetFun
 func (this *Feed) makeFeed(doc *xmlx.Document) (err error) {
 	// Extract type and version of the feed so we can have the appropriate
 	// function parse it (rss 0.91, rss 0.92, rss 2, atom etc).
-	this.Type, this.Version = this.GetVersionInfo(doc)
+	this.format, this.version = this.GetVersionInfo(doc)
 
 	if ok := this.testVersions(); !ok {
-		err = errors.New(fmt.Sprintf("Unsupported feed: %s, version: %+v", this.Type, this.Version))
+		err = errors.New(fmt.Sprintf("Unsupported feed: %s, version: %+v", this.format, this.version))
 		return
 	}
 
-	if err = this.buildFeed(doc); err != nil || len(this.Channels) == 0 {
+	if err = this.buildFeed(doc); err != nil || len(this.channels) == 0 {
 		return
 	}
 
 	// reset cache timeout values according to feed specified values (TTL)
-	if this.EnforceCacheLimit && this.CacheTimeout < time.Minute*time.Duration(this.Channels[0].TTL) {
-		this.CacheTimeout = time.Minute * time.Duration(this.Channels[0].TTL)
+	if this.cacheTimeout < time.Minute*time.Duration(this.channels[0].TTL) {
+		this.cacheTimeout = time.Minute * time.Duration(this.channels[0].TTL)
 	}
 
 	this.notifyListeners()
@@ -166,7 +164,7 @@ func (this *Feed) makeFeed(doc *xmlx.Document) (err error) {
 
 func (this *Feed) notifyListeners() {
 	var newchannels []*Channel
-	for _, channel := range this.Channels {
+	for _, channel := range this.channels {
 		if !this.known.Contains(channel.Key()) {
 			newchannels = append(newchannels, channel)
 		}
@@ -189,30 +187,29 @@ func (this *Feed) notifyListeners() {
 
 // This function returns true or false, depending on whether the CacheTimeout
 // value has expired or not. Additionally, it will ensure that we adhere to the
-// RSS spec's SkipDays and SkipHours values (if Feed.EnforceCacheLimit is set to
-// true). If this function returns true, you can be sure that a fresh feed
-// update will be performed.
+// RSS spec's SkipDays and SkipHours values. If this function returns true, you
+// can be sure that a fresh feed update will be performed.
 func (this *Feed) CanUpdate() bool {
 	// Make sure we are not within the specified cache-limit.
 	// This ensures we don't request data too often.
 	utc := time.Now().UTC()
-	if utc.Sub(this.lastupdate) < this.CacheTimeout {
+	if utc.Sub(this.lastupdate) < this.cacheTimeout {
 		return false
 	}
 
 	// If skipDays or skipHours are set in the RSS feed, use these to see if
 	// we can update.
-	if len(this.Channels) == 1 && this.Type == "rss" {
-		if this.EnforceCacheLimit && len(this.Channels[0].SkipDays) > 0 {
-			for _, v := range this.Channels[0].SkipDays {
+	if len(this.channels) == 1 && this.format == "rss" {
+		if len(this.channels[0].SkipDays) > 0 {
+			for _, v := range this.channels[0].SkipDays {
 				if time.Weekday(v) == utc.Weekday() {
 					return false
 				}
 			}
 		}
 
-		if this.EnforceCacheLimit && len(this.Channels[0].SkipHours) > 0 {
-			for _, v := range this.Channels[0].SkipHours {
+		if len(this.channels[0].SkipHours) > 0 {
+			for _, v := range this.channels[0].SkipHours {
 				if v == utc.Hour() {
 					return false
 				}
@@ -227,11 +224,11 @@ func (this *Feed) CanUpdate() bool {
 // Returns the number of seconds needed to elapse
 // before the feed should update.
 func (this *Feed) DurationTillUpdate() time.Duration {
-	return this.CacheTimeout - time.Now().UTC().Sub(this.lastupdate)
+	return this.cacheTimeout - time.Now().UTC().Sub(this.lastupdate)
 }
 
 func (this *Feed) buildFeed(doc *xmlx.Document) (err error) {
-	switch this.Type {
+	switch this.format {
 	case "rss":
 		err = this.readRss2(doc)
 	case "atom":
@@ -241,14 +238,14 @@ func (this *Feed) buildFeed(doc *xmlx.Document) (err error) {
 }
 
 func (this *Feed) testVersions() bool {
-	switch this.Type {
+	switch this.format {
 	case "rss":
-		if this.Version[0] > 2 || (this.Version[0] == 2 && this.Version[1] > 0) {
+		if this.version[0] > 2 || (this.version[0] == 2 && this.version[1] > 0) {
 			return false
 		}
 
 	case "atom":
-		if this.Version[0] > 1 || (this.Version[0] == 1 && this.Version[1] > 0) {
+		if this.version[0] > 1 || (this.version[0] == 1 && this.version[1] > 0) {
 			return false
 		}
 

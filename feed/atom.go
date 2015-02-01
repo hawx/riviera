@@ -107,6 +107,6 @@ func (this *Feed) readAtom(doc *xmlx.Document) (err error) {
 			ch.Items = append(ch.Items, i)
 		}
 	}
-	this.Channels = foundChannels
+	this.channels = foundChannels
 	return
 }

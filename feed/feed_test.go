@@ -38,7 +38,7 @@ func Test_NewItem(t *testing.T) {
 	}
 
 	content, _ = ioutil.ReadFile("testdata/initial_plus_one_new.atom")
-	feed.FetchBytes("http://example.com", content, nil)
+	feed.fetchBytes("http://example.com", content, nil)
 	expected := "Second title"
 	if len(items) != 1 {
 		t.Errorf("Expected %s new item, got %s", 1, len(items))
@@ -55,7 +55,7 @@ func Test_AtomAuthor(t *testing.T) {
 		t.Errorf("unable to load file")
 	}
 	feed := New(1, true, chanHandler, itemHandler, NewDatabase())
-	err = feed.FetchBytes("http://example.com", content, nil)
+	err = feed.fetchBytes("http://example.com", content, nil)
 
 	item := feed.Channels[0].Items[0]
 	expected := "Cody Lee"
@@ -67,7 +67,7 @@ func Test_AtomAuthor(t *testing.T) {
 func Test_RssAuthor(t *testing.T) {
 	content, _ := ioutil.ReadFile("testdata/boing.rss")
 	feed := New(1, true, chanHandler, itemHandler, NewDatabase())
-	feed.FetchBytes("http://example.com", content, nil)
+	feed.fetchBytes("http://example.com", content, nil)
 
 	item := feed.Channels[0].Items[0]
 	expected := "Cory Doctorow"
@@ -79,7 +79,7 @@ func Test_RssAuthor(t *testing.T) {
 func Test_ItemExtensions(t *testing.T) {
 	content, _ := ioutil.ReadFile("testdata/extension.rss")
 	feed := New(1, true, chanHandler, itemHandler, NewDatabase())
-	feed.FetchBytes("http://example.com", content, nil)
+	feed.fetchBytes("http://example.com", content, nil)
 
 	edgarExtensionxbrlFiling := feed.Channels[0].Items[0].Extensions["http://www.sec.gov/Archives/edgar"]["xbrlFiling"][0].Childrens
 	companyExpected := "Cellular Biomedicine Group, Inc."
@@ -104,7 +104,7 @@ func Test_ItemExtensions(t *testing.T) {
 func Test_ChannelExtensions(t *testing.T) {
 	content, _ := ioutil.ReadFile("testdata/extension.rss")
 	feed := New(1, true, chanHandler, itemHandler, NewDatabase())
-	feed.FetchBytes("http://example.com", content, nil)
+	feed.fetchBytes("http://example.com", content, nil)
 
 	channel := feed.Channels[0]
 	itunesExtentions := channel.Extensions["http://www.itunes.com/dtds/podcast-1.0.dtd"]
@@ -134,7 +134,7 @@ func Test_ChannelExtensions(t *testing.T) {
 func Test_CData(t *testing.T) {
 	content, _ := ioutil.ReadFile("testdata/iosBoardGameGeek.rss")
 	feed := New(1, true, chanHandler, itemHandler, NewDatabase())
-	feed.FetchBytes("http://example.com", content, nil)
+	feed.fetchBytes("http://example.com", content, nil)
 
 	item := feed.Channels[0].Items[0]
 	expected := `<p>abc<div>"def"</div>ghi`
@@ -146,7 +146,7 @@ func Test_CData(t *testing.T) {
 func Test_Link(t *testing.T) {
 	content, _ := ioutil.ReadFile("testdata/nytimes.rss")
 	feed := New(1, true, chanHandler, itemHandler, NewDatabase())
-	feed.FetchBytes("http://example.com", content, nil)
+	feed.fetchBytes("http://example.com", content, nil)
 
 	channel := feed.Channels[0]
 	item := channel.Items[0]

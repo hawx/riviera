@@ -215,7 +215,7 @@ func (this *Feed) readRss2(doc *xmlx.Document) (err error) {
 		}
 
 	}
-	this.Channels = foundChannels
+	this.channels = foundChannels
 	return
 }
 

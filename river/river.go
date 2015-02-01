@@ -74,11 +74,26 @@ func (r *river) Add(sub subscriptions.Subscription) {
 	b, _ := persistence.NewBucket(r.store, sub.Uri)
 
 	tributary := newTributary(b, sub.Uri, r.cacheTimeout)
+
 	tributary.OnUpdate(func(feed models.Feed) {
 		sub.FeedUrl = feed.FeedUrl
 		sub.WebsiteUrl = feed.WebsiteUrl
 		sub.FeedTitle = feed.FeedTitle
 		sub.FeedDescription = feed.FeedDescription
+
+		r.subs.Refresh(sub)
+	})
+
+	tributary.OnStatus(func(code Status) {
+		switch code {
+		case Good:
+			sub.Status = subscriptions.Good
+		case Bad:
+			sub.Status = subscriptions.Bad
+		case Gone:
+			sub.Status = subscriptions.Gone
+			defer tributary.Kill()
+		}
 
 		r.subs.Refresh(sub)
 	})

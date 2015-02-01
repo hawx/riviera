@@ -7,6 +7,13 @@ import (
 	"encoding/json"
 )
 
+type Status string
+const (
+	Good Status = "Good"
+	Bad  Status = "Bad"
+	Gone Status = "Gone"
+)
+
 type Subscriptions interface {
 	List() []Subscription
 	Import(opml.Opml)
@@ -32,6 +39,7 @@ type Subscription struct {
 	WebsiteUrl      string `json:"websiteUrl"`
 	FeedTitle       string `json:"feedTitle"`
 	FeedDescription string `json:"feedDescription"`
+	Status          Status `json:"status"`
 }
 
 type subs struct {
