@@ -39,6 +39,13 @@ func convertItem(item *feed.Item) *models.Item {
 				i.PermaLink = link.Href
 				i.Link = link.Href
 			}
+
+			if link.Rel == "enclosure" {
+				i.Enclosures = append(i.Enclosures, models.Enclosure{
+					Url: link.Href,
+					Type: link.Type,
+				})
+			}
 		}
 	}
 
