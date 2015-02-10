@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/hawx/riviera/river"
 	"github.com/hawx/riviera/data"
+	"github.com/hawx/riviera/river"
 	"github.com/hawx/riviera/subscriptions"
 	"github.com/hawx/riviera/subscriptions/opml"
 

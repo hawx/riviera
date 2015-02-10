@@ -17,10 +17,12 @@ func convertItem(item *feed.Item) *models.Item {
 	}
 
 	i := &models.Item{
-		Body:    stripAndCrop(item.Description),
-		PubDate: models.RssTime{pubDate},
-		Title:   item.Title,
-		Id:      item.Key(),
+		Body:       stripAndCrop(item.Description),
+		PubDate:    models.RssTime{pubDate},
+		Title:      item.Title,
+		Id:         item.Key(),
+		Comments:   item.Comments,
+		Enclosures: []models.Enclosure{},
 	}
 
 	if item.Guid != nil && item.Guid.IsPermaLink {
@@ -42,6 +44,14 @@ func convertItem(item *feed.Item) *models.Item {
 
 	if item.Content != nil {
 		i.Body = stripAndCrop(item.Content.Text)
+	}
+
+	for _, enclosure := range item.Enclosures {
+		i.Enclosures = append(i.Enclosures, models.Enclosure{
+			Url:    enclosure.Url,
+			Type:   enclosure.Type,
+			Length: enclosure.Length,
+		})
 	}
 
 	return i

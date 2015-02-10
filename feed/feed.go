@@ -29,11 +29,11 @@ import (
 	"errors"
 	"fmt"
 	xmlx "github.com/jteeuwen/go-pkg-xmlx"
+	"io"
 	"net/http"
 	"strconv"
 	"strings"
 	"time"
-	"io"
 )
 
 type ChannelHandler func(f *Feed, newchannels []*Channel)

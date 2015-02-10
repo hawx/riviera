@@ -5,9 +5,9 @@ package data
 
 import (
 	"github.com/boltdb/bolt"
+
 	"fmt"
 )
-
 
 type Database interface {
 	// Bucket returns a namespaced bucket for storing key-value data.
@@ -44,7 +44,6 @@ type Tx interface {
 	All() [][]byte
 }
 
-
 type database struct {
 	db *bolt.DB
 }
@@ -75,9 +74,8 @@ func (this *database) Close() error {
 	return this.db.Close()
 }
 
-
 type bucket struct {
-	db *bolt.DB
+	db   *bolt.DB
 	name []byte
 }
 
@@ -94,7 +92,6 @@ func (this *bucket) Update(t func(Tx) error) error {
 		return t(tx{b})
 	})
 }
-
 
 type tx struct {
 	b *bolt.Bucket

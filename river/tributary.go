@@ -15,6 +15,7 @@ import (
 )
 
 type Status int
+
 const (
 	Good Status = iota
 	Bad

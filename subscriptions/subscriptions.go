@@ -8,6 +8,7 @@ import (
 )
 
 type Status string
+
 const (
 	Good Status = "Good"
 	Bad  Status = "Bad"

@@ -45,8 +45,19 @@ type Item struct {
 	// incremented by one for each item, but that's not guaranteed.
 	Id string `json:"id"`
 
-	// I am, at least for the moment, not including the optional elements that
-	// river.js allows.
+	// Comments points to a page of comments related to the item (it's exactly as
+	// in RSS 2.0).
+	Comments string `json:"comments,omitempty"`
+
+	// Enclosure is exactly as in RSS 2.0, with three sub-elements, url, type and
+	// length.
+	Enclosures []Enclosure `json:"enclosure,omitempty"`
+}
+
+type Enclosure struct {
+	Url    string `json:"url"`
+	Type   string `json:"type"`
+	Length int64  `json:"length"`
 }
 
 type Metadata struct {

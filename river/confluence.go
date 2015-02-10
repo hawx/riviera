@@ -1,8 +1,8 @@
 package river
 
 import (
-	"github.com/hawx/riviera/river/persistence"
 	"github.com/hawx/riviera/river/models"
+	"github.com/hawx/riviera/river/persistence"
 
 	"time"
 )
