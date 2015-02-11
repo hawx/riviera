@@ -1,10 +1,10 @@
+// Package models contains structs that map to the parts of a river.js
+// feed. Commentary for the types in this package is copied from riverjs.org.
 package models
 
 import "time"
 
-// Commentary copied from riverjs.org.
-
-type Wrapper struct {
+type River struct {
 	UpdatedFeeds Feeds    `json:"updatedFeeds"`
 	Metadata     Metadata `json:"metadata"`
 }

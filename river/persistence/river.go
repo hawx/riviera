@@ -8,6 +8,9 @@ import (
 	"time"
 )
 
+// A River contains persisted feed data, specifically each "block" of updates
+// for a feed. This allows the river to be recreated from past data, to be
+// displayed.
 type River interface {
 	Add(models.Feed)
 	Latest(time.Duration) []models.Feed

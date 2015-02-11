@@ -5,6 +5,7 @@ import (
 	"github.com/hawx/riviera/feed"
 )
 
+// A Bucket is an implementation of a feed.Database that persists data.
 type Bucket interface {
 	feed.Database
 }

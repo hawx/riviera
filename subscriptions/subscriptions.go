@@ -1,3 +1,5 @@
+// Package subscriptions implements a list of feeds along with operations to
+// modify the list.
 package subscriptions
 
 import (
@@ -16,15 +18,28 @@ const (
 )
 
 type Subscriptions interface {
+	// The list of feeds subscribed to.
 	List() []Subscription
-	Import(opml.Opml)
+
+	// Add a new feed url to the list.
 	Add(string)
+
+	// Refresh the data for a particular Subscription.
 	Refresh(Subscription)
+
+	// Remove the Subscription with url provided.
 	Remove(string)
+
+	// Call the associated function whenever Add(string) is called, with the
+	// Subscription that is created..
 	OnAdd(func(Subscription))
+
+	// Call the associated function whenever Remove(string) is called, with the
+	// string value provided.
 	OnRemove(func(string))
 }
 
+// A List provides a read-only view to Subscriptions.
 type List interface {
 	List() []Subscription
 	Refresh(Subscription)
@@ -60,12 +75,6 @@ func Open(db data.Database) (Subscriptions, error) {
 	}
 
 	return &subs{b, []func(Subscription){}, []func(string){}}, nil
-}
-
-func (s *subs) Import(doc opml.Opml) {
-	for _, e := range doc.Body.Outline {
-		s.Add(e.XmlUrl)
-	}
 }
 
 func (s *subs) List() []Subscription {
@@ -119,6 +128,13 @@ func (s *subs) OnAdd(f func(Subscription)) {
 
 func (s *subs) OnRemove(f func(string)) {
 	s.onRemove = append(s.onRemove, f)
+}
+
+// FromOpml adds all feeds listed in an opml.Opml document to the Subscriptions.
+func FromOpml(s Subscriptions, doc opml.Opml) {
+	for _, e := range doc.Body.Outline {
+		s.Add(e.XmlUrl)
+	}
 }
 
 // AsOpml returns a representation of the Subscriptions as an OMPL document.

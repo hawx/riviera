@@ -28,11 +28,7 @@ type river struct {
 	mapping      Mapping
 }
 
-func New(store data.Database, cutOff, cacheTimeout time.Duration) River {
-	return NewWithMapping(store, DefaultMapping, cutOff, cacheTimeout)
-}
-
-func NewWithMapping(store data.Database, mapping Mapping, cutOff, cacheTimeout time.Duration) River {
+func New(store data.Database, mapping Mapping, cutOff, cacheTimeout time.Duration) River {
 	r, _ := persistence.NewRiver(store)
 	confluence := newConfluence(r, cutOff)
 
@@ -67,12 +63,10 @@ func (r *river) WriteTo(w io.Writer) error {
 		Secs:      0,
 	}
 
-	wrapper := models.Wrapper{
+	return json.NewEncoder(w).Encode(models.River{
 		Metadata:     metadata,
 		UpdatedFeeds: updatedFeeds,
-	}
-
-	return json.NewEncoder(w).Encode(wrapper)
+	})
 }
 
 func (r *river) Add(sub subscriptions.Subscription) {

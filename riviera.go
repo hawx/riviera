@@ -85,12 +85,12 @@ func main() {
 			log.Fatal(err)
 		}
 
-		subs.Import(outline)
+		subscriptions.FromOpml(subs, outline)
 		log.Printf("imported %s\n", *opmlPath)
 		return
 	}
 
-	feeds := river.New(store, duration, cacheTimeout)
+	feeds := river.New(store, river.DefaultMapping, duration, cacheTimeout)
 	feeds.SubscribeTo(subs)
 
 	http.HandleFunc("/river.js", func(w http.ResponseWriter, r *http.Request) {
