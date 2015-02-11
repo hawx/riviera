@@ -58,13 +58,8 @@ func New(store data.Database, subs subscriptions.List, options Options) River {
 		r.Add(sub)
 	}
 
-	subs.OnAdd(func(sub subscriptions.Subscription) {
-		r.Add(sub)
-	})
-
-	subs.OnRemove(func(uri string) {
-		r.Remove(uri)
-	})
+	subs.OnAdd(r.Add)
+	subs.OnRemove(r.Remove)
 
 	return r
 }
