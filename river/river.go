@@ -25,13 +25,18 @@ type river struct {
 	store        data.Database
 	cacheTimeout time.Duration
 	subs         subscriptions.List
+	mapping      Mapping
 }
 
 func New(store data.Database, cutOff, cacheTimeout time.Duration) River {
+	return NewWithMapping(store, DefaultMapping, cutOff, cacheTimeout)
+}
+
+func NewWithMapping(store data.Database, mapping Mapping, cutOff, cacheTimeout time.Duration) River {
 	r, _ := persistence.NewRiver(store)
 	confluence := newConfluence(r, cutOff)
 
-	return &river{confluence, store, cacheTimeout, nil}
+	return &river{confluence, store, cacheTimeout, nil, mapping}
 }
 
 func (r *river) SubscribeTo(subs subscriptions.List) {
@@ -73,7 +78,7 @@ func (r *river) WriteTo(w io.Writer) error {
 func (r *river) Add(sub subscriptions.Subscription) {
 	b, _ := persistence.NewBucket(r.store, sub.Uri)
 
-	tributary := newTributary(b, sub.Uri, r.cacheTimeout)
+	tributary := newTributary(b, sub.Uri, r.cacheTimeout, r.mapping)
 
 	tributary.OnUpdate(func(feed models.Feed) {
 		sub.FeedUrl = feed.FeedUrl

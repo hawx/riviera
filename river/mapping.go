@@ -9,7 +9,15 @@ import (
 	"time"
 )
 
-func convertItem(item *feed.Item) *models.Item {
+// A Mapping takes an item from a feed and returns an item for the river, if nil
+// is returned the item will not be added to the river.
+type Mapping func(*feed.Item) *models.Item
+
+// DefaultMapping will always return an item. It: attempts to parse the PubDate,
+// otherwise uses the current time; truncates the description to 280 characters;
+// finds the correct Link and PermaLink; copies any Enclosures; and fills out
+// the other properties by copying the correct values.
+func DefaultMapping(item *feed.Item) *models.Item {
 	pubDate, err := item.ParsedPubDate()
 	if err != nil {
 		log.Println(err)

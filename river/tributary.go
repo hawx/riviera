@@ -26,16 +26,18 @@ type tributary struct {
 	uri      string
 	feed     *feed.Feed
 	client   *http.Client
+	mapping  Mapping
 	onUpdate []func(models.Feed)
 	onStatus []func(Status)
 	quit     chan struct{}
 }
 
-func newTributary(store persistence.Bucket, uri string, cacheTimeout time.Duration) *tributary {
+func newTributary(store persistence.Bucket, uri string, cacheTimeout time.Duration, mapping Mapping) *tributary {
 	p := &tributary{}
 	p.uri = uri
 	p.feed = feed.New(cacheTimeout, p.chanHandler, p.itemHandler, store)
 	p.client = &http.Client{Timeout: time.Minute, Transport: &statusTransport{http.DefaultTransport.(*http.Transport), p}}
+	p.mapping = mapping
 	p.onUpdate = []func(models.Feed){}
 	p.quit = make(chan struct{})
 
@@ -127,7 +129,7 @@ func (t *tributary) chanHandler(feed *feed.Feed, newchannels []*feed.Channel) {}
 func (t *tributary) itemHandler(feed *feed.Feed, ch *feed.Channel, newitems []*feed.Item) {
 	items := []models.Item{}
 	for _, item := range newitems {
-		converted := convertItem(item)
+		converted := t.mapping(item)
 
 		if converted != nil {
 			items = append(items, *converted)
