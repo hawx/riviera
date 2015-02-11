@@ -17,7 +17,27 @@ const DOCS = "http://scripting.com/stories/2010/12/06/innovationRiverOfNewsInJso
 
 type River interface {
 	WriteTo(io.Writer) error
-	SubscribeTo(subscriptions.List)
+}
+
+type Options struct {
+	// Mapping is the function used to convert a feed item to an item in the
+	// river.
+	Mapping Mapping
+
+	// CutOff is the duration after which items are not shown in the river. This
+	// is given as a negative time and is calculated from the time the feed was
+	// fetched not the time the item was published.
+	CutOff time.Duration
+
+	// Refresh is the minimum refresh period. If an rss feed does not specify
+	// when to be fetched this duration will be used.
+	Refresh time.Duration
+}
+
+var DefaultOptions = Options{
+	Mapping: DefaultMapping,
+	CutOff:  -24 * time.Hour,
+	Refresh: 15 * time.Minute,
 }
 
 type river struct {
@@ -28,15 +48,11 @@ type river struct {
 	mapping      Mapping
 }
 
-func New(store data.Database, mapping Mapping, cutOff, cacheTimeout time.Duration) River {
-	r, _ := persistence.NewRiver(store)
-	confluence := newConfluence(r, cutOff)
+func New(store data.Database, subs subscriptions.List, options Options) River {
+	rp, _ := persistence.NewRiver(store)
+	confluence := newConfluence(rp, options.CutOff)
 
-	return &river{confluence, store, cacheTimeout, nil, mapping}
-}
-
-func (r *river) SubscribeTo(subs subscriptions.List) {
-	r.subs = subs
+	r := &river{confluence, store, options.Refresh, subs, options.Mapping}
 
 	for _, sub := range subs.List() {
 		r.Add(sub)
@@ -49,6 +65,8 @@ func (r *river) SubscribeTo(subs subscriptions.List) {
 	subs.OnRemove(func(uri string) {
 		r.Remove(uri)
 	})
+
+	return r
 }
 
 func (r *river) WriteTo(w io.Writer) error {
