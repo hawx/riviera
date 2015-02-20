@@ -113,6 +113,6 @@ func (r *river) Add(sub subscriptions.Subscription) {
 	r.confluence.Add(tributary)
 }
 
-func (r *river) Remove(uri string) bool {
-	return r.confluence.Remove(uri)
+func (r *river) Remove(uri string) {
+	r.confluence.Remove(uri)
 }
