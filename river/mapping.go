@@ -1,12 +1,13 @@
 package river
 
 import (
+	"html"
+	"log"
+	"time"
+
 	"github.com/hawx/riviera/feed"
 	"github.com/hawx/riviera/river/models"
 	"github.com/kennygrant/sanitize"
-
-	"log"
-	"time"
 )
 
 // A Mapping takes an item from a feed and returns an item for the river, if nil
@@ -50,7 +51,7 @@ func DefaultMapping(item *feed.Item) *models.Item {
 
 			if link.Rel == "enclosure" {
 				i.Enclosures = append(i.Enclosures, models.Enclosure{
-					Url: link.Href,
+					Url:  link.Href,
 					Type: link.Type,
 				})
 			}
@@ -75,7 +76,7 @@ func DefaultMapping(item *feed.Item) *models.Item {
 // Strips html markup, then limits to 280 characters. If the original text was
 // longer than 280 chars, three periods are appended.
 func stripAndCrop(content string) string {
-	content = sanitize.HTML(content)
+	content = sanitize.HTML(html.UnescapeString(content))
 
 	if len(content) < 280 {
 		return content
