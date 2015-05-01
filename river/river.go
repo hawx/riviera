@@ -3,10 +3,10 @@
 package river
 
 import (
-	"github.com/hawx/riviera/data"
-	"github.com/hawx/riviera/river/models"
-	"github.com/hawx/riviera/river/persistence"
-	"github.com/hawx/riviera/subscriptions"
+	"hawx.me/code/riviera/data"
+	"hawx.me/code/riviera/river/models"
+	"hawx.me/code/riviera/river/persistence"
+	"hawx.me/code/riviera/subscriptions"
 
 	"encoding/json"
 	"io"

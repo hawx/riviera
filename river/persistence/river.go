@@ -1,8 +1,8 @@
 package persistence
 
 import (
-	"github.com/hawx/riviera/data"
-	"github.com/hawx/riviera/river/models"
+	"hawx.me/code/riviera/data"
+	"hawx.me/code/riviera/river/models"
 
 	"encoding/json"
 	"time"

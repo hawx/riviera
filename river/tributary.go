@@ -1,9 +1,9 @@
 package river
 
 import (
-	"github.com/hawx/riviera/feed"
-	"github.com/hawx/riviera/river/models"
-	"github.com/hawx/riviera/river/persistence"
+	"hawx.me/code/riviera/feed"
+	"hawx.me/code/riviera/river/models"
+	"hawx.me/code/riviera/river/persistence"
 
 	"code.google.com/p/go-charset/charset"
 	_ "code.google.com/p/go-charset/data"

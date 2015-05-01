@@ -3,8 +3,8 @@
 package subscriptions
 
 import (
-	"github.com/hawx/riviera/data"
-	"github.com/hawx/riviera/subscriptions/opml"
+	"hawx.me/code/riviera/data"
+	"hawx.me/code/riviera/subscriptions/opml"
 
 	"encoding/json"
 )

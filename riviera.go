@@ -1,10 +1,10 @@
 package main
 
 import (
-	"github.com/hawx/riviera/data"
-	"github.com/hawx/riviera/river"
-	"github.com/hawx/riviera/subscriptions"
-	"github.com/hawx/riviera/subscriptions/opml"
+	"hawx.me/code/riviera/data"
+	"hawx.me/code/riviera/river"
+	"hawx.me/code/riviera/subscriptions"
+	"hawx.me/code/riviera/subscriptions/opml"
 
 	"github.com/hawx/serve"
 

@@ -1,8 +1,8 @@
 package persistence
 
 import (
-	"github.com/hawx/riviera/data"
-	"github.com/hawx/riviera/feed"
+	"hawx.me/code/riviera/data"
+	"hawx.me/code/riviera/feed"
 )
 
 // A Bucket is an implementation of a feed.Database that persists data.

@@ -5,9 +5,9 @@ import (
 	"log"
 	"time"
 
-	"github.com/hawx/riviera/feed"
-	"github.com/hawx/riviera/river/models"
 	"github.com/kennygrant/sanitize"
+	"hawx.me/code/riviera/feed"
+	"hawx.me/code/riviera/river/models"
 )
 
 // A Mapping takes an item from a feed and returns an item for the river, if nil
