@@ -3,7 +3,7 @@
 A [river.js][] generator written in Go.
 
 ``` bash
-$ go get github.com/hawx/riviera
+$ go get hawx.me/code/riviera
 $ riviera
 XXXX/XX/XX XX:XX:XX listening on port :8080
 ...

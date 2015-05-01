@@ -6,7 +6,7 @@ import (
 	"hawx.me/code/riviera/subscriptions"
 	"hawx.me/code/riviera/subscriptions/opml"
 
-	"github.com/hawx/serve"
+	"hawx.me/code/serve"
 
 	"encoding/json"
 	"flag"
