@@ -11,6 +11,8 @@ import (
 	_ "code.google.com/p/go-charset/data"
 )
 
+func itemHandler(feed *Feed, ch *Channel, newitems []*Item) {}
+
 func charsetReader(name string, r io.Reader) (io.Reader, error) {
 	return charset.NewReader(name, r)
 }
@@ -28,7 +30,7 @@ func TestFeed(t *testing.T) {
 	var err error
 
 	for _, uri := range urilist {
-		feed = New(5, chanHandler, itemHandler, NewDatabase())
+		feed = New(5, itemHandler, NewDatabase())
 
 		if _, err = feed.Fetch(uri, &http.Client{Timeout: 5 * time.Second}, charsetReader); err != nil {
 			t.Errorf("%s >>> %s", uri, err)
@@ -40,7 +42,7 @@ func TestFeed(t *testing.T) {
 func Test_NewItem(t *testing.T) {
 	content, _ := ioutil.ReadFile("testdata/initial.atom")
 	itemsCh := make(chan []*Item, 2)
-	feed := New(1, chanHandler, func(_ *Feed, _ *Channel, newitems []*Item) {
+	feed := New(1, func(_ *Feed, _ *Channel, newitems []*Item) {
 		itemsCh <- newitems
 	}, NewDatabase())
 	err := feed.fetchBytes("http://example.com", content, nil)
@@ -85,7 +87,7 @@ func Test_AtomAuthor(t *testing.T) {
 		t.Errorf("unable to load file")
 	}
 	itemCh := make(chan *Item, 1)
-	feed := New(1, chanHandler, func(f *Feed, ch *Channel, newitems []*Item) {
+	feed := New(1, func(f *Feed, ch *Channel, newitems []*Item) {
 		itemCh <- newitems[0]
 	}, NewDatabase())
 	err = feed.fetchBytes("http://example.com", content, nil)
@@ -104,7 +106,7 @@ func Test_AtomAuthor(t *testing.T) {
 func Test_RssAuthor(t *testing.T) {
 	content, _ := ioutil.ReadFile("testdata/boing.rss")
 	itemCh := make(chan *Item, 1)
-	feed := New(1, chanHandler, func(f *Feed, ch *Channel, newitems []*Item) {
+	feed := New(1, func(f *Feed, ch *Channel, newitems []*Item) {
 		itemCh <- newitems[0]
 	}, NewDatabase())
 	feed.fetchBytes("http://example.com", content, nil)
@@ -123,7 +125,7 @@ func Test_RssAuthor(t *testing.T) {
 func Test_ItemExtensions(t *testing.T) {
 	content, _ := ioutil.ReadFile("testdata/extension.rss")
 	itemCh := make(chan *Item, 1)
-	feed := New(1, chanHandler, func(_ *Feed, _ *Channel, newitems []*Item) {
+	feed := New(1, func(_ *Feed, _ *Channel, newitems []*Item) {
 		itemCh <- newitems[0]
 	}, NewDatabase())
 	feed.fetchBytes("http://example.com", content, nil)
@@ -156,9 +158,9 @@ func Test_ItemExtensions(t *testing.T) {
 func Test_ChannelExtensions(t *testing.T) {
 	content, _ := ioutil.ReadFile("testdata/extension.rss")
 	channelCh := make(chan *Channel, 1)
-	feed := New(1, func(_ *Feed, newchannels []*Channel) {
-		channelCh <- newchannels[0]
-	}, itemHandler, NewDatabase())
+	feed := New(1, func(_ *Feed, ch *Channel, _ []*Item) {
+		channelCh <- ch
+	}, NewDatabase())
 	feed.fetchBytes("http://example.com", content, nil)
 
 	select {
@@ -193,7 +195,7 @@ func Test_ChannelExtensions(t *testing.T) {
 func Test_CData(t *testing.T) {
 	content, _ := ioutil.ReadFile("testdata/iosBoardGameGeek.rss")
 	itemCh := make(chan *Item, 1)
-	feed := New(1, chanHandler, func(_ *Feed, _ *Channel, newitems []*Item) {
+	feed := New(1, func(_ *Feed, _ *Channel, newitems []*Item) {
 		itemCh <- newitems[0]
 	}, NewDatabase())
 	feed.fetchBytes("http://example.com", content, nil)
@@ -217,7 +219,7 @@ func Test_Link(t *testing.T) {
 	}
 	itemCh := make(chan pair, 1)
 
-	feed := New(1, chanHandler, func(_ *Feed, ch *Channel, newitems []*Item) {
+	feed := New(1, func(_ *Feed, ch *Channel, newitems []*Item) {
 		itemCh <- pair{newitems[0], ch}
 	}, NewDatabase())
 	feed.fetchBytes("http://example.com", content, nil)
@@ -241,6 +243,3 @@ func Test_Link(t *testing.T) {
 		t.Fatal("timeout")
 	}
 }
-
-func chanHandler(feed *Feed, newchannels []*Channel)        {}
-func itemHandler(feed *Feed, ch *Channel, newitems []*Item) {}

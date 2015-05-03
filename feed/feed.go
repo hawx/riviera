@@ -1,26 +1,24 @@
 /*
- Author: jim teeuwen <jimteeuwen@gmail.com>
- Dependencies: go-pkg-xmlx (http://github.com/jteeuwen/go-pkg-xmlx)
+ Package feed provides an RSS and Atom feed fetcher.
 
- This package allows us to fetch Rss and Atom feeds from the internet.
- They are parsed into an object tree which is a hyvrid of both the RSS and Atom
+ They are parsed into an object tree which is a hybrid of both the RSS and Atom
  standards.
 
  Supported feeds are:
- 	- Rss v0.91, 0.91 and 2.0
+ 	- RSS v0.91, 0.91 and 2.0
  	- Atom 1.0
 
  The package allows us to maintain cache timeout management. This prevents us
- from querying the servers for feed updates too often and risk ip bams. Appart
+ from querying the servers for feed updates too often and risk ip bams. Apart
  from setting a cache timeout manually, the package also optionally adheres to
- the TTL, SkipDays and SkipHours values specied in the feeds themselves.
+ the TTL, SkipDays and SkipHours values specified in the feeds themselves.
 
  Note that the TTL, SkipDays and SkipHour fields are only part of the RSS spec.
  For Atom feeds, we use the CacheTimeout in the Feed struct.
 
  Because the object structure is a hybrid between both RSS and Atom specs, not
  all fields will be filled when requesting either an RSS or Atom feed. I have
- tried to create as many shared fields as possiblem but some of them simply do
+ tried to create as many shared fields as possible but some of them simply do
  not occur in either the RSS or Atom spec.
 */
 package feed
@@ -28,15 +26,15 @@ package feed
 import (
 	"errors"
 	"fmt"
-	xmlx "github.com/jteeuwen/go-pkg-xmlx"
 	"io"
 	"net/http"
 	"strconv"
 	"strings"
 	"time"
+
+	xmlx "github.com/jteeuwen/go-pkg-xmlx"
 )
 
-type ChannelHandler func(f *Feed, newchannels []*Channel)
 type ItemHandler func(f *Feed, ch *Channel, newitems []*Item)
 
 type Feed struct {
@@ -58,10 +56,6 @@ type Feed struct {
 	// Known containing a list of known Items and Channels for this instance
 	known Database
 
-	// A notification function, used to notify the host when a new channel
-	// has been found.
-	chanhandler ChannelHandler
-
 	// A notification function, used to notify the host when a new item
 	// has been found for a given channel.
 	itemhandler ItemHandler
@@ -71,12 +65,11 @@ type Feed struct {
 	lastupdate time.Time
 }
 
-func New(cachetimeout time.Duration, ch ChannelHandler, ih ItemHandler, database Database) *Feed {
+func New(cachetimeout time.Duration, ih ItemHandler, database Database) *Feed {
 	v := new(Feed)
 	v.cacheTimeout = cachetimeout
 	v.format = "none"
 	v.known = database
-	v.chanhandler = ch
 	v.itemhandler = ih
 	return v
 }
@@ -120,7 +113,7 @@ func (this *Feed) load(r io.Reader, charset xmlx.CharsetFunc) error {
 	return this.makeFeed(doc)
 }
 
-// Fetch retrieves the feed's content from the []byte
+// fetchBytes retrieves the feed's content from the []byte
 //
 // The charset parameter overrides the xml decoder's CharsetReader.
 // This allows us to specify a custom character encoding conversion
@@ -163,25 +156,18 @@ func (this *Feed) makeFeed(doc *xmlx.Document) (err error) {
 }
 
 func (this *Feed) notifyListeners() {
-	var newchannels []*Channel
 	for _, channel := range this.channels {
-		if !this.known.Contains(channel.Key()) {
-			newchannels = append(newchannels, channel)
-		}
-
 		var newitems []*Item
+
 		for _, item := range channel.Items {
 			if !this.known.Contains(item.Key()) {
 				newitems = append(newitems, item)
 			}
 		}
+
 		if len(newitems) > 0 && this.itemhandler != nil {
 			this.itemhandler(this, channel, newitems)
 		}
-	}
-
-	if len(newchannels) > 0 && this.chanhandler != nil {
-		this.chanhandler(this, newchannels)
 	}
 }
 
