@@ -197,21 +197,17 @@ func (this *Feed) readRss2(doc *xmlx.Document) (err error) {
 				}
 			}
 
-			tl = item.SelectNodes(ns, ns)
 			i.Extensions = make(map[string]map[string][]Extension)
-			for _, lv := range tl {
+			for _, lv := range item.Children {
 				getExtensions(&i.Extensions, lv)
 			}
 
 			ch.Items = append(ch.Items, i)
 		}
 
-		x := node.SelectNodes(ns, ns)
 		ch.Extensions = make(map[string]map[string][]Extension)
-		for _, v := range x {
-			if v.Name.Space != "" {
-				getExtensions(&ch.Extensions, v)
-			}
+		for _, v := range node.Children {
+			getExtensions(&ch.Extensions, v)
 		}
 
 	}
@@ -222,17 +218,15 @@ func (this *Feed) readRss2(doc *xmlx.Document) (err error) {
 func getExtensions(extensionsX *map[string]map[string][]Extension, node *xmlx.Node) {
 	extentions := *extensionsX
 
-	if node.Name.Space != "" {
-		extensione, noErrors := getExtension(node)
-		if noErrors {
-			if len(extentions[node.Name.Space]) == 0 {
-				extentions[node.Name.Space] = make(map[string][]Extension, 0)
-			}
-			if len(extentions[node.Name.Space][node.Name.Local]) == 0 {
-				extentions[node.Name.Space][node.Name.Local] = make([]Extension, 0)
-			}
-			extentions[node.Name.Space][node.Name.Local] = append(extentions[node.Name.Space][node.Name.Local], extensione)
+	extensione, noErrors := getExtension(node)
+	if noErrors {
+		if len(extentions[node.Name.Space]) == 0 {
+			extentions[node.Name.Space] = make(map[string][]Extension, 0)
 		}
+		if len(extentions[node.Name.Space][node.Name.Local]) == 0 {
+			extentions[node.Name.Space][node.Name.Local] = make([]Extension, 0)
+		}
+		extentions[node.Name.Space][node.Name.Local] = append(extentions[node.Name.Space][node.Name.Local], extensione)
 	}
 }
 

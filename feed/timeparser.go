@@ -30,7 +30,7 @@ func parseTime(formatted string) (time.Time, error) {
 
 	for _, layout := range layouts {
 		t, err = time.Parse(layout, formatted)
-		if !t.IsZero() && err == nil {
+		if !t.IsZero() {
 			break
 		}
 	}
