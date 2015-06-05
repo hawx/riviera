@@ -1,21 +1,27 @@
 package river
 
 import (
+	"time"
+
 	"hawx.me/code/riviera/river/models"
 	"hawx.me/code/riviera/river/persistence"
-
-	"time"
 )
+
+type trib interface {
+	OnUpdate(f func(models.Feed))
+	Uri() string
+	Kill()
+}
 
 type confluence struct {
 	store   persistence.River
-	streams []*tributary
+	streams []trib
 	latest  []models.Feed
 	cutOff  time.Duration
 }
 
 func newConfluence(store persistence.River, cutOff time.Duration) *confluence {
-	return &confluence{store, []*tributary{}, store.Latest(cutOff), cutOff}
+	return &confluence{store, []trib{}, store.Latest(cutOff), cutOff}
 }
 
 func (c *confluence) Latest() []models.Feed {
@@ -32,7 +38,7 @@ func (c *confluence) Latest() []models.Feed {
 	return c.latest
 }
 
-func (c *confluence) Add(stream *tributary) {
+func (c *confluence) Add(stream trib) {
 	c.streams = append(c.streams, stream)
 
 	stream.OnUpdate(func(feed models.Feed) {
@@ -42,7 +48,7 @@ func (c *confluence) Add(stream *tributary) {
 }
 
 func (c *confluence) Remove(uri string) bool {
-	streams := []*tributary{}
+	streams := []trib{}
 	ok := false
 
 	for _, stream := range c.streams {

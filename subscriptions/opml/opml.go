@@ -6,6 +6,9 @@ import (
 	"encoding/xml"
 	"io"
 	"os"
+
+	"code.google.com/p/go-charset/charset"
+	_ "code.google.com/p/go-charset/data"
 )
 
 type Opml struct {
@@ -60,15 +63,19 @@ func Load(path string) (doc Opml, err error) {
 	if err != nil {
 		return
 	}
+	defer file.Close()
 
-	err = xml.NewDecoder(file).Decode(&doc)
-	if err != nil {
-		return
-	}
+	return Read(file)
+}
 
+func Read(r io.Reader) (doc Opml, err error) {
+	d := xml.NewDecoder(r)
+	d.CharsetReader = charset.NewReader
+	err = d.Decode(&doc)
 	return
 }
 
 func (doc Opml) WriteTo(w io.Writer) {
+	w.Write([]byte(xml.Header))
 	xml.NewEncoder(w).Encode(doc)
 }

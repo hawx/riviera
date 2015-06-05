@@ -3,14 +3,14 @@
 package river
 
 import (
+	"encoding/json"
+	"io"
+	"time"
+
 	"hawx.me/code/riviera/data"
 	"hawx.me/code/riviera/river/models"
 	"hawx.me/code/riviera/river/persistence"
 	"hawx.me/code/riviera/subscriptions"
-
-	"encoding/json"
-	"io"
-	"time"
 )
 
 const DOCS = "http://scripting.com/stories/2010/12/06/innovationRiverOfNewsInJso.html"

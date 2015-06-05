@@ -8,7 +8,6 @@ import (
 	"code.google.com/p/go-charset/charset"
 	_ "code.google.com/p/go-charset/data"
 
-	"io"
 	"log"
 	"net/http"
 	"time"
@@ -74,10 +73,6 @@ loop:
 	log.Println("stopped fetching", t.uri)
 }
 
-func charsetReader(name string, r io.Reader) (io.Reader, error) {
-	return charset.NewReader(name, r)
-}
-
 type statusTransport struct {
 	*http.Transport
 	trib *tributary
@@ -105,7 +100,7 @@ func (t *statusTransport) RoundTrip(req *http.Request) (resp *http.Response, err
 // fetch retrieves the feed for the tributary, if an error occurs or the status
 // code is not 200 OK any listeners are notified of the status change.
 func (t *tributary) fetch() {
-	code, err := t.feed.Fetch(t.uri, t.client, charsetReader)
+	code, err := t.feed.Fetch(t.uri, t.client, charset.NewReader)
 	if err != nil {
 		t.status(Bad)
 		log.Println("error fetching", t.uri+":", code, err)
@@ -176,5 +171,8 @@ func (t *tributary) status(code Status) {
 }
 
 func (t *tributary) Kill() {
+	t.onUpdate = []func(models.Feed){}
+	t.quit = make(chan struct{})
+
 	close(t.quit)
 }

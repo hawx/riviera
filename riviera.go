@@ -2,6 +2,8 @@ package main
 
 import (
 	"hawx.me/code/riviera/data"
+	"hawx.me/code/riviera/data/boltdata"
+	"hawx.me/code/riviera/data/memdata"
 	"hawx.me/code/riviera/river"
 	"hawx.me/code/riviera/subscriptions"
 	"hawx.me/code/riviera/subscriptions/opml"
@@ -17,30 +19,48 @@ import (
 )
 
 func printHelp() {
-	fmt.Println(
-		"Usage: riviera [options]\n",
-		"\n",
-		"  Riviera is a river of news feed generator\n",
-		"\n",
-		"    --opml <path>      # Path to opml file containing feeds to import\n",
-		"    --db <path>        # Path to database\n",
-		"\n",
-		"    --cutoff <dur>     # Time to ignore items after (default: -24h)\n",
-		"    --refresh <dur>    # Time to refresh feeds after (default: 15m)\n",
-		"    --port <num>       # Port to bind to (default: 8080)\n",
-		"    --socket <path>    # Serve using unix socket instead\n",
-		"    --with-admin       # Allow access to admin routes, /-\n",
-		"\n",
-		"    --help             # Display help message\n",
-	)
+	fmt.Println(`Usage: riviera [options]
+
+  Riviera is a river of news feed generator.
+
+   --opml PATH
+      Import subscriptions from opml feed, then quit.
+
+ DISPLAY
+   --cutoff DUR='-24h'
+      Time to ignore items after, in standard go duration format.
+
+   --refresh DUR='15m'
+      Time to refresh feeds after.
+
+ DATA
+   --boltdb PATH
+      Use the boltdb file at the given path.
+
+   --memdb
+      Use an in memory database, default.
+
+ SERVE
+   --with-admin
+      Serve admin routes at '/-'.
+
+   --port PORT='8080'
+      Serve on given port.
+
+   --socket SOCK
+      Serve at given socket.
+`)
 }
 
 var (
 	opmlPath = flag.String("opml", "", "")
-	dbPath   = flag.String("db", "./db", "")
 
-	cutOff    = flag.String("cutoff", "-24h", "")
-	refresh   = flag.String("refresh", "15m", "")
+	cutOff  = flag.String("cutoff", "-24h", "")
+	refresh = flag.String("refresh", "15m", "")
+
+	boltdbPath = flag.String("boltdb", "", "")
+	memdbFlag  = flag.Bool("memdb", true, "")
+
 	port      = flag.String("port", "8080", "")
 	socket    = flag.String("socket", "", "")
 	withAdmin = flag.Bool("with-admin", false, "")
@@ -68,11 +88,15 @@ func main() {
 		log.Fatal(err)
 	}
 
-	store, err := data.Open(*dbPath)
-	if err != nil {
-		log.Fatal(err)
+	var store data.Database = memdata.Open()
+
+	if *boltdbPath != "" {
+		store, err = boltdata.Open(*boltdbPath)
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer store.Close()
 	}
-	defer store.Close()
 
 	subs, err := subscriptions.Open(store)
 	if err != nil {
