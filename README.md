@@ -4,7 +4,7 @@ A [river.js][] generator written in Go.
 
 ``` bash
 $ go get hawx.me/code/riviera
-$ riviera
+$ riviera --boltdb ./mydb
 XXXX/XX/XX XX:XX:XX listening on port :8080
 ...
 ```
@@ -20,8 +20,8 @@ If the `--with-admin` flag is passed, the following routes are also exposed:
 - `/-/subscribe`
 - `/-/unsubscribe`
 
-All data is stored in a local database with path specified by the `--db` flag,
-by default at `./db`.
+By default an in memory database will be used, so to persist data specify a path
+with the `--boltdb` option.
 
 
 ## Importing existing subscriptions
