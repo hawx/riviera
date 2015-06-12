@@ -20,10 +20,8 @@ type River interface {
 	// a callback function.
 	WriteTo(w io.Writer) error
 
-	// Meta returns a list of data (title, description, etc.) about the feeds
-	// subscribed to, along with a log of the last few times the feed was fetched
-	// and the HTTP status code that was returned..
-	Meta() []Metadata
+	// Log returns a list of fetch events.
+	Log() []Event
 
 	// Add subscribes the river to the feed at uri.
 	Add(uri string)
@@ -54,7 +52,7 @@ var DefaultOptions = Options{
 	Mapping:   DefaultMapping,
 	CutOff:    -24 * time.Hour,
 	Refresh:   15 * time.Minute,
-	LogLength: 5,
+	LogLength: 500,
 }
 
 // river acts as the top-level factory. It manages the creation of the initial
@@ -71,7 +69,7 @@ func New(store data.Database, options Options) River {
 	rp, _ := persistence.NewRiver(store)
 
 	return &river{
-		confluence:   newConfluence(rp, newMetaStore(options.LogLength), options.CutOff),
+		confluence:   newConfluence(rp, newEvents(options.LogLength), options.CutOff),
 		store:        store,
 		cacheTimeout: options.Refresh,
 		mapping:      options.Mapping,
@@ -108,6 +106,6 @@ func (r *river) Remove(uri string) {
 	r.confluence.Remove(uri)
 }
 
-func (r *river) Meta() []Metadata {
-	return r.confluence.Meta()
+func (r *river) Log() []Event {
+	return r.confluence.Log()
 }

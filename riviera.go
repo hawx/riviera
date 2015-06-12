@@ -29,9 +29,7 @@ func printHelp() {
   as FILE, polls these feeds at a customisable interval, and serves
   a riverjs (http://riverjs.org) format document at '/river'.
 
-  A page is served at '/river/meta' containing information about the
-  feeds subscribed to, along with a log for each feed with when it
-  was fetched and what the response code was.
+  A json list of fetch events is served at '/river/log'
 
   Changes to FILE are watched and will modify the feeds watched, if it
   can be successfully parsed.
@@ -129,10 +127,10 @@ func (h *riverHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		}
 		fmt.Fprintf(w, ")")
 
-	case "/meta":
+	case "/log":
 		w.Header().Set("Content-Type", "application/json")
-		if err := json.NewEncoder(w).Encode(h.Meta()); err != nil {
-			log.Println("/meta:", err)
+		if err := json.NewEncoder(w).Encode(h.Log()); err != nil {
+			log.Println("/log:", err)
 		}
 
 	default:

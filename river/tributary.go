@@ -13,13 +13,14 @@ import (
 )
 
 type tributary struct {
-	uri      string
-	feed     *feed.Feed
-	client   *http.Client
-	mapping  Mapping
-	onUpdate []func(models.Feed)
-	onStatus []func(int)
-	quit     chan struct{}
+	OnUpdate func(models.Feed)
+	OnStatus func(int)
+
+	uri     string
+	feed    *feed.Feed
+	client  *http.Client
+	mapping Mapping
+	quit    chan struct{}
 }
 
 func newTributary(store persistence.Bucket, uri string, cacheTimeout time.Duration, mapping Mapping) *tributary {
@@ -32,14 +33,6 @@ func newTributary(store persistence.Bucket, uri string, cacheTimeout time.Durati
 
 	go p.poll()
 	return p
-}
-
-func (t *tributary) OnUpdate(f func(models.Feed)) {
-	t.onUpdate = append(t.onUpdate, f)
-}
-
-func (t *tributary) OnStatus(f func(int)) {
-	t.onStatus = append(t.onStatus, f)
 }
 
 func (t *tributary) Uri() string {
@@ -91,7 +84,7 @@ func (t *statusTransport) RoundTrip(req *http.Request) (resp *http.Response, err
 // fetch retrieves the feed for the tributary.
 func (t *tributary) fetch() {
 	code, err := t.feed.Fetch(t.uri, t.client, charset.NewReader)
-	t.status(code)
+	t.OnStatus(code)
 
 	if err != nil {
 		log.Println("error fetching", t.uri+":", code, err)
@@ -128,7 +121,7 @@ func (t *tributary) itemHandler(feed *feed.Feed, ch *feed.Channel, newitems []*f
 		}
 	}
 
-	t.notify(models.Feed{
+	t.OnUpdate(models.Feed{
 		FeedUrl:         feedUrl,
 		WebsiteUrl:      websiteUrl,
 		FeedTitle:       ch.Title,
@@ -138,19 +131,6 @@ func (t *tributary) itemHandler(feed *feed.Feed, ch *feed.Channel, newitems []*f
 	})
 }
 
-func (t *tributary) notify(feed models.Feed) {
-	for _, f := range t.onUpdate {
-		f(feed)
-	}
-}
-
-func (t *tributary) status(code int) {
-	for _, f := range t.onStatus {
-		f(code)
-	}
-}
-
 func (t *tributary) Kill() {
-	t.onUpdate = []func(models.Feed){}
 	close(t.quit)
 }
