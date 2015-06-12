@@ -40,9 +40,9 @@ func TestTributary(t *testing.T) {
 	ch := make(chan models.Feed, 1)
 
 	tributary := newTributary(bucket, s.URL, time.Minute, DefaultMapping)
-	tributary.OnUpdate(func(f models.Feed) {
+	tributary.OnUpdate = func(f models.Feed) {
 		ch <- f
-	})
+	}
 
 	expected := models.Feed{
 		FeedUrl:         s.URL,

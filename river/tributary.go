@@ -24,12 +24,16 @@ type tributary struct {
 }
 
 func newTributary(store persistence.Bucket, uri string, cacheTimeout time.Duration, mapping Mapping) *tributary {
-	p := &tributary{}
-	p.uri = uri
+	p := &tributary{
+		OnUpdate: func(models.Feed) {},
+		OnStatus: func(int) {},
+		uri:      uri,
+		mapping:  mapping,
+		quit:     make(chan struct{}),
+	}
+
 	p.feed = feed.New(cacheTimeout, p.itemHandler, store)
 	p.client = &http.Client{Timeout: time.Minute, Transport: &statusTransport{http.DefaultTransport.(*http.Transport), p}}
-	p.mapping = mapping
-	p.quit = make(chan struct{})
 
 	go p.poll()
 	return p
