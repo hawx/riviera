@@ -2,6 +2,7 @@
 // key-value database arranged into buckets.
 package data
 
+// Database is a key-value store with data arranged in buckets.
 type Database interface {
 	// Bucket returns a namespaced bucket for storing key-value data.
 	Bucket(name []byte) (Bucket, error)
@@ -11,14 +12,29 @@ type Database interface {
 	Close() error
 }
 
+// Bucket is a table for storing key-value pairs.
 type Bucket interface {
 	// View executes the function in the context of a read-only transaction.
-	View(func(Tx) error) error
+	View(func(ReadTx) error) error
 
 	// Update executes the function in the context of a read-write transaction.
 	Update(func(Tx) error) error
 }
 
+// ReadTx is a read-only database transaction.
+type ReadTx interface {
+	// Get returns the value associated with a key. Returns a nil value if the key does not exist.
+	Get(key []byte) []byte
+
+	// After returns all values listed after the key given to the last value, in
+	// sorted key order.
+	After(start []byte) [][]byte
+
+	// All returns all values listed in sorted key order.
+	All() [][]byte
+}
+
+// Tx is a database transaction.
 type Tx interface {
 	// Get returns the value associated with a key. Returns a nil value if the key does not exist.
 	Get(key []byte) []byte

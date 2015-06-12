@@ -1,5 +1,6 @@
-// Package models contains structs that map to the parts of a river.js
-// feed. Commentary for the types in this package is copied from riverjs.org.
+// Package models contains structs that map to the parts of a riverjs feed.
+//
+// Commentary for the types in this package is copied from http://riverjs.org.
 package models
 
 import "time"
@@ -77,6 +78,8 @@ type Metadata struct {
 	Secs float64 `json:"secs,string"`
 }
 
+// RssTime wraps a time.Time object so that when serialised and unserialised it
+// uses the RFC1123Z format.
 type RssTime struct {
 	time.Time
 }

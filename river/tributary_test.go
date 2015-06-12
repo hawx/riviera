@@ -7,9 +7,9 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
-	"hawx.me/code/riviera/data/memdata"
+	"hawx.me/code/riviera/river/data/memdata"
+	"hawx.me/code/riviera/river/internal/persistence"
 	"hawx.me/code/riviera/river/models"
-	"hawx.me/code/riviera/river/persistence"
 )
 
 func TestTributary(t *testing.T) {

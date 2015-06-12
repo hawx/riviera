@@ -2,19 +2,15 @@ package subscriptions
 
 import (
 	"testing"
-	"time"
 
 	"github.com/stretchr/testify/assert"
-	"hawx.me/code/riviera/data/memdata"
+	"hawx.me/code/riviera/subscriptions/opml"
 )
 
 func TestSubscriptions(t *testing.T) {
-	db := memdata.Open()
+	subs := New()
 
-	subs, err := Open(db)
-
-	assert.Nil(t, err)
-	assert.Equal(t, []Subscription{}, subs.List())
+	assert.Equal(t, []Subscription(nil), subs.List())
 
 	// Add feed
 	subs.Add("http://example.com/feed")
@@ -29,11 +25,11 @@ func TestSubscriptions(t *testing.T) {
 
 	// Refresh feed
 	subs.Refresh(Subscription{
-		Uri:    "http://example.com/feed",
-		Status: Bad,
+		Uri:       "http://example.com/feed",
+		FeedTitle: "what",
 	})
 	assert.Equal(t, []Subscription{
-		{Uri: "http://example.com/feed", Status: Bad},
+		{Uri: "http://example.com/feed", FeedTitle: "what"},
 		{Uri: "http://example.com/feed2"},
 		{Uri: "http://example.org/xml"},
 	}, subs.List())
@@ -46,43 +42,51 @@ func TestSubscriptions(t *testing.T) {
 	}, subs.List())
 }
 
-func TestOnAdd(t *testing.T) {
-	db := memdata.Open()
+func TestDiffWhenChanged(t *testing.T) {
+	a := New()
+	a.Add("http://example.com/feed2")
+	a.Add("http://example.com/feed")
 
-	subs, _ := Open(db)
+	b := New()
+	b.Add("http://example.com/feed")
+	b.Add("http://example.org/xml")
 
-	ch := make(chan Subscription, 1)
-	subs.OnAdd(func(s Subscription) {
-		ch <- s
-	})
-
-	subs.Add("http://example.com/feed")
-
-	select {
-	case s := <-ch:
-		assert.Equal(t, Subscription{Uri: "http://example.com/feed"}, s)
-	case <-time.After(time.Second):
-		t.Fatal("timeout")
-	}
+	assert.Equal(t, []Change{
+		Change{Removed, "http://example.com/feed2"},
+		Change{Added, "http://example.org/xml"},
+	}, Diff(a, b))
 }
 
-func TestOnRemove(t *testing.T) {
-	db := memdata.Open()
-
-	subs, _ := Open(db)
-	subs.Add("http://example.com/feed")
-
-	ch := make(chan string, 1)
-	subs.OnRemove(func(s string) {
-		ch <- s
-	})
-
-	subs.Remove("http://example.com/feed")
-
-	select {
-	case s := <-ch:
-		assert.Equal(t, "http://example.com/feed", s)
-	case <-time.After(time.Second):
-		t.Fatal("timeout")
+func TestFromOpml(t *testing.T) {
+	doc := opml.Opml{
+		Version: "1.1",
+		Body: opml.Body{Outline: []opml.Outline{
+			{ // ignored as type not "rss"
+				Type:   "whu",
+				Text:   "hey",
+				XmlUrl: "what",
+			},
+			{
+				Type:   "rss",
+				Text:   "hey2",
+				XmlUrl: "what2",
+			},
+			{
+				Type:        "rss",
+				Text:        "cool",
+				XmlUrl:      "yes",
+				Description: "this desc",
+				HtmlUrl:     "htmls",
+				Language:    "en",
+				Title:       "titl",
+			},
+		}},
 	}
+
+	subs := FromOpml(doc)
+
+	assert.Equal(t, []Subscription{
+		{Uri: "what2", FeedTitle: "hey2", FeedUrl: "what2"},
+		{Uri: "yes", FeedTitle: "cool", FeedUrl: "yes", WebsiteUrl: "htmls", FeedDescription: "this desc"},
+	}, subs.List())
 }

@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"hawx.me/code/riviera/data/memdata"
+	"hawx.me/code/riviera/river/data/memdata"
 )
 
 func TestBucket(t *testing.T) {

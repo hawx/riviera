@@ -1,15 +1,17 @@
+// Package memdata implements data over a set of in memory maps.
 package memdata
 
 import (
 	"sort"
 
-	"hawx.me/code/riviera/data"
+	"hawx.me/code/riviera/river/data"
 )
 
 type database struct {
 	buckets map[string]data.Bucket
 }
 
+// Open a new in memory database.
 func Open() data.Database {
 	return &database{buckets: map[string]data.Bucket{}}
 }
@@ -32,7 +34,7 @@ type bucket struct {
 	kv map[string][]byte
 }
 
-func (b *bucket) View(t func(data.Tx) error) error {
+func (b *bucket) View(t func(data.ReadTx) error) error {
 	return t(tx{b})
 }
 

@@ -1,82 +1,154 @@
+// Riviera is a feed aggregator.
 package main
 
 import (
-	"hawx.me/code/riviera/data"
-	"hawx.me/code/riviera/data/boltdata"
-	"hawx.me/code/riviera/data/memdata"
-	"hawx.me/code/riviera/river"
-	"hawx.me/code/riviera/subscriptions"
-	"hawx.me/code/riviera/subscriptions/opml"
-
-	"hawx.me/code/serve"
-
 	"encoding/json"
 	"flag"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
+	"strings"
 	"time"
+
+	"gopkg.in/fsnotify.v1"
+	"hawx.me/code/riviera/river"
+	"hawx.me/code/riviera/river/data"
+	"hawx.me/code/riviera/river/data/boltdata"
+	"hawx.me/code/riviera/river/data/memdata"
+	"hawx.me/code/riviera/subscriptions"
+	"hawx.me/code/riviera/subscriptions/opml"
+	"hawx.me/code/serve"
 )
 
 func printHelp() {
-	fmt.Println(`Usage: riviera [options]
+	fmt.Println(`Usage: riviera [options] FILE
 
-  Riviera is a river of news feed generator.
+  Riviera is a feed aggregator. It reads a list of feeds in OPML
+  subscription list format (http://dev.opml.org/spec2.html) given
+  as FILE, polls these feeds at a customisable interval, and serves
+  a riverjs (http://riverjs.org) format document at '/river'.
 
-   --opml PATH
-      Import subscriptions from opml feed, then quit.
+  A page is served at '/river/meta' containing information about the
+  feeds subscribed to, along with a log for each feed with when it
+  was fetched and what the response code was.
+
+  Changes to FILE are watched and will modify the feeds watched, if it
+  can be successfully parsed.
 
  DISPLAY
    --cutoff DUR='-24h'
-      Time to ignore items after, in standard go duration format.
+      Time to ignore items after, given in standard go duration format
+      (see http://golang.org/pkg/time/#ParseDuration).
 
    --refresh DUR='15m'
-      Time to refresh feeds after.
+      Time to refresh feeds after. This is the default used, but if
+      advice is given in the feed itself it may be ignored.
 
  DATA
+   By default riviera runs with an in memory database.
+
    --boltdb PATH
       Use the boltdb file at the given path.
 
-   --memdb
-      Use an in memory database, default.
-
  SERVE
-   --with-admin
-      Serve admin routes at '/-'.
-
    --port PORT='8080'
       Serve on given port.
 
    --socket SOCK
-      Serve at given socket.
+      Serve at given socket, instead.
 `)
 }
 
 var (
-	opmlPath = flag.String("opml", "", "")
-
 	cutOff  = flag.String("cutoff", "-24h", "")
 	refresh = flag.String("refresh", "15m", "")
 
 	boltdbPath = flag.String("boltdb", "", "")
-	memdbFlag  = flag.Bool("memdb", true, "")
 
-	port      = flag.String("port", "8080", "")
-	socket    = flag.String("socket", "", "")
-	withAdmin = flag.Bool("with-admin", false, "")
+	port   = flag.String("port", "8080", "")
+	socket = flag.String("socket", "", "")
 
 	help = flag.Bool("help", false, "")
 )
 
-const DEFAULT_CALLBACK = "onGetRiverStream"
+// DefaultCallback is the name of the callback to use in the jsonp response.
+const DefaultCallback = "onGetRiverStream"
+
+func loadDatastore() (data.Database, error) {
+	if *boltdbPath != "" {
+		return boltdata.Open(*boltdbPath)
+	}
+
+	return memdata.Open(), nil
+}
+
+func watchFile(path string, f func()) (io.Closer, error) {
+	watcher, err := fsnotify.NewWatcher()
+	if err != nil {
+		return watcher, err
+	}
+
+	go func() {
+		for {
+			select {
+			case event := <-watcher.Events:
+				if event.Op&fsnotify.Write == fsnotify.Write {
+					f()
+				}
+			case err := <-watcher.Errors:
+				log.Println("error:", err)
+			}
+		}
+	}()
+
+	return watcher, watcher.Add(path)
+}
+
+type riverHandler struct {
+	river.River
+}
+
+func newRiverHandler(feeds river.River) http.Handler {
+	return &riverHandler{feeds}
+}
+
+func (h *riverHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	if strings.ToUpper(r.Method) != "GET" {
+		w.Header().Set("Accept", "GET")
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		return
+	}
+
+	switch r.URL.Path {
+	case "/":
+		w.Header().Set("Content-Type", "application/javascript")
+		fmt.Fprintf(w, "%s(", DefaultCallback)
+		if err := h.WriteTo(w); err != nil {
+			log.Println("/:", err)
+		}
+		fmt.Fprintf(w, ")")
+
+	case "/meta":
+		w.Header().Set("Content-Type", "application/json")
+		if err := json.NewEncoder(w).Encode(h.Meta()); err != nil {
+			log.Println("/meta:", err)
+		}
+
+	default:
+		http.NotFound(w, r)
+	}
+}
 
 func main() {
 	flag.Parse()
 
-	if *help {
+	if *help || flag.NArg() == 0 {
 		printHelp()
 		return
 	}
+
+	opmlPath := flag.Arg(0)
 
 	duration, err := time.ParseDuration(*cutOff)
 	if err != nil {
@@ -88,74 +160,59 @@ func main() {
 		log.Fatal(err)
 	}
 
-	var store data.Database = memdata.Open()
-
-	if *boltdbPath != "" {
-		store, err = boltdata.Open(*boltdbPath)
-		if err != nil {
-			log.Fatal(err)
-		}
-		defer store.Close()
+	store, err := loadDatastore()
+	if err != nil {
+		log.Fatal(err)
 	}
+	defer store.Close()
 
-	subs, err := subscriptions.Open(store)
+	outline, err := opml.Load(opmlPath)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	if *opmlPath != "" {
-		outline, err := opml.Load(*opmlPath)
+	subs := subscriptions.FromOpml(outline)
+
+	feeds := river.New(store, river.Options{
+		Mapping:   river.DefaultMapping,
+		CutOff:    duration,
+		Refresh:   cacheTimeout,
+		LogLength: 500,
+	})
+
+	for _, sub := range subs.List() {
+		feeds.Add(sub.Uri)
+	}
+
+	updateSubs := func() {
+		log.Printf("reading %s\n", opmlPath)
+		outline, err := opml.Load(opmlPath)
 		if err != nil {
-			log.Fatal(err)
+			log.Printf("could not read %s: %s\n", opmlPath, err)
+			return
 		}
 
-		subscriptions.FromOpml(subs, outline)
-		log.Printf("imported %s\n", *opmlPath)
-		return
-	}
+		newsubs := subscriptions.FromOpml(outline)
 
-	feeds := river.New(store, subs, river.Options{
-		Mapping: river.DefaultMapping,
-		CutOff:  duration,
-		Refresh: cacheTimeout,
-	})
-
-	http.HandleFunc("/river.js", func(w http.ResponseWriter, r *http.Request) {
-		callback := r.FormValue("callback")
-		if callback == "" {
-			callback = DEFAULT_CALLBACK
+		for _, change := range subscriptions.Diff(subs, newsubs) {
+			switch change.Type {
+			case subscriptions.Removed:
+				feeds.Remove(change.Uri)
+				subs.Remove(change.Uri)
+			case subscriptions.Added:
+				feeds.Add(change.Uri)
+				subs.Add(change.Uri)
+			}
 		}
-
-		w.Header().Set("Content-Type", "application/javascript")
-
-		fmt.Fprintf(w, "%s(", callback)
-		feeds.WriteTo(w)
-		fmt.Fprintf(w, ")")
-	})
-
-	http.HandleFunc("/subscriptions.opml", func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "text/xml")
-		subscriptions.AsOpml(subs).WriteTo(w)
-	})
-
-	if *withAdmin {
-		http.HandleFunc("/-/list", func(w http.ResponseWriter, r *http.Request) {
-			w.Header().Set("Content-Type", "application/json")
-			json.NewEncoder(w).Encode(subs.List())
-		})
-
-		http.HandleFunc("/-/subscribe", func(w http.ResponseWriter, r *http.Request) {
-			url := r.FormValue("url")
-			subs.Add(url)
-			w.WriteHeader(204)
-		})
-
-		http.HandleFunc("/-/unsubscribe", func(w http.ResponseWriter, r *http.Request) {
-			url := r.FormValue("url")
-			subs.Remove(url)
-			w.WriteHeader(204)
-		})
 	}
+
+	http.Handle("/river/", http.StripPrefix("/river", newRiverHandler(feeds)))
+
+	watcher, err := watchFile(opmlPath, updateSubs)
+	if err != nil {
+		log.Printf("could not start watching %s: %v\n", opmlPath, err)
+	}
+	defer watcher.Close()
 
 	serve.Serve(*port, *socket, http.DefaultServeMux)
 }

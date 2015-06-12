@@ -58,6 +58,7 @@ type Outline struct {
 	Title string `xml:"title,attr,omitempty"`
 }
 
+// Load parses the OPML file at the path.
 func Load(path string) (doc Opml, err error) {
 	file, err := os.Open(path)
 	if err != nil {
@@ -68,6 +69,7 @@ func Load(path string) (doc Opml, err error) {
 	return Read(file)
 }
 
+// Read parses an OPML document.
 func Read(r io.Reader) (doc Opml, err error) {
 	d := xml.NewDecoder(r)
 	d.CharsetReader = charset.NewReader
@@ -75,7 +77,12 @@ func Read(r io.Reader) (doc Opml, err error) {
 	return
 }
 
-func (doc Opml) WriteTo(w io.Writer) {
-	w.Write([]byte(xml.Header))
-	xml.NewEncoder(w).Encode(doc)
+// WriteTo writes the OPML document out.
+func (doc Opml) WriteTo(w io.Writer) error {
+	_, err := w.Write([]byte(xml.Header))
+	if err != nil {
+		return err
+	}
+
+	return xml.NewEncoder(w).Encode(doc)
 }

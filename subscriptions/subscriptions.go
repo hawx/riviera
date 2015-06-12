@@ -3,50 +3,19 @@
 package subscriptions
 
 import (
-	"hawx.me/code/riviera/data"
+	"sort"
+	"sync"
+
 	"hawx.me/code/riviera/subscriptions/opml"
-
-	"encoding/json"
 )
-
-type Status string
-
-const (
-	Good Status = "Good"
-	Bad  Status = "Bad"
-	Gone Status = "Gone"
-)
-
-type Subscriptions interface {
-	// The list of feeds subscribed to.
-	List() []Subscription
-
-	// Add a new feed url to the list.
-	Add(string)
-
-	// Refresh the data for a particular Subscription.
-	Refresh(Subscription)
-
-	// Remove the Subscription with url provided.
-	Remove(string)
-
-	// Call the associated function whenever Add(string) is called, with the
-	// Subscription that is created..
-	OnAdd(func(Subscription))
-
-	// Call the associated function whenever Remove(string) is called, with the
-	// string value provided.
-	OnRemove(func(string))
-}
 
 // A List provides a read-only view to Subscriptions.
 type List interface {
 	List() []Subscription
 	Refresh(Subscription)
-	OnAdd(func(Subscription))
-	OnRemove(func(string))
 }
 
+// Subscription represents the metadata for a single feed.
 type Subscription struct {
 	// Uri the subscription was created with, never changed!
 	Uri string `json:"uri"`
@@ -55,90 +24,81 @@ type Subscription struct {
 	WebsiteUrl      string `json:"websiteUrl"`
 	FeedTitle       string `json:"feedTitle"`
 	FeedDescription string `json:"feedDescription"`
-	Status          Status `json:"status"`
 }
 
-type subs struct {
-	data.Bucket
-	onAdd    []func(Subscription)
-	onRemove []func(string)
+// Subscriptions is a list of subscriptions that is safe to access across
+// goroutines.
+type Subscriptions struct {
+	m  map[string]Subscription
+	mu sync.RWMutex
 }
 
-var subscriptionsBucketName = []byte("subscriptions")
+// New returns an empty subscription list.
+func New() *Subscriptions {
+	return &Subscriptions{m: map[string]Subscription{}}
+}
 
-// Open loads the Subscriptions from a Database, or initialises an empty set if
-// they do not exist.
-func Open(db data.Database) (Subscriptions, error) {
-	b, err := db.Bucket(subscriptionsBucketName)
-	if err != nil {
-		return nil, err
+// List of feeds subscribed to.
+func (s *Subscriptions) List() []Subscription {
+	var l []Subscription
+
+	s.mu.RLock()
+	var keys []string
+	for k := range s.m {
+		keys = append(keys, k)
 	}
+	sort.Strings(keys)
 
-	return &subs{b, []func(Subscription){}, []func(string){}}, nil
-}
-
-func (s *subs) List() []Subscription {
-	subscriptions := []Subscription{}
-	s.View(func(tx data.Tx) error {
-		for _, e := range tx.All() {
-			var s Subscription
-			json.Unmarshal(e, &s)
-			subscriptions = append(subscriptions, s)
-		}
-		return nil
-	})
-
-	return subscriptions
-}
-
-func (s *subs) Add(uri string) {
-	sub := Subscription{Uri: uri}
-	s.Update(func(tx data.Tx) error {
-		value, _ := json.Marshal(sub)
-
-		return tx.Put([]byte(uri), value)
-	})
-
-	for _, f := range s.onAdd {
-		f(sub)
+	for _, k := range keys {
+		l = append(l, s.m[k])
 	}
+	s.mu.RUnlock()
+
+	return l
 }
 
-func (s *subs) Refresh(sub Subscription) {
-	s.Update(func(tx data.Tx) error {
-		value, _ := json.Marshal(sub)
-
-		return tx.Put([]byte(sub.Uri), value)
-	})
+// Add a new feed url to the list.
+func (s *Subscriptions) Add(uri string) {
+	s.mu.Lock()
+	s.m[uri] = Subscription{Uri: uri}
+	s.mu.Unlock()
 }
 
-func (s *subs) Remove(uri string) {
-	s.Update(func(tx data.Tx) error {
-		return tx.Delete([]byte(uri))
-	})
-
-	for _, f := range s.onRemove {
-		f(uri)
-	}
+// Refresh the data for a particular Subscription.
+func (s *Subscriptions) Refresh(sub Subscription) {
+	s.mu.Lock()
+	s.m[sub.Uri] = sub
+	s.mu.Unlock()
 }
 
-func (s *subs) OnAdd(f func(Subscription)) {
-	s.onAdd = append(s.onAdd, f)
-}
-
-func (s *subs) OnRemove(f func(string)) {
-	s.onRemove = append(s.onRemove, f)
+// Remove the Subscription with url provided.
+func (s *Subscriptions) Remove(uri string) {
+	s.mu.Lock()
+	delete(s.m, uri)
+	s.mu.Unlock()
 }
 
 // FromOpml adds all feeds listed in an opml.Opml document to the Subscriptions.
-func FromOpml(s Subscriptions, doc opml.Opml) {
+func FromOpml(doc opml.Opml) *Subscriptions {
+	s := New()
 	for _, e := range doc.Body.Outline {
-		s.Add(e.XmlUrl)
+		if e.Type != "rss" {
+			continue
+		}
+
+		s.Refresh(Subscription{
+			FeedTitle:       e.Text,
+			FeedUrl:         e.XmlUrl,
+			Uri:             e.XmlUrl,
+			WebsiteUrl:      e.HtmlUrl,
+			FeedDescription: e.Description,
+		})
 	}
+	return s
 }
 
 // AsOpml returns a representation of the Subscriptions as an OMPL document.
-func AsOpml(s Subscriptions) opml.Opml {
+func AsOpml(s List) opml.Opml {
 	l := opml.Opml{
 		Version: "1.1",
 		Head:    opml.Head{Title: "Subscriptions"},
@@ -157,4 +117,41 @@ func AsOpml(s Subscriptions) opml.Opml {
 	}
 
 	return l
+}
+
+type ChangeType int
+
+const (
+	Removed ChangeType = iota
+	Added
+)
+
+type Change struct {
+	Type ChangeType
+	Uri  string
+}
+
+// Diff finds the difference between two subscription lists.
+func Diff(a, b *Subscriptions) []Change {
+	var changes []Change
+
+	a.mu.RLock()
+	b.mu.RLock()
+
+	for _, s := range a.m {
+		if _, ok := b.m[s.Uri]; !ok {
+			changes = append(changes, Change{Removed, s.Uri})
+		}
+	}
+
+	for _, s := range b.m {
+		if _, ok := a.m[s.Uri]; !ok {
+			changes = append(changes, Change{Added, s.Uri})
+		}
+	}
+
+	a.mu.RUnlock()
+	b.mu.RUnlock()
+
+	return changes
 }

@@ -1,8 +1,8 @@
 package persistence
 
 import (
-	"hawx.me/code/riviera/data"
 	"hawx.me/code/riviera/feed"
+	"hawx.me/code/riviera/river/data"
 )
 
 // A Bucket is an implementation of a feed.Database that persists data.
@@ -14,7 +14,7 @@ type bucket struct {
 	data.Bucket
 }
 
-var in []byte = []byte("in")
+var in = []byte("in")
 
 func NewBucket(database data.Database, name string) (Bucket, error) {
 	b, err := database.Bucket([]byte(name))
@@ -28,7 +28,7 @@ func NewBucket(database data.Database, name string) (Bucket, error) {
 func (d *bucket) Contains(key string) bool {
 	ok := false
 
-	d.View(func(tx data.Tx) error {
+	d.View(func(tx data.ReadTx) error {
 		if tx.Get([]byte(key)) != nil {
 			ok = true
 		}

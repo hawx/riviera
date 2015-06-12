@@ -1,5 +1,6 @@
-// Package river generates river.js files. See riverjs.org for more information
-// on the format.
+// Package river aggregates feeds into a riverjs file.
+//
+// See http://riverjs.org for more information on the format.
 package river
 
 import (
@@ -7,16 +8,28 @@ import (
 	"io"
 	"time"
 
-	"hawx.me/code/riviera/data"
+	"hawx.me/code/riviera/river/data"
+	"hawx.me/code/riviera/river/internal/persistence"
 	"hawx.me/code/riviera/river/models"
-	"hawx.me/code/riviera/river/persistence"
-	"hawx.me/code/riviera/subscriptions"
 )
 
-const DOCS = "http://scripting.com/stories/2010/12/06/innovationRiverOfNewsInJso.html"
+const docsPath = "http://scripting.com/stories/2010/12/06/innovationRiverOfNewsInJso.html"
 
 type River interface {
-	WriteTo(io.Writer) error
+	// WriteTo writes the river to w in json format. It does not write the json in
+	// a callback function.
+	WriteTo(w io.Writer) error
+
+	// Meta returns a list of data (title, description, etc.) about the feeds
+	// subscribed to, along with a log of the last few times the feed was fetched
+	// and the HTTP status code that was returned..
+	Meta() []Metadata
+
+	// Add subscribes the river to the feed at uri.
+	Add(uri string)
+
+	// Remove unsubscribes the river from the feed at url.
+	Remove(uri string)
 }
 
 type Options struct {
@@ -32,36 +45,37 @@ type Options struct {
 	// Refresh is the minimum refresh period. If an rss feed does not specify
 	// when to be fetched this duration will be used.
 	Refresh time.Duration
+
+	// LogLength defines the number of events to keep in the crawl log, per feed.
+	LogLength int
 }
 
 var DefaultOptions = Options{
-	Mapping: DefaultMapping,
-	CutOff:  -24 * time.Hour,
-	Refresh: 15 * time.Minute,
+	Mapping:   DefaultMapping,
+	CutOff:    -24 * time.Hour,
+	Refresh:   15 * time.Minute,
+	LogLength: 5,
 }
 
+// river acts as the top-level factory. It manages the creation of the initial
+// confluence and creating new tributaries to add to it.
 type river struct {
 	confluence   *confluence
 	store        data.Database
 	cacheTimeout time.Duration
-	subs         subscriptions.List
 	mapping      Mapping
 }
 
-func New(store data.Database, subs subscriptions.List, options Options) River {
+// New creates an empty river.
+func New(store data.Database, options Options) River {
 	rp, _ := persistence.NewRiver(store)
-	confluence := newConfluence(rp, options.CutOff)
 
-	r := &river{confluence, store, options.Refresh, subs, options.Mapping}
-
-	for _, sub := range subs.List() {
-		r.Add(sub)
+	return &river{
+		confluence:   newConfluence(rp, newMetaStore(options.LogLength), options.CutOff),
+		store:        store,
+		cacheTimeout: options.Refresh,
+		mapping:      options.Mapping,
 	}
-
-	subs.OnAdd(r.Add)
-	subs.OnRemove(r.Remove)
-
-	return r
 }
 
 func (r *river) WriteTo(w io.Writer) error {
@@ -69,7 +83,7 @@ func (r *river) WriteTo(w io.Writer) error {
 	now := time.Now()
 
 	metadata := models.Metadata{
-		Docs:      DOCS,
+		Docs:      docsPath,
 		WhenGMT:   models.RssTime{now.UTC()},
 		WhenLocal: models.RssTime{now},
 		Version:   "3",
@@ -82,37 +96,18 @@ func (r *river) WriteTo(w io.Writer) error {
 	})
 }
 
-func (r *river) Add(sub subscriptions.Subscription) {
-	b, _ := persistence.NewBucket(r.store, sub.Uri)
+func (r *river) Add(uri string) {
+	b, _ := persistence.NewBucket(r.store, uri)
 
-	tributary := newTributary(b, sub.Uri, r.cacheTimeout, r.mapping)
-
-	tributary.OnUpdate(func(feed models.Feed) {
-		sub.FeedUrl = feed.FeedUrl
-		sub.WebsiteUrl = feed.WebsiteUrl
-		sub.FeedTitle = feed.FeedTitle
-		sub.FeedDescription = feed.FeedDescription
-
-		r.subs.Refresh(sub)
-	})
-
-	tributary.OnStatus(func(code Status) {
-		switch code {
-		case Good:
-			sub.Status = subscriptions.Good
-		case Bad:
-			sub.Status = subscriptions.Bad
-		case Gone:
-			sub.Status = subscriptions.Gone
-			defer tributary.Kill()
-		}
-
-		r.subs.Refresh(sub)
-	})
+	tributary := newTributary(b, uri, r.cacheTimeout, r.mapping)
 
 	r.confluence.Add(tributary)
 }
 
 func (r *river) Remove(uri string) {
 	r.confluence.Remove(uri)
+}
+
+func (r *river) Meta() []Metadata {
+	return r.confluence.Meta()
 }

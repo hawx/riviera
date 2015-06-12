@@ -1,24 +1,15 @@
 package river
 
 import (
-	"hawx.me/code/riviera/feed"
-	"hawx.me/code/riviera/river/models"
-	"hawx.me/code/riviera/river/persistence"
-
-	"code.google.com/p/go-charset/charset"
-	_ "code.google.com/p/go-charset/data"
-
 	"log"
 	"net/http"
 	"time"
-)
 
-type Status int
-
-const (
-	Good Status = iota
-	Bad
-	Gone
+	"code.google.com/p/go-charset/charset"
+	_ "code.google.com/p/go-charset/data"
+	"hawx.me/code/riviera/feed"
+	"hawx.me/code/riviera/river/internal/persistence"
+	"hawx.me/code/riviera/river/models"
 )
 
 type tributary struct {
@@ -27,7 +18,7 @@ type tributary struct {
 	client   *http.Client
 	mapping  Mapping
 	onUpdate []func(models.Feed)
-	onStatus []func(Status)
+	onStatus []func(int)
 	quit     chan struct{}
 }
 
@@ -37,7 +28,6 @@ func newTributary(store persistence.Bucket, uri string, cacheTimeout time.Durati
 	p.feed = feed.New(cacheTimeout, p.itemHandler, store)
 	p.client = &http.Client{Timeout: time.Minute, Transport: &statusTransport{http.DefaultTransport.(*http.Transport), p}}
 	p.mapping = mapping
-	p.onUpdate = []func(models.Feed){}
 	p.quit = make(chan struct{})
 
 	go p.poll()
@@ -48,7 +38,7 @@ func (t *tributary) OnUpdate(f func(models.Feed)) {
 	t.onUpdate = append(t.onUpdate, f)
 }
 
-func (t *tributary) OnStatus(f func(Status)) {
+func (t *tributary) OnStatus(f func(int)) {
 	t.onStatus = append(t.onStatus, f)
 }
 
@@ -57,6 +47,7 @@ func (t *tributary) Uri() string {
 }
 
 func (t *tributary) poll() {
+	log.Println("started fetching", t.uri)
 	t.fetch()
 
 loop:
@@ -97,25 +88,14 @@ func (t *statusTransport) RoundTrip(req *http.Request) (resp *http.Response, err
 	return
 }
 
-// fetch retrieves the feed for the tributary, if an error occurs or the status
-// code is not 200 OK any listeners are notified of the status change.
+// fetch retrieves the feed for the tributary.
 func (t *tributary) fetch() {
 	code, err := t.feed.Fetch(t.uri, t.client, charset.NewReader)
+	t.status(code)
+
 	if err != nil {
-		t.status(Bad)
 		log.Println("error fetching", t.uri+":", code, err)
 		return
-	}
-
-	switch code {
-	case http.StatusOK:
-		t.status(Good)
-	case http.StatusNotModified:
-		// ignore
-	case http.StatusGone:
-		t.status(Gone)
-	default:
-		t.status(Bad)
 	}
 }
 
@@ -164,7 +144,7 @@ func (t *tributary) notify(feed models.Feed) {
 	}
 }
 
-func (t *tributary) status(code Status) {
+func (t *tributary) status(code int) {
 	for _, f := range t.onStatus {
 		f(code)
 	}
@@ -172,7 +152,5 @@ func (t *tributary) status(code Status) {
 
 func (t *tributary) Kill() {
 	t.onUpdate = []func(models.Feed){}
-	t.quit = make(chan struct{})
-
 	close(t.quit)
 }

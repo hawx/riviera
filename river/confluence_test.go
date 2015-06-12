@@ -5,16 +5,16 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
-	"hawx.me/code/riviera/data/memdata"
+	"hawx.me/code/riviera/river/data/memdata"
+	"hawx.me/code/riviera/river/internal/persistence"
 	"hawx.me/code/riviera/river/models"
-	"hawx.me/code/riviera/river/persistence"
 )
 
 func TestConfluence(t *testing.T) {
 	db := memdata.Open()
 	river, _ := persistence.NewRiver(db)
 
-	c := newConfluence(river, time.Minute)
+	c := newConfluence(river, newMetaStore(3), time.Minute)
 
 	assert.Empty(t, c.Latest())
 }
@@ -34,6 +34,10 @@ func (d *dummyTrib) OnUpdate(f func(models.Feed)) {
 	d.push()
 }
 
+func (d *dummyTrib) OnStatus(f func(int)) {
+
+}
+
 func (d *dummyTrib) Uri() string { return "hey" }
 func (d *dummyTrib) Kill() {
 	d.f = func(models.Feed) {}
@@ -44,7 +48,7 @@ func TestConfluenceWithTributary(t *testing.T) {
 	db := memdata.Open()
 	river, _ := persistence.NewRiver(db)
 
-	c := newConfluence(river, -time.Minute)
+	c := newConfluence(river, newMetaStore(3), -time.Minute)
 
 	feed := models.Feed{
 		FeedTitle:      "hey",
@@ -79,7 +83,7 @@ func TestConfluenceWithTributaryWhenTooOld(t *testing.T) {
 	db := memdata.Open()
 	river, _ := persistence.NewRiver(db)
 
-	c := newConfluence(river, -time.Minute)
+	c := newConfluence(river, newMetaStore(3), -time.Minute)
 
 	feed := models.Feed{
 		FeedTitle:      "hey",
