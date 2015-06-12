@@ -13,7 +13,6 @@ import (
 type confluence struct {
 	store   persistence.River
 	streams []*tributary
-	latest  []models.Feed
 	cutOff  time.Duration
 	evs     *events
 }
@@ -22,24 +21,13 @@ func newConfluence(store persistence.River, evs *events, cutOff time.Duration) *
 	return &confluence{
 		store:   store,
 		streams: []*tributary{},
-		latest:  store.Latest(cutOff),
 		cutOff:  cutOff,
 		evs:     evs,
 	}
 }
 
 func (c *confluence) Latest() []models.Feed {
-	yesterday := time.Now().Add(c.cutOff)
-	newLatest := []models.Feed{}
-
-	for _, feed := range c.latest {
-		if feed.WhenLastUpdate.After(yesterday) {
-			newLatest = append(newLatest, feed)
-		}
-	}
-
-	c.latest = newLatest
-	return c.latest
+	return c.store.Latest(c.cutOff)
 }
 
 func (c *confluence) Log() []Event {
@@ -50,7 +38,6 @@ func (c *confluence) Add(stream *tributary) {
 	c.streams = append(c.streams, stream)
 
 	stream.OnUpdate = func(feed models.Feed) {
-		c.latest = append([]models.Feed{feed}, c.latest...)
 		c.store.Add(feed)
 	}
 
