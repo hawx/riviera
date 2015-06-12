@@ -55,18 +55,16 @@ func (c *confluence) Add(stream *tributary) {
 }
 
 func (c *confluence) Remove(uri string) bool {
-	streams := []*tributary{}
-	ok := false
+	idx := -1
 
-	for _, stream := range c.streams {
-		if stream.Uri() != uri {
-			streams = append(streams, stream)
-		} else {
-			ok = true
+	for i, stream := range c.streams {
+		if stream.Uri() == uri {
+			idx = i
 			stream.Kill()
+			break
 		}
 	}
 
-	c.streams = streams
-	return ok
+	c.streams = append(c.streams[:idx], c.streams[idx+1:]...)
+	return idx > 0
 }
