@@ -2,10 +2,11 @@ package feed
 
 import xmlx "github.com/jteeuwen/go-pkg-xmlx"
 
-func (this *Feed) readAtom(doc *xmlx.Document) (err error) {
+func readAtom(doc *xmlx.Document) ([]*Channel, error) {
 	ns := "http://www.w3.org/2005/Atom"
 	channels := doc.SelectNodes(ns, "feed")
 
+	var err error
 	var foundChannels []*Channel
 	var ch *Channel
 	var i *Item
@@ -107,6 +108,6 @@ func (this *Feed) readAtom(doc *xmlx.Document) (err error) {
 			ch.Items = append(ch.Items, i)
 		}
 	}
-	this.channels = foundChannels
-	return
+
+	return foundChannels, err
 }

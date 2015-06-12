@@ -23,7 +23,8 @@ var days = map[string]int{
 	"Sunday":    7,
 }
 
-func (this *Feed) readRss2(doc *xmlx.Document) (err error) {
+func readRss2(doc *xmlx.Document) ([]*Channel, error) {
+	var err error
 	var foundChannels []*Channel
 	var ch *Channel
 	var i *Item
@@ -37,7 +38,7 @@ func (this *Feed) readRss2(doc *xmlx.Document) (err error) {
 	}
 
 	if root == nil {
-		return errors.New("Failed to find rss/rdf node in XML.")
+		return foundChannels, errors.New("Failed to find rss/rdf node in XML.")
 	}
 
 	channels := root.SelectNodes(ns, "channel")
@@ -211,8 +212,7 @@ func (this *Feed) readRss2(doc *xmlx.Document) (err error) {
 		}
 
 	}
-	this.channels = foundChannels
-	return
+	return foundChannels, err
 }
 
 func getExtensions(extensionsX *map[string]map[string][]Extension, node *xmlx.Node) {

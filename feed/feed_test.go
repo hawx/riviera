@@ -1,6 +1,7 @@
 package feed
 
 import (
+	"bytes"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -45,13 +46,13 @@ func Test_NewItem(t *testing.T) {
 	feed := New(1, func(_ *Feed, _ *Channel, newitems []*Item) {
 		itemsCh <- newitems
 	}, NewDatabase())
-	err := feed.fetchBytes("http://example.com", content, nil)
+	err := feed.load(bytes.NewReader(content), nil)
 	if err != nil {
 		t.Error(err)
 	}
 
 	content, _ = ioutil.ReadFile("testdata/initial_plus_one_new.atom")
-	feed.fetchBytes("http://example.com", content, nil)
+	feed.load(bytes.NewReader(content), nil)
 	expected := "Second title"
 
 	select {
@@ -90,7 +91,7 @@ func Test_AtomAuthor(t *testing.T) {
 	feed := New(1, func(f *Feed, ch *Channel, newitems []*Item) {
 		itemCh <- newitems[0]
 	}, NewDatabase())
-	err = feed.fetchBytes("http://example.com", content, nil)
+	err = feed.load(bytes.NewReader(content), nil)
 
 	select {
 	case item := <-itemCh:
@@ -109,7 +110,7 @@ func Test_RssAuthor(t *testing.T) {
 	feed := New(1, func(f *Feed, ch *Channel, newitems []*Item) {
 		itemCh <- newitems[0]
 	}, NewDatabase())
-	feed.fetchBytes("http://example.com", content, nil)
+	feed.load(bytes.NewReader(content), nil)
 
 	select {
 	case item := <-itemCh:
@@ -128,7 +129,7 @@ func Test_ItemExtensions(t *testing.T) {
 	feed := New(1, func(_ *Feed, _ *Channel, newitems []*Item) {
 		itemCh <- newitems[0]
 	}, NewDatabase())
-	feed.fetchBytes("http://example.com", content, nil)
+	feed.load(bytes.NewReader(content), nil)
 
 	select {
 	case item := <-itemCh:
@@ -161,7 +162,7 @@ func Test_ChannelExtensions(t *testing.T) {
 	feed := New(1, func(_ *Feed, ch *Channel, _ []*Item) {
 		channelCh <- ch
 	}, NewDatabase())
-	feed.fetchBytes("http://example.com", content, nil)
+	feed.load(bytes.NewReader(content), nil)
 
 	select {
 	case channel := <-channelCh:
@@ -198,7 +199,7 @@ func Test_CData(t *testing.T) {
 	feed := New(1, func(_ *Feed, _ *Channel, newitems []*Item) {
 		itemCh <- newitems[0]
 	}, NewDatabase())
-	feed.fetchBytes("http://example.com", content, nil)
+	feed.load(bytes.NewReader(content), nil)
 
 	select {
 	case item := <-itemCh:
@@ -222,7 +223,7 @@ func Test_Link(t *testing.T) {
 	feed := New(1, func(_ *Feed, ch *Channel, newitems []*Item) {
 		itemCh <- pair{newitems[0], ch}
 	}, NewDatabase())
-	feed.fetchBytes("http://example.com", content, nil)
+	feed.load(bytes.NewReader(content), nil)
 
 	select {
 	case p := <-itemCh:

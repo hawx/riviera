@@ -41,9 +41,6 @@ type Feed struct {
 	// Type of feed. Rss, Atom, etc
 	format string
 
-	// Version of the feed. Major and Minor.
-	version [2]int
-
 	// Channels with content.
 	channels []*Channel
 
@@ -100,45 +97,25 @@ func (this *Feed) Fetch(uri string, client *http.Client, charset xmlx.CharsetFun
 	return r.StatusCode, this.load(r.Body, charset)
 }
 
-func (this *Feed) load(r io.Reader, charset xmlx.CharsetFunc) error {
-	doc := xmlx.New()
-	err := doc.LoadStream(r, charset)
-	if err != nil {
-		return err
-	}
-
-	return this.makeFeed(doc)
-}
-
-// fetchBytes retrieves the feed's content from the []byte
-//
-// The charset parameter overrides the xml decoder's CharsetReader.
-// This allows us to specify a custom character encoding conversion
-// routine when dealing with non-utf8 input. Supply 'nil' to use the
-// default from Go's xml package.
-func (this *Feed) fetchBytes(uri string, content []byte, charset xmlx.CharsetFunc) (err error) {
-	this.url = uri
-
+func Parse(r io.Reader, charset xmlx.CharsetFunc) (chs []*Channel, err error) {
 	doc := xmlx.New()
 
-	if err = doc.LoadBytes(content, charset); err != nil {
+	if err = doc.LoadStream(r, charset); err != nil {
 		return
 	}
 
-	return this.makeFeed(doc)
-}
-
-func (this *Feed) makeFeed(doc *xmlx.Document) (err error) {
-	// Extract type and version of the feed so we can have the appropriate
-	// function parse it (rss 0.91, rss 0.92, rss 2, atom etc).
-	this.format, this.version = this.GetVersionInfo(doc)
-
-	if ok := this.testVersions(); !ok {
-		err = errors.New(fmt.Sprintf("Unsupported feed: %s, version: %+v", this.format, this.version))
+	format, version := GetVersionInfo(doc)
+	if ok := testVersions(format, version); !ok {
+		err = errors.New(fmt.Sprintf("Unsupported feed: %s, version: %+v", format, version))
 		return
 	}
 
-	if err = this.buildFeed(doc); err != nil || len(this.channels) == 0 {
+	return buildFeed(format, doc)
+}
+
+func (this *Feed) load(r io.Reader, charset xmlx.CharsetFunc) (err error) {
+	this.channels, err = Parse(r, charset)
+	if err != nil || len(this.channels) == 0 {
 		return
 	}
 
@@ -148,7 +125,6 @@ func (this *Feed) makeFeed(doc *xmlx.Document) (err error) {
 	}
 
 	this.notifyListeners()
-
 	return
 }
 
@@ -210,25 +186,24 @@ func (this *Feed) DurationTillUpdate() time.Duration {
 	return this.cacheTimeout - time.Now().UTC().Sub(this.lastupdate)
 }
 
-func (this *Feed) buildFeed(doc *xmlx.Document) (err error) {
-	switch this.format {
-	case "rss":
-		err = this.readRss2(doc)
+func buildFeed(format string, doc *xmlx.Document) ([]*Channel, error) {
+	switch format {
 	case "atom":
-		err = this.readAtom(doc)
+		return readAtom(doc)
+	default:
+		return readRss2(doc)
 	}
-	return
 }
 
-func (this *Feed) testVersions() bool {
-	switch this.format {
+func testVersions(format string, version [2]int) bool {
+	switch format {
 	case "rss":
-		if this.version[0] > 2 || (this.version[0] == 2 && this.version[1] > 0) {
+		if version[0] > 2 || (version[0] == 2 && version[1] > 0) {
 			return false
 		}
 
 	case "atom":
-		if this.version[0] > 1 || (this.version[0] == 1 && this.version[1] > 0) {
+		if version[0] > 1 || (version[0] == 1 && version[1] > 0) {
 			return false
 		}
 
@@ -239,36 +214,24 @@ func (this *Feed) testVersions() bool {
 	return true
 }
 
-func (this *Feed) GetVersionInfo(doc *xmlx.Document) (ftype string, fversion [2]int) {
-	var node *xmlx.Node
-
-	if node = doc.SelectNode("http://www.w3.org/2005/Atom", "feed"); node == nil {
-		goto rss
+func GetVersionInfo(doc *xmlx.Document) (string, [2]int) {
+	if node := doc.SelectNode("http://www.w3.org/2005/Atom", "feed"); node != nil {
+		return "atom", [2]int{1, 0}
 	}
 
-	ftype = "atom"
-	fversion = [2]int{1, 0}
-	return
-
-rss:
-	if node = doc.SelectNode("", "rss"); node != nil {
-		ftype = "rss"
+	if node := doc.SelectNode("", "rss"); node != nil {
 		version := node.As("", "version")
 		p := strings.Index(version, ".")
 		major, _ := strconv.Atoi(version[0:p])
 		minor, _ := strconv.Atoi(version[p+1 : len(version)])
-		fversion = [2]int{major, minor}
-		return
+
+		return "rss", [2]int{major, minor}
 	}
 
 	// issue#5: Some documents have an RDF root node instead of rss.
-	if node = doc.SelectNode("http://www.w3.org/1999/02/22-rdf-syntax-ns#", "RDF"); node != nil {
-		ftype = "rss"
-		fversion = [2]int{1, 1}
-		return
+	if node := doc.SelectNode("http://www.w3.org/1999/02/22-rdf-syntax-ns#", "RDF"); node != nil {
+		return "rss", [2]int{1, 1}
 	}
 
-	ftype = "unknown"
-	fversion = [2]int{0, 0}
-	return
+	return "unknown", [2]int{0, 0}
 }
