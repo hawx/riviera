@@ -1,6 +1,8 @@
 package persistence
 
 import (
+	"log"
+
 	"hawx.me/code/riviera/river/data"
 	"hawx.me/code/riviera/river/models"
 
@@ -29,7 +31,17 @@ func NewRiver(database data.Database, cutoff time.Duration) (River, error) {
 		return nil, err
 	}
 
-	return &river{b, cutoff}, nil
+	riv := &river{b, cutoff}
+
+	go func() {
+		for _ = range time.Tick(cutoff) {
+			log.Println("truncating feed data")
+			riv.truncate()
+			log.Println("done truncating")
+		}
+	}()
+
+	return riv, nil
 }
 
 func (d *river) Add(feed models.Feed) {
