@@ -26,9 +26,13 @@ type ReadTx interface {
 	// Get returns the value associated with a key. Returns a nil value if the key does not exist.
 	Get(key []byte) []byte
 
-	// After returns all values listed after the key given to the last value, in
+	// After returns all values listed after the key given, inclusive, to the last
+	// value, in sorted key order.
+	After(first []byte) [][]byte
+
+	// KeysBefore returns all keys from the first to the key given, exlusive, in
 	// sorted key order.
-	After(start []byte) [][]byte
+	KeysBefore(last []byte) [][]byte
 
 	// All returns all values listed in sorted key order.
 	All() [][]byte
@@ -48,6 +52,10 @@ type Tx interface {
 	// After returns all values listed after the key given to the last value, in
 	// sorted key order.
 	After(start []byte) [][]byte
+
+	// KeysBefore returns all keys from the first to the key given, exlusive, in
+	// sorted key order.
+	KeysBefore(last []byte) [][]byte
 
 	// All returns all values listed in sorted key order.
 	All() [][]byte

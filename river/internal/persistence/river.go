@@ -41,6 +41,18 @@ func (d *river) Add(feed models.Feed) {
 	})
 }
 
+func (d *river) truncate() {
+	d.Update(func(tx data.Tx) error {
+		max := time.Now().UTC().Add(d.cutoff).Format(time.RFC3339)
+
+		for _, k := range tx.KeysBefore([]byte(max)) {
+			tx.Delete(k)
+		}
+
+		return nil
+	})
+}
+
 func (d *river) Latest() []models.Feed {
 	feeds := []models.Feed{}
 

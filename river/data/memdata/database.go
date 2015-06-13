@@ -84,6 +84,30 @@ func (x tx) After(start []byte) [][]byte {
 	return vs
 }
 
+func (x tx) KeysBefore(last []byte) [][]byte {
+	var ks []string
+	for k := range x.b.kv {
+		ks = append(ks, k)
+	}
+
+	sort.Strings(ks)
+
+	i := sort.Search(len(ks), func(i int) bool {
+		return ks[i] >= string(last)
+	})
+
+	if i < len(ks) {
+		ks = ks[:i]
+	}
+
+	r := make([][]byte, len(ks))
+	for i, k := range ks {
+		r[i] = []byte(k)
+	}
+
+	return r
+}
+
 func (x tx) All() [][]byte {
 	var ks []string
 	for k := range x.b.kv {

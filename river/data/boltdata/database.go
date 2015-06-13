@@ -2,6 +2,7 @@
 package boltdata
 
 import (
+	"bytes"
 	"fmt"
 
 	"github.com/boltdb/bolt"
@@ -80,6 +81,17 @@ func (t tx) After(start []byte) [][]byte {
 
 	for k, v := c.Seek(start); k != nil; k, v = c.Next() {
 		r = append(r, v)
+	}
+
+	return r
+}
+
+func (t tx) KeysBefore(last []byte) [][]byte {
+	r := [][]byte{}
+	c := t.b.Cursor()
+
+	for k, _ := c.First(); bytes.Compare(k, last) < 0; k, _ = c.Next() {
+		r = append(r, k)
 	}
 
 	return r
