@@ -66,10 +66,10 @@ type river struct {
 
 // New creates an empty river.
 func New(store data.Database, options Options) River {
-	rp, _ := persistence.NewRiver(store)
+	rp, _ := persistence.NewRiver(store, options.CutOff)
 
 	return &river{
-		confluence:   newConfluence(rp, newEvents(options.LogLength), options.CutOff),
+		confluence:   newConfluence(rp, newEvents(options.LogLength)),
 		store:        store,
 		cacheTimeout: options.Refresh,
 		mapping:      options.Mapping,

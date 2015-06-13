@@ -11,9 +11,9 @@ import (
 
 func TestConfluence(t *testing.T) {
 	db := memdata.Open()
-	river, _ := persistence.NewRiver(db)
+	river, _ := persistence.NewRiver(db, -time.Minute)
 
-	c := newConfluence(river, newEvents(3), time.Minute)
+	c := newConfluence(river, newEvents(3))
 
 	assert.Empty(t, c.Latest())
 }

@@ -13,21 +13,19 @@ import (
 type confluence struct {
 	store   persistence.River
 	streams []*tributary
-	cutOff  time.Duration
 	evs     *events
 }
 
-func newConfluence(store persistence.River, evs *events, cutOff time.Duration) *confluence {
+func newConfluence(store persistence.River, evs *events) *confluence {
 	return &confluence{
 		store:   store,
 		streams: []*tributary{},
-		cutOff:  cutOff,
 		evs:     evs,
 	}
 }
 
 func (c *confluence) Latest() []models.Feed {
-	return c.store.Latest(c.cutOff)
+	return c.store.Latest()
 }
 
 func (c *confluence) Log() []Event {

@@ -13,7 +13,7 @@ func TestRiver(t *testing.T) {
 	assert := assert.New(t)
 	db := memdata.Open()
 
-	river, err := NewRiver(db)
+	river, err := NewRiver(db, -time.Minute)
 	assert.Nil(err)
 
 	now := time.Now().Round(time.Second)
@@ -31,7 +31,7 @@ func TestRiver(t *testing.T) {
 	// old feed, ignored
 	river.Add(models.Feed{FeedTitle: "out", FeedUrl: "out", WhenLastUpdate: models.RssTime{time.Now().Add(-2 * time.Minute)}})
 
-	latest := river.Latest(-time.Minute)
+	latest := river.Latest()
 	if assert.Len(latest, len(feeds)) {
 		// ordered by date, then reverse alphabetically on FeedUrl
 		assert.Equal(feeds[1], latest[0])
