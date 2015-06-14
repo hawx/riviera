@@ -43,6 +43,7 @@ func TestTributary(t *testing.T) {
 	tributary.OnUpdate = func(f models.Feed) {
 		ch <- f
 	}
+	go tributary.Poll()
 
 	expected := models.Feed{
 		FeedUrl:         s.URL,

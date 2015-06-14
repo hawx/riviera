@@ -35,7 +35,6 @@ func newTributary(store persistence.Bucket, uri string, cacheTimeout time.Durati
 	p.feed = feed.New(cacheTimeout, p.itemHandler, store)
 	p.client = &http.Client{Timeout: time.Minute, Transport: &statusTransport{http.DefaultTransport.(*http.Transport), p}}
 
-	go p.poll()
 	return p
 }
 
@@ -43,7 +42,7 @@ func (t *tributary) Uri() string {
 	return t.uri
 }
 
-func (t *tributary) poll() {
+func (t *tributary) Poll() {
 	log.Println("started fetching", t.uri)
 	t.fetch()
 

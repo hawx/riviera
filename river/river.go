@@ -98,8 +98,9 @@ func (r *river) Add(uri string) {
 	b, _ := persistence.NewBucket(r.store, uri)
 
 	tributary := newTributary(b, uri, r.cacheTimeout, r.mapping)
-
 	r.confluence.Add(tributary)
+
+	go tributary.Poll()
 }
 
 func (r *river) Remove(uri string) {
