@@ -1,10 +1,9 @@
 package feed
 
 import (
-	"bytes"
 	"io"
-	"io/ioutil"
 	"net/http"
+	"os"
 	"testing"
 	"time"
 
@@ -41,18 +40,22 @@ func TestFeed(t *testing.T) {
 }
 
 func Test_NewItem(t *testing.T) {
-	content, _ := ioutil.ReadFile("testdata/initial.atom")
+	file, _ := os.Open("testdata/initial.atom")
+
 	itemsCh := make(chan []*Item, 2)
 	feed := New(1, func(_ *Feed, _ *Channel, newitems []*Item) {
 		itemsCh <- newitems
 	}, NewDatabase())
-	err := feed.load(bytes.NewReader(content), nil)
+	err := feed.load(file, nil)
 	if err != nil {
 		t.Error(err)
 	}
 
-	content, _ = ioutil.ReadFile("testdata/initial_plus_one_new.atom")
-	feed.load(bytes.NewReader(content), nil)
+	file.Close()
+
+	file, _ = os.Open("testdata/initial_plus_one_new.atom")
+	defer file.Close()
+	feed.load(file, nil)
 	expected := "Second title"
 
 	select {
@@ -83,15 +86,17 @@ func Test_NewItem(t *testing.T) {
 }
 
 func Test_AtomAuthor(t *testing.T) {
-	content, err := ioutil.ReadFile("testdata/idownload.atom")
+	file, err := os.Open("testdata/idownload.atom")
 	if err != nil {
 		t.Errorf("unable to load file")
 	}
+	defer file.Close()
+
 	itemCh := make(chan *Item, 1)
 	feed := New(1, func(f *Feed, ch *Channel, newitems []*Item) {
 		itemCh <- newitems[0]
 	}, NewDatabase())
-	err = feed.load(bytes.NewReader(content), nil)
+	err = feed.load(file, nil)
 
 	select {
 	case item := <-itemCh:
@@ -105,12 +110,14 @@ func Test_AtomAuthor(t *testing.T) {
 }
 
 func Test_RssAuthor(t *testing.T) {
-	content, _ := ioutil.ReadFile("testdata/boing.rss")
+	file, _ := os.Open("testdata/boing.rss")
+	defer file.Close()
+
 	itemCh := make(chan *Item, 1)
 	feed := New(1, func(f *Feed, ch *Channel, newitems []*Item) {
 		itemCh <- newitems[0]
 	}, NewDatabase())
-	feed.load(bytes.NewReader(content), nil)
+	feed.load(file, nil)
 
 	select {
 	case item := <-itemCh:
@@ -124,12 +131,14 @@ func Test_RssAuthor(t *testing.T) {
 }
 
 func Test_ItemExtensions(t *testing.T) {
-	content, _ := ioutil.ReadFile("testdata/extension.rss")
+	file, _ := os.Open("testdata/extension.rss")
+	defer file.Close()
+
 	itemCh := make(chan *Item, 1)
 	feed := New(1, func(_ *Feed, _ *Channel, newitems []*Item) {
 		itemCh <- newitems[0]
 	}, NewDatabase())
-	feed.load(bytes.NewReader(content), nil)
+	feed.load(file, nil)
 
 	select {
 	case item := <-itemCh:
@@ -157,12 +166,15 @@ func Test_ItemExtensions(t *testing.T) {
 }
 
 func Test_ChannelExtensions(t *testing.T) {
-	content, _ := ioutil.ReadFile("testdata/extension.rss")
+	file, _ := os.Open("testdata/extension.rss")
+	defer file.Close()
+
 	channelCh := make(chan *Channel, 1)
 	feed := New(1, func(_ *Feed, ch *Channel, _ []*Item) {
 		channelCh <- ch
 	}, NewDatabase())
-	feed.load(bytes.NewReader(content), nil)
+
+	feed.load(file, nil)
 
 	select {
 	case channel := <-channelCh:
@@ -194,12 +206,15 @@ func Test_ChannelExtensions(t *testing.T) {
 }
 
 func Test_CData(t *testing.T) {
-	content, _ := ioutil.ReadFile("testdata/iosBoardGameGeek.rss")
+	file, _ := os.Open("testdata/iosBoardGameGeek.rss")
+	defer file.Close()
+
 	itemCh := make(chan *Item, 1)
 	feed := New(1, func(_ *Feed, _ *Channel, newitems []*Item) {
 		itemCh <- newitems[0]
 	}, NewDatabase())
-	feed.load(bytes.NewReader(content), nil)
+
+	feed.load(file, nil)
 
 	select {
 	case item := <-itemCh:
@@ -213,7 +228,9 @@ func Test_CData(t *testing.T) {
 }
 
 func Test_Link(t *testing.T) {
-	content, _ := ioutil.ReadFile("testdata/nytimes.rss")
+	file, _ := os.Open("testdata/nytimes.rss")
+	defer file.Close()
+
 	type pair struct {
 		Item    *Item
 		Channel *Channel
@@ -223,7 +240,7 @@ func Test_Link(t *testing.T) {
 	feed := New(1, func(_ *Feed, ch *Channel, newitems []*Item) {
 		itemCh <- pair{newitems[0], ch}
 	}, NewDatabase())
-	feed.load(bytes.NewReader(content), nil)
+	feed.load(file, nil)
 
 	select {
 	case p := <-itemCh:
