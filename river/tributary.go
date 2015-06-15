@@ -3,6 +3,7 @@ package river
 import (
 	"log"
 	"net/http"
+	"net/url"
 	"time"
 
 	"code.google.com/p/go-charset/charset"
@@ -16,7 +17,7 @@ type tributary struct {
 	OnUpdate func(models.Feed)
 	OnStatus func(int)
 
-	uri     string
+	uri     *url.URL
 	feed    *feed.Feed
 	client  *http.Client
 	mapping Mapping
@@ -24,10 +25,12 @@ type tributary struct {
 }
 
 func newTributary(store persistence.Bucket, uri string, cacheTimeout time.Duration, mapping Mapping) *tributary {
+	parsedUri, _ := url.Parse(uri)
+
 	p := &tributary{
 		OnUpdate: func(models.Feed) {},
 		OnStatus: func(int) {},
-		uri:      uri,
+		uri:      parsedUri,
 		mapping:  mapping,
 		quit:     make(chan struct{}),
 	}
@@ -39,11 +42,11 @@ func newTributary(store persistence.Bucket, uri string, cacheTimeout time.Durati
 }
 
 func (t *tributary) Uri() string {
-	return t.uri
+	return t.uri.String()
 }
 
 func (t *tributary) Poll() {
-	log.Println("started fetching", t.uri)
+	log.Printf("started fetching %s\n", t.uri)
 	t.fetch()
 
 loop:
@@ -52,12 +55,12 @@ loop:
 		case <-t.quit:
 			break loop
 		case <-time.After(t.feed.DurationTillUpdate()):
-			log.Println("fetching", t.uri)
+			log.Printf("fetching %s\n", t.uri)
 			t.fetch()
 		}
 	}
 
-	log.Println("stopped fetching", t.uri)
+	log.Printf("stopped fetching %s\n", t.uri)
 }
 
 type statusTransport struct {
@@ -77,8 +80,15 @@ func (t *statusTransport) RoundTrip(req *http.Request) (resp *http.Response, err
 
 	if resp.StatusCode == http.StatusMovedPermanently {
 		newLoc := resp.Header.Get("Location")
-		log.Println(t.trib.uri, "moved to", newLoc)
-		t.trib.uri = newLoc
+
+		newUrl, errp := url.Parse(newLoc)
+		if errp != nil {
+			log.Printf("%s moved to %s, error: %s\n", t.trib.uri, newLoc, errp)
+			return
+		}
+
+		log.Printf("%s moved to %s\n", t.trib.uri, newLoc)
+		t.trib.uri = newUrl
 	}
 
 	return
@@ -86,13 +96,22 @@ func (t *statusTransport) RoundTrip(req *http.Request) (resp *http.Response, err
 
 // fetch retrieves the feed for the tributary.
 func (t *tributary) fetch() {
-	code, err := t.feed.Fetch(t.uri, t.client, charset.NewReader)
+	code, err := t.feed.Fetch(t.uri.String(), t.client, charset.NewReader)
 	t.OnStatus(code)
 
 	if err != nil {
-		log.Println("error fetching", t.uri+":", code, err)
+		log.Printf("error fetching %s: %d %s\n", t.uri, code, err)
 		return
 	}
+}
+
+func maybeResolvedLink(root *url.URL, other string) string {
+	parsed, err := root.Parse(other)
+	if err == nil {
+		return parsed.String()
+	}
+
+	return other
 }
 
 func (t *tributary) itemHandler(feed *feed.Feed, ch *feed.Channel, newitems []*feed.Item) {
@@ -101,16 +120,19 @@ func (t *tributary) itemHandler(feed *feed.Feed, ch *feed.Channel, newitems []*f
 		converted := t.mapping(item)
 
 		if converted != nil {
+			converted.Link = maybeResolvedLink(t.uri, converted.Link)
+			converted.PermaLink = maybeResolvedLink(t.uri, converted.PermaLink)
+
 			items = append(items, *converted)
 		}
 	}
 
-	log.Println(len(items), "new item(s) in", t.uri)
+	log.Printf("%d new item(s) in %s\n", len(items), t.uri)
 	if len(items) == 0 {
 		return
 	}
 
-	feedUrl := t.uri
+	feedUrl := t.uri.String()
 	websiteUrl := ""
 	for _, link := range ch.Links {
 		if feedUrl != "" && websiteUrl != "" {
@@ -118,9 +140,9 @@ func (t *tributary) itemHandler(feed *feed.Feed, ch *feed.Channel, newitems []*f
 		}
 
 		if link.Rel == "self" {
-			feedUrl = link.Href
+			feedUrl = maybeResolvedLink(t.uri, link.Href)
 		} else {
-			websiteUrl = link.Href
+			websiteUrl = maybeResolvedLink(t.uri, link.Href)
 		}
 	}
 

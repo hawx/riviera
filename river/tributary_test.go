@@ -77,3 +77,78 @@ func TestTributary(t *testing.T) {
 		t.Fatal("timeout")
 	}
 }
+
+func TestTributaryAtomWithRelativeLinks(t *testing.T) {
+	s := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte(`<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+ <title>GitHub Engineering</title>
+ <link href="/atom.xml" rel="self"/>
+ <link href=""/>
+ <updated>2015-06-15T16:58:27+00:00</updated>
+ <id></id>
+ <author>
+   <name>GitHub Engineering</name>
+ </author>
+
+ <entry>
+   <title>Brubeck, a statsd-compatible metrics aggregator</title>
+   <link href="/brubeck/"/>
+   <updated>2015-06-15T00:00:00+00:00</updated>
+   <id>/brubeck</id>
+
+     <author>
+       <name>vmg</name>
+       <uri>https://github.com/vmg</uri>
+     </author>
+
+   <content type="html">&lt;p&gt;One of the key points of GitHub&amp;#39;s engineering culture —and I believe, of any
+good engineering culture— is our obsession with aggressively measuring everything.&lt;/p&gt;</content>
+  </entry>
+</feed>`))
+	}))
+	defer s.Close()
+
+	db := memdata.Open()
+	bucket, _ := persistence.NewBucket(db, "-")
+
+	ch := make(chan models.Feed, 1)
+
+	tributary := newTributary(bucket, s.URL, time.Minute, DefaultMapping)
+	tributary.OnUpdate = func(f models.Feed) {
+		ch <- f
+	}
+	go tributary.Poll()
+
+	expected := models.Feed{
+		FeedUrl:         s.URL + "/atom.xml",
+		WebsiteUrl:      s.URL,
+		FeedTitle:       "GitHub Engineering",
+		FeedDescription: "",
+		WhenLastUpdate:  models.RssTime{time.Now()},
+		Items: []models.Item{{
+			Title:      "Brubeck, a statsd-compatible metrics aggregator",
+			Link:       s.URL + "/brubeck/",
+			PermaLink:  s.URL + "/brubeck/",
+			Id:         "/brubeck",
+			PubDate:    models.RssTime{time.Date(2015, 06, 15, 0, 0, 0, 0, time.FixedZone("", 0))},
+			Body:       "One of the key points of GitHub's engineering culture —and I believe, of anygood engineering culture— is our obsession with aggressively measuring everything.\n",
+			Enclosures: []models.Enclosure{},
+		}},
+	}
+
+	assert := assert.New(t)
+
+	select {
+	case f := <-ch:
+		assert.Equal(expected.FeedUrl, f.FeedUrl)
+		assert.Equal(expected.WebsiteUrl, f.WebsiteUrl)
+		assert.Equal(expected.FeedTitle, f.FeedTitle)
+		assert.Equal(expected.FeedDescription, f.FeedDescription)
+		assert.WithinDuration(expected.WhenLastUpdate.Time, f.WhenLastUpdate.Time, time.Second)
+		assert.Equal(expected.Items, f.Items)
+
+	case <-time.After(time.Second):
+		t.Fatal("timeout")
+	}
+}

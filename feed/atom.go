@@ -22,7 +22,7 @@ func readAtom(doc *xmlx.Document) ([]*Channel, error) {
 		ch.Id = node.S(ns, "id")
 		ch.Rights = node.S(ns, "rights")
 
-		list = node.SelectNodes(ns, "link")
+		list = node.SelectNodesDirect(ns, "link")
 		ch.Links = make([]Link, len(list))
 		for i, v := range list {
 			ch.Links[i].Href = v.As("", "href")
