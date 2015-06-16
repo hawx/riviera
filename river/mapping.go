@@ -3,6 +3,7 @@ package river
 import (
 	"html"
 	"log"
+	"strings"
 	"time"
 
 	"github.com/kennygrant/sanitize"
@@ -76,11 +77,26 @@ func DefaultMapping(item *feed.Item) *models.Item {
 // Strips html markup, then limits to 280 characters. If the original text was
 // longer than 280 chars, three periods are appended.
 func stripAndCrop(content string) string {
-	content = sanitize.HTML(html.UnescapeString(content))
+	content = processString(content,
+		strings.NewReplacer("\n", " ").Replace,
+		strings.NewReplacer("  ", " ").Replace,
+		strings.TrimSpace,
+		html.UnescapeString,
+		html.UnescapeString,
+		sanitize.HTML,
+	)
 
-	if len(content) < 280 {
+	if len(content) <= 280 {
 		return content
 	}
 
-	return content[0:280] + "..."
+	return strings.TrimSpace(content[0:279]) + "…"
+}
+
+func processString(in string, fs ...func(string) string) string {
+	for _, f := range fs {
+		in = f(in)
+	}
+
+	return in
 }

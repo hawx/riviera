@@ -57,7 +57,7 @@ func TestTributary(t *testing.T) {
 			PermaLink:  "http://feedproxy.google.com/~r/boingboing/iBag/~3/EKKb-61Ismc/story01.htm",
 			Id:         "http://boingboing.net/?p=221544",
 			PubDate:    models.RssTime{time.Date(2013, 03, 27, 12, 40, 18, 0, time.UTC)},
-			Body:       "A reader writes, \"Noisebridge, San Francisco's Hackerspace, is having some hard times, so we're throwing an epic benefit and party this Saturday, to include eclectic performers, interactive art, a raffle and more! For more details, if any BBers want to put on demos or ideas share...",
+			Body:       "A reader writes, \"Noisebridge, San Francisco's Hackerspace, is having some hard times, so we're throwing an epic benefit and party this Saturday, to include eclectic performers, interactive art, a raffle and more! For more details, if any BBers want to put on demos or ideas shar…",
 			Enclosures: []models.Enclosure{},
 		}},
 	}
@@ -132,7 +132,7 @@ good engineering culture— is our obsession with aggressively measuring everyth
 			PermaLink:  s.URL + "/brubeck/",
 			Id:         "/brubeck",
 			PubDate:    models.RssTime{time.Date(2015, 06, 15, 0, 0, 0, 0, time.FixedZone("", 0))},
-			Body:       "One of the key points of GitHub's engineering culture —and I believe, of anygood engineering culture— is our obsession with aggressively measuring everything.\n",
+			Body:       "One of the key points of GitHub's engineering culture —and I believe, of any good engineering culture— is our obsession with aggressively measuring everything.\n",
 			Enclosures: []models.Enclosure{},
 		}},
 	}

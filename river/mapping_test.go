@@ -48,7 +48,7 @@ func TestDefaultMapping(t *testing.T) {
 				PubDate:     "Mon, 02 Jan 2006 20:04:19 UTC",
 			},
 			&models.Item{
-				Body:       "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec a diam lectus. Sed sit amet ipsum mauris. Maecenas congue ligula ac quam viverra nec consectetur ante hendrerit. Donec et mollis dolor. Praesent et diam eget libero egestas mattis sit amet vitae augue. Nam tincidunt c...",
+				Body:       "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec a diam lectus. Sed sit amet ipsum mauris. Maecenas congue ligula ac quam viverra nec consectetur ante hendrerit. Donec et mollis dolor. Praesent et diam eget libero egestas mattis sit amet vitae augue. Nam tincidunt…",
 				PubDate:    models.RssTime{time.Date(2006, 1, 2, 20, 4, 19, 0, time.UTC)},
 				Title:      "cool feed thang",
 				Id:         "cool feed thangMon, 02 Jan 2006 20:04:19 UTC",
@@ -226,5 +226,40 @@ func TestDefaultMapping(t *testing.T) {
 		assert.Equal(expected.Id, mapped.Id, tc.name)
 		assert.Equal(expected.Comments, mapped.Comments, tc.name)
 		assert.Equal(expected.Enclosures, mapped.Enclosures, tc.name)
+	}
+}
+
+func stringOfLength(n int) string {
+	s := ""
+	for i := 0; i < n; i++ {
+		s += "X"
+	}
+	return s
+}
+
+func TestStripAndCrop(t *testing.T) {
+	tcs := []struct {
+		In, Out string
+	}{
+		{``, ``},
+		{`Hey  what`, `Hey what`},
+		{stringOfLength(280), stringOfLength(280)},
+		{stringOfLength(281), stringOfLength(281)[0:279] + "…"},
+		{stringOfLength(279) + "  ", stringOfLength(279)},
+		{`&amp;`, `&amp;`},
+		{`<p>`, ``},
+		{`&lt;p&gt;`, ``},
+		{`&amp;lt;p&amp;gt;`, ``},
+		{`<p>Hello
+
+there <a href="coolcat.jpg">pictur</a></p>
+
+
+`, `Hello there pictur
+`},
+	}
+
+	for _, tc := range tcs {
+		assert.Equal(t, tc.Out, stripAndCrop(tc.In))
 	}
 }
