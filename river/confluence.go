@@ -12,14 +12,14 @@ import (
 // single (truncated) list.
 type confluence struct {
 	store   persistence.River
-	streams []*tributary
+	streams []Tributary
 	evs     *events
 }
 
 func newConfluence(store persistence.River, evs *events) *confluence {
 	return &confluence{
 		store:   store,
-		streams: []*tributary{},
+		streams: []Tributary{},
 		evs:     evs,
 	}
 }
@@ -32,33 +32,40 @@ func (c *confluence) Log() []Event {
 	return c.evs.List()
 }
 
-func (c *confluence) Add(stream *tributary) {
+func (c *confluence) Add(stream Tributary) {
 	c.streams = append(c.streams, stream)
 
-	stream.OnUpdate = func(feed models.Feed) {
-		c.store.Add(feed)
-	}
+	go func() {
+		feeds := stream.Feeds()
+		fetches := stream.Fetches()
 
-	stream.OnStatus = func(code int) {
-		if code == http.StatusGone {
-			c.Remove(stream.Uri())
+		for {
+			select {
+			case feed := <-feeds:
+				c.store.Add(feed)
+
+			case code := <-fetches:
+				if code == http.StatusGone {
+					c.Remove(stream.Name())
+				}
+
+				c.evs.Prepend(Event{
+					At:   time.Now().UTC(),
+					Uri:  stream.Name(),
+					Code: code,
+				})
+			}
 		}
-
-		c.evs.Prepend(Event{
-			At:   time.Now().UTC(),
-			Uri:  stream.Uri(),
-			Code: code,
-		})
-	}
+	}()
 }
 
 func (c *confluence) Remove(uri string) bool {
 	idx := -1
 
 	for i, stream := range c.streams {
-		if stream.Uri() == uri {
+		if stream.Name() == uri {
 			idx = i
-			stream.Kill()
+			stream.Stop()
 			break
 		}
 	}

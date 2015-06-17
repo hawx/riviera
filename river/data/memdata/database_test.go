@@ -34,11 +34,13 @@ func TestMemData(t *testing.T) {
 		for i, v := range tx.After([]byte("3")) {
 			assert.Equal([]byte(afters[i]), v)
 		}
+		assert.Empty(tx.After([]byte("6")))
 
 		befores := []string{"1", "2"}
 		for i, k := range tx.KeysBefore([]byte("3")) {
 			assert.Equal([]byte(befores[i]), k)
 		}
+		assert.Empty(tx.KeysBefore([]byte("-1")))
 
 		alls := []string{"a", "b", "c", "d", "e"}
 		for i, v := range tx.All() {

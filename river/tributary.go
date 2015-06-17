@@ -13,14 +13,30 @@ import (
 	"hawx.me/code/riviera/river/models"
 )
 
-type tributary struct {
-	OnUpdate func(models.Feed)
-	OnStatus func(int)
+type Tributary interface {
+	// Name returns a unique name to refer to the tributary.
+	Name() string
 
+	// Feeds returns a channel that sends out the latest updates to the tributary.
+	Feeds() <-chan models.Feed
+
+	// Fetches returns a channel that sends out the status code for each fetch.
+	Fetches() <-chan int
+
+	// Start polling for updates.
+	Start()
+
+	// Stop polling.
+	Stop()
+}
+
+type tributary struct {
 	uri     *url.URL
 	feed    *feed.Feed
 	client  *http.Client
 	mapping Mapping
+	feeds   chan models.Feed
+	fetches chan int
 	quit    chan struct{}
 }
 
@@ -28,11 +44,11 @@ func newTributary(store persistence.Bucket, uri string, cacheTimeout time.Durati
 	parsedUri, _ := url.Parse(uri)
 
 	p := &tributary{
-		OnUpdate: func(models.Feed) {},
-		OnStatus: func(int) {},
-		uri:      parsedUri,
-		mapping:  mapping,
-		quit:     make(chan struct{}),
+		uri:     parsedUri,
+		mapping: mapping,
+		feeds:   make(chan models.Feed),
+		fetches: make(chan int),
+		quit:    make(chan struct{}),
 	}
 
 	p.feed = feed.New(cacheTimeout, p.itemHandler, store)
@@ -41,26 +57,40 @@ func newTributary(store persistence.Bucket, uri string, cacheTimeout time.Durati
 	return p
 }
 
-func (t *tributary) Uri() string {
+func (t *tributary) Name() string {
 	return t.uri.String()
 }
 
-func (t *tributary) Poll() {
-	log.Printf("started fetching %s\n", t.uri)
-	t.fetch()
+func (t *tributary) Feeds() <-chan models.Feed {
+	return t.feeds
+}
 
-loop:
-	for {
-		select {
-		case <-t.quit:
-			break loop
-		case <-time.After(t.feed.DurationTillUpdate()):
-			log.Printf("fetching %s\n", t.uri)
-			t.fetch()
+func (t *tributary) Fetches() <-chan int {
+	return t.fetches
+}
+
+func (t *tributary) Start() {
+	go func() {
+		log.Printf("started fetching %s\n", t.uri)
+		t.fetch()
+
+	loop:
+		for {
+			select {
+			case <-t.quit:
+				break loop
+			case <-time.After(t.feed.DurationTillUpdate()):
+				log.Printf("fetching %s\n", t.uri)
+				t.fetch()
+			}
 		}
-	}
 
-	log.Printf("stopped fetching %s\n", t.uri)
+		log.Printf("stopped fetching %s\n", t.uri)
+	}()
+}
+
+func (t *tributary) Stop() {
+	close(t.quit)
 }
 
 type statusTransport struct {
@@ -97,7 +127,7 @@ func (t *statusTransport) RoundTrip(req *http.Request) (resp *http.Response, err
 // fetch retrieves the feed for the tributary.
 func (t *tributary) fetch() {
 	code, err := t.feed.Fetch(t.uri.String(), t.client, charset.NewReader)
-	t.OnStatus(code)
+	t.fetches <- code
 
 	if err != nil {
 		log.Printf("error fetching %s: %d %s\n", t.uri, code, err)
@@ -146,16 +176,12 @@ func (t *tributary) itemHandler(feed *feed.Feed, ch *feed.Channel, newitems []*f
 		}
 	}
 
-	t.OnUpdate(models.Feed{
+	t.feeds <- models.Feed{
 		FeedUrl:         feedUrl,
 		WebsiteUrl:      websiteUrl,
 		FeedTitle:       ch.Title,
 		FeedDescription: ch.Description,
 		WhenLastUpdate:  models.RssTime{time.Now()},
 		Items:           items,
-	})
-}
-
-func (t *tributary) Kill() {
-	close(t.quit)
+	}
 }

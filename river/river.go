@@ -100,7 +100,7 @@ func (r *river) Add(uri string) {
 	tributary := newTributary(b, uri, r.cacheTimeout, r.mapping)
 	r.confluence.Add(tributary)
 
-	go tributary.Poll()
+	tributary.Start()
 }
 
 func (r *river) Remove(uri string) {

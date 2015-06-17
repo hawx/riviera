@@ -37,13 +37,8 @@ func TestTributary(t *testing.T) {
 	db := memdata.Open()
 	bucket, _ := persistence.NewBucket(db, "-")
 
-	ch := make(chan models.Feed, 1)
-
 	tributary := newTributary(bucket, s.URL, time.Minute, DefaultMapping)
-	tributary.OnUpdate = func(f models.Feed) {
-		ch <- f
-	}
-	go tributary.Poll()
+	tributary.Start()
 
 	expected := models.Feed{
 		FeedUrl:         s.URL,
@@ -65,7 +60,7 @@ func TestTributary(t *testing.T) {
 	assert := assert.New(t)
 
 	select {
-	case f := <-ch:
+	case f := <-tributary.Feeds():
 		assert.Equal(expected.FeedUrl, f.FeedUrl)
 		assert.Equal(expected.WebsiteUrl, f.WebsiteUrl)
 		assert.Equal(expected.FeedTitle, f.FeedTitle)
@@ -112,13 +107,8 @@ good engineering culture— is our obsession with aggressively measuring everyth
 	db := memdata.Open()
 	bucket, _ := persistence.NewBucket(db, "-")
 
-	ch := make(chan models.Feed, 1)
-
 	tributary := newTributary(bucket, s.URL, time.Minute, DefaultMapping)
-	tributary.OnUpdate = func(f models.Feed) {
-		ch <- f
-	}
-	go tributary.Poll()
+	tributary.Start()
 
 	expected := models.Feed{
 		FeedUrl:         s.URL + "/atom.xml",
@@ -140,7 +130,7 @@ good engineering culture— is our obsession with aggressively measuring everyth
 	assert := assert.New(t)
 
 	select {
-	case f := <-ch:
+	case f := <-tributary.Feeds():
 		assert.Equal(expected.FeedUrl, f.FeedUrl)
 		assert.Equal(expected.WebsiteUrl, f.WebsiteUrl)
 		assert.Equal(expected.FeedTitle, f.FeedTitle)

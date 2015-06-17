@@ -72,9 +72,7 @@ func (x tx) After(start []byte) [][]byte {
 		return ks[i] >= string(start)
 	})
 
-	if i < len(ks) {
-		ks = ks[i:]
-	}
+	ks = ks[i:]
 
 	vs := make([][]byte, len(ks))
 	for i, k := range ks {
