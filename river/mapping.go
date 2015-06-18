@@ -29,7 +29,7 @@ func DefaultMapping(item *feed.Item) *models.Item {
 	i := &models.Item{
 		Body:       stripAndCrop(item.Description),
 		PubDate:    models.RssTime{pubDate},
-		Title:      item.Title,
+		Title:      html.UnescapeString(item.Title),
 		Id:         item.Key(),
 		Comments:   item.Comments,
 		Enclosures: []models.Enclosure{},
@@ -75,7 +75,7 @@ func DefaultMapping(item *feed.Item) *models.Item {
 }
 
 // Strips html markup, then limits to 280 characters. If the original text was
-// longer than 280 chars, three periods are appended.
+// longer than 280 chars, an ellipsis is appended.
 func stripAndCrop(content string) string {
 	content = processString(content,
 		strings.NewReplacer("\n", " ").Replace,
@@ -83,8 +83,7 @@ func stripAndCrop(content string) string {
 		strings.TrimSpace,
 		html.UnescapeString,
 		html.UnescapeString,
-		sanitize.HTML,
-	)
+		sanitize.HTML)
 
 	if len(content) <= 280 {
 		return content

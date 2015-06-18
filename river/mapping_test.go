@@ -70,6 +70,22 @@ func TestDefaultMapping(t *testing.T) {
 			},
 		},
 
+		// Title
+		{
+			"title unescaped",
+			&feed.Item{
+				Title:   "&#8220;The purpose of the IoT is to give humans superpowers&#8221;",
+				PubDate: "Mon, 02 Jan 2006 20:04:19 UTC",
+				Id:      "5",
+			},
+			&models.Item{
+				Title:      `“The purpose of the IoT is to give humans superpowers”`,
+				PubDate:    models.RssTime{time.Date(2006, 1, 2, 20, 4, 19, 0, time.UTC)},
+				Id:         "5",
+				Enclosures: []models.Enclosure{},
+			},
+		},
+
 		// Pubdate
 		{
 			"pubdate",
