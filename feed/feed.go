@@ -77,12 +77,12 @@ func New(cachetimeout time.Duration, ih ItemHandler, database Database) *Feed {
 //
 // The client parameter allows the use of arbitrary network connections, for
 // example the Google App Engine "URL Fetch" service.
-func (this *Feed) Fetch(uri string, client *http.Client, charset xmlx.CharsetFunc) (int, error) {
-	if !this.CanUpdate() {
+func (f *Feed) Fetch(uri string, client *http.Client, charset xmlx.CharsetFunc) (int, error) {
+	if !f.CanUpdate() {
 		return -1, nil
 	}
 
-	this.url = uri
+	f.url = uri
 
 	r, err := client.Get(uri)
 	if err != nil {
@@ -94,7 +94,7 @@ func (this *Feed) Fetch(uri string, client *http.Client, charset xmlx.CharsetFun
 		return r.StatusCode, nil
 	}
 
-	return r.StatusCode, this.load(r.Body, charset)
+	return r.StatusCode, f.load(r.Body, charset)
 }
 
 func Parse(r io.Reader, charset xmlx.CharsetFunc) (chs []*Channel, err error) {
@@ -113,33 +113,33 @@ func Parse(r io.Reader, charset xmlx.CharsetFunc) (chs []*Channel, err error) {
 	return buildFeed(format, doc)
 }
 
-func (this *Feed) load(r io.Reader, charset xmlx.CharsetFunc) (err error) {
-	this.channels, err = Parse(r, charset)
-	if err != nil || len(this.channels) == 0 {
+func (f *Feed) load(r io.Reader, charset xmlx.CharsetFunc) (err error) {
+	f.channels, err = Parse(r, charset)
+	if err != nil || len(f.channels) == 0 {
 		return
 	}
 
 	// reset cache timeout values according to feed specified values (TTL)
-	if this.cacheTimeout < time.Minute*time.Duration(this.channels[0].TTL) {
-		this.cacheTimeout = time.Minute * time.Duration(this.channels[0].TTL)
+	if f.cacheTimeout < time.Minute*time.Duration(f.channels[0].TTL) {
+		f.cacheTimeout = time.Minute * time.Duration(f.channels[0].TTL)
 	}
 
-	this.notifyListeners()
+	f.notifyListeners()
 	return
 }
 
-func (this *Feed) notifyListeners() {
-	for _, channel := range this.channels {
+func (f *Feed) notifyListeners() {
+	for _, channel := range f.channels {
 		var newitems []*Item
 
 		for _, item := range channel.Items {
-			if !this.known.Contains(item.Key()) {
+			if !f.known.Contains(item.Key()) {
 				newitems = append(newitems, item)
 			}
 		}
 
-		if len(newitems) > 0 && this.itemhandler != nil {
-			this.itemhandler(this, channel, newitems)
+		if len(newitems) > 0 && f.itemhandler != nil {
+			f.itemhandler(f, channel, newitems)
 		}
 	}
 }
@@ -148,27 +148,27 @@ func (this *Feed) notifyListeners() {
 // value has expired or not. Additionally, it will ensure that we adhere to the
 // RSS spec's SkipDays and SkipHours values. If this function returns true, you
 // can be sure that a fresh feed update will be performed.
-func (this *Feed) CanUpdate() bool {
+func (f *Feed) CanUpdate() bool {
 	// Make sure we are not within the specified cache-limit.
 	// This ensures we don't request data too often.
 	utc := time.Now().UTC()
-	if utc.Sub(this.lastupdate) < this.cacheTimeout {
+	if utc.Sub(f.lastupdate) < f.cacheTimeout {
 		return false
 	}
 
 	// If skipDays or skipHours are set in the RSS feed, use these to see if
 	// we can update.
-	if len(this.channels) == 1 && this.format == "rss" {
-		if len(this.channels[0].SkipDays) > 0 {
-			for _, v := range this.channels[0].SkipDays {
+	if len(f.channels) == 1 && f.format == "rss" {
+		if len(f.channels[0].SkipDays) > 0 {
+			for _, v := range f.channels[0].SkipDays {
 				if time.Weekday(v) == utc.Weekday() {
 					return false
 				}
 			}
 		}
 
-		if len(this.channels[0].SkipHours) > 0 {
-			for _, v := range this.channels[0].SkipHours {
+		if len(f.channels[0].SkipHours) > 0 {
+			for _, v := range f.channels[0].SkipHours {
 				if v == utc.Hour() {
 					return false
 				}
@@ -176,14 +176,14 @@ func (this *Feed) CanUpdate() bool {
 		}
 	}
 
-	this.lastupdate = utc
+	f.lastupdate = utc
 	return true
 }
 
 // Returns the number of seconds needed to elapse
 // before the feed should update.
-func (this *Feed) DurationTillUpdate() time.Duration {
-	return this.cacheTimeout - time.Now().UTC().Sub(this.lastupdate)
+func (f *Feed) DurationTillUpdate() time.Duration {
+	return f.cacheTimeout - time.Now().UTC().Sub(f.lastupdate)
 }
 
 func buildFeed(format string, doc *xmlx.Document) ([]*Channel, error) {

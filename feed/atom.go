@@ -2,107 +2,101 @@ package feed
 
 import xmlx "github.com/jteeuwen/go-pkg-xmlx"
 
-func readAtom(doc *xmlx.Document) ([]*Channel, error) {
-	ns := "http://www.w3.org/2005/Atom"
-	channels := doc.SelectNodes(ns, "feed")
+func readAtom(doc *xmlx.Document) (foundChannels []*Channel, err error) {
+	const ns = "http://www.w3.org/2005/Atom"
 
-	var err error
-	var foundChannels []*Channel
-	var ch *Channel
-	var i *Item
-	var tn *xmlx.Node
-	var list []*xmlx.Node
+	for _, node := range doc.SelectNodes(ns, "feed") {
+		ch := &Channel{
+			Title:         node.S(ns, "title"),
+			LastBuildDate: node.S(ns, "updated"),
+			Id:            node.S(ns, "id"),
+			Rights:        node.S(ns, "rights"),
+		}
 
-	for _, node := range channels {
-		ch = new(Channel)
 		foundChannels = append(foundChannels, ch)
 
-		ch.Title = node.S(ns, "title")
-		ch.LastBuildDate = node.S(ns, "updated")
-		ch.Id = node.S(ns, "id")
-		ch.Rights = node.S(ns, "rights")
-
-		list = node.SelectNodesDirect(ns, "link")
-		ch.Links = make([]Link, len(list))
-		for i, v := range list {
-			ch.Links[i].Href = v.As("", "href")
-			ch.Links[i].Rel = v.As("", "rel")
-			ch.Links[i].Type = v.As("", "type")
-			ch.Links[i].HrefLang = v.As("", "hreflang")
+		for _, v := range node.SelectNodesDirect(ns, "link") {
+			ch.Links = append(ch.Links, Link{
+				Href:     v.As("", "href"),
+				Rel:      v.As("", "rel"),
+				Type:     v.As("", "type"),
+				HrefLang: v.As("", "hreflang"),
+			})
 		}
 
-		if tn = node.SelectNode(ns, "subtitle"); tn != nil {
-			ch.SubTitle = SubTitle{}
-			ch.SubTitle.Type = tn.As("", "type")
-			ch.SubTitle.Text = tn.GetValue()
+		if tn := node.SelectNode(ns, "subtitle"); tn != nil {
+			ch.SubTitle = SubTitle{
+				Type: tn.As("", "type"),
+				Text: tn.GetValue(),
+			}
 		}
 
-		if tn = node.SelectNode(ns, "generator"); tn != nil {
-			ch.Generator = Generator{}
-			ch.Generator.Uri = tn.As("", "uri")
-			ch.Generator.Version = tn.As("", "version")
-			ch.Generator.Text = tn.GetValue()
+		if tn := node.SelectNode(ns, "generator"); tn != nil {
+			ch.Generator = Generator{
+				Uri:     tn.As("", "uri"),
+				Version: tn.As("", "version"),
+				Text:    tn.GetValue(),
+			}
 		}
 
-		if tn = node.SelectNode(ns, "author"); tn != nil {
-			ch.Author = Author{}
-			ch.Author.Name = tn.S("", "name")
-			ch.Author.Uri = tn.S("", "uri")
-			ch.Author.Email = tn.S("", "email")
+		if tn := node.SelectNode(ns, "author"); tn != nil {
+			ch.Author = Author{
+				Name:  tn.S("", "name"),
+				Uri:   tn.S("", "uri"),
+				Email: tn.S("", "email"),
+			}
 		}
 
-		list = node.SelectNodes(ns, "entry")
+		for _, item := range node.SelectNodes(ns, "entry") {
+			i := &Item{
+				Title:       item.S(ns, "title"),
+				Id:          item.S(ns, "id"),
+				PubDate:     item.S(ns, "updated"),
+				Description: item.S(ns, "summary"),
+			}
 
-		for _, item := range list {
-			i = new(Item)
-			i.Title = item.S(ns, "title")
-			i.Id = item.S(ns, "id")
-			i.PubDate = item.S(ns, "updated")
-			i.Description = item.S(ns, "summary")
-
-			links := item.SelectNodes(ns, "link")
-			for _, lv := range links {
-				if lv.As(ns, "rel") == "enclosure" {
-					enc := new(Enclosure)
-					enc.Url = lv.As("", "href")
-					enc.Type = lv.As("", "type")
-					i.Enclosures = append(i.Enclosures, enc)
+			for _, v := range item.SelectNodes(ns, "link") {
+				if v.As(ns, "rel") == "enclosure" {
+					i.Enclosures = append(i.Enclosures, &Enclosure{
+						Url:  v.As("", "href"),
+						Type: v.As("", "type"),
+					})
 				} else {
-					lnk := new(Link)
-					lnk.Href = lv.As("", "href")
-					lnk.Rel = lv.As("", "rel")
-					lnk.Type = lv.As("", "type")
-					lnk.HrefLang = lv.As("", "hreflang")
-					i.Links = append(i.Links, lnk)
+					i.Links = append(i.Links, &Link{
+						Href:     v.As("", "href"),
+						Rel:      v.As("", "rel"),
+						Type:     v.As("", "type"),
+						HrefLang: v.As("", "hreflang"),
+					})
 				}
 			}
 
-			list = item.SelectNodes(ns, "contributor")
-			for _, cv := range list {
-				i.Contributors = append(i.Contributors, cv.S("", "name"))
+			for _, v := range item.SelectNodes(ns, "contributor") {
+				i.Contributors = append(i.Contributors, v.S("", "name"))
 			}
 
-			list = item.SelectNodes(ns, "category")
-			for _, cv := range list {
-				cat := new(Category)
-				cat.Domain = ""
-				cat.Text = cv.As("", "term")
-				i.Categories = append(i.Categories, cat)
+			for _, cv := range item.SelectNodes(ns, "category") {
+				i.Categories = append(i.Categories, &Category{
+					Domain: "",
+					Text:   cv.As("", "term"),
+				})
 			}
 
-			if tn = item.SelectNode(ns, "content"); tn != nil {
-				i.Content = new(Content)
-				i.Content.Type = tn.As("", "type")
-				i.Content.Lang = tn.S("xml", "lang")
-				i.Content.Base = tn.S("xml", "base")
-				i.Content.Text = tn.GetValue()
+			if tn := item.SelectNode(ns, "content"); tn != nil {
+				i.Content = &Content{
+					Type: tn.As("", "type"),
+					Lang: tn.S("xml", "lang"),
+					Base: tn.S("xml", "base"),
+					Text: tn.GetValue(),
+				}
 			}
 
-			if tn = item.SelectNode(ns, "author"); tn != nil {
-				i.Author = Author{}
-				i.Author.Name = tn.S(ns, "name")
-				i.Author.Uri = tn.S(ns, "uri")
-				i.Author.Email = tn.S(ns, "email")
+			if tn := item.SelectNode(ns, "author"); tn != nil {
+				i.Author = Author{
+					Name:  tn.S(ns, "name"),
+					Uri:   tn.S(ns, "uri"),
+					Email: tn.S(ns, "email"),
+				}
 			}
 
 			ch.Items = append(ch.Items, i)
