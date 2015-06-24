@@ -3,6 +3,7 @@ package feed
 import (
 	"io"
 	"net/http"
+	"net/http/httptest"
 	"os"
 	"testing"
 	"time"
@@ -18,21 +19,27 @@ func charsetReader(name string, r io.Reader) (io.Reader, error) {
 }
 
 func TestFeed(t *testing.T) {
-	urilist := []string{
-		"http://cyber.law.harvard.edu/rss/examples/sampleRss091.xml", // Non-utf8 encoding.
-		"http://store.steampowered.com/feeds/news.xml",               // This feed violates the rss spec.
-		"http://cyber.law.harvard.edu/rss/examples/sampleRss092.xml",
-		"http://cyber.law.harvard.edu/rss/examples/rss2sample.xml",
-		"http://blog.case.edu/news/feed.atom",
+	feedlist := []string{
+		"/testdata/cyber.law.harvard.edu-sampleRss091.xml", // "http://cyber.law.harvard.edu/rss/examples/sampleRss091.xml", // Non-utf8 encoding.
+		"/testdata/store.steampowered.com-news.xml",        // "http://store.steampowered.com/feeds/news.xml", // This feed violates the rss spec.
+		"/testdata/cyber.law.harvard.edu-sampleRss092.xml", // "http://cyber.law.harvard.edu/rss/examples/sampleRss092.xml",
+		"/testdata/cyber.law.harvard.edu-rss2sample.xml",   // "http://cyber.law.harvard.edu/rss/examples/rss2sample.xml",
+		"/testdata/blog.case.edu-feed.atom",                // "http://blog.case.edu/news/feed.atom",
 	}
+
+	s := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		f, _ := os.Open(r.URL.Path[1:])
+		io.Copy(w, f)
+		f.Close()
+	}))
 
 	var feed *Feed
 	var err error
 
-	for _, uri := range urilist {
+	for _, uri := range feedlist {
 		feed = New(5, itemHandler, NewDatabase())
 
-		if _, err = feed.Fetch(uri, &http.Client{Timeout: 5 * time.Second}, charsetReader); err != nil {
+		if _, err = feed.Fetch(s.URL+uri, http.DefaultClient, charset.NewReader); err != nil {
 			t.Errorf("%s >>> %s", uri, err)
 			return
 		}
@@ -61,7 +68,7 @@ func Test_NewItem(t *testing.T) {
 	select {
 	case items := <-itemsCh:
 		if len(items) != 1 {
-			t.Errorf("Expected %s new item, got %s", 1, len(items))
+			t.Errorf("Expected %d new item, got %d", 1, len(items))
 		}
 
 		if "First title" != items[0].Title {
@@ -74,7 +81,7 @@ func Test_NewItem(t *testing.T) {
 	select {
 	case items := <-itemsCh:
 		if len(items) != 1 {
-			t.Errorf("Expected %s new item, got %s", 1, len(items))
+			t.Errorf("Expected %d new item, got %d", 1, len(items))
 		}
 
 		if expected != items[0].Title {
@@ -152,13 +159,13 @@ func Test_ItemExtensions(t *testing.T) {
 		files := edgarExtensionxbrlFiling["xbrlFiles"][0].Childrens["xbrlFile"]
 		fileSizeExpected := 10
 		if len(files) != 10 {
-			t.Errorf("Expected files size to be %s but found %s", fileSizeExpected, len(files))
+			t.Errorf("Expected files size to be %d but found %d", fileSizeExpected, len(files))
 		}
 
 		file := files[0]
 		fileExpected := "cbmg_10qa.htm"
 		if file.Attrs["file"] != fileExpected {
-			t.Errorf("Expected file to be %s but found %s", fileExpected, len(file.Attrs["file"]))
+			t.Errorf("Expected file to be %s but found %d", fileExpected, len(file.Attrs["file"]))
 		}
 	case <-time.After(time.Second):
 		t.Fatal("timeout")

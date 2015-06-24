@@ -1,0 +1,294 @@
+<?xml version="1.0" encoding="UTF-8" ?><rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:sy="http://purl.org/rss/1.0/modules/syndication/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:cc="http://web.resource.org/cc/" xmlns:steam="http://www.steampowered.com" xmlns="http://purl.org/rss/1.0/">
+	<channel rdf:about="http://www.steampowered.com">
+		<title>Steam RSS News Feed</title> 
+		<link>http://www.steampowered.com/</link> 
+		<description>All Steam news, all the time!</description> 
+		<language>en</language> 
+				<pubDate>Tue, 23 Jun 2015 12:12:00 -0700</pubDate>
+		<generator>http://www.steampowered.com/</generator> 
+		<items>
+			<rdf:Seq>
+							<rdf:li rdf:resource="http://store.steampowered.com/news/17260/" />
+							<rdf:li rdf:resource="http://store.steampowered.com/news/17256/" />
+							<rdf:li rdf:resource="http://store.steampowered.com/news/17255/" />
+							<rdf:li rdf:resource="http://store.steampowered.com/news/17254/" />
+							<rdf:li rdf:resource="http://store.steampowered.com/news/17252/" />
+							<rdf:li rdf:resource="http://store.steampowered.com/news/17251/" />
+							<rdf:li rdf:resource="http://store.steampowered.com/news/17241/" />
+							<rdf:li rdf:resource="http://store.steampowered.com/news/17237/" />
+							<rdf:li rdf:resource="http://store.steampowered.com/news/17235/" />
+							<rdf:li rdf:resource="http://store.steampowered.com/news/17231/" />
+							<rdf:li rdf:resource="http://store.steampowered.com/news/17233/" />
+							<rdf:li rdf:resource="http://store.steampowered.com/news/17232/" />
+							<rdf:li rdf:resource="http://store.steampowered.com/news/17229/" />
+							<rdf:li rdf:resource="http://store.steampowered.com/news/17228/" />
+							<rdf:li rdf:resource="http://store.steampowered.com/news/17222/" />
+							<rdf:li rdf:resource="http://store.steampowered.com/news/17223/" />
+							<rdf:li rdf:resource="http://store.steampowered.com/news/17221/" />
+							<rdf:li rdf:resource="http://store.steampowered.com/news/17219/" />
+							<rdf:li rdf:resource="http://store.steampowered.com/news/17218/" />
+							<rdf:li rdf:resource="http://store.steampowered.com/news/17217/" />
+						</rdf:Seq>
+		</items>
+	</channel>
+					<item rdf:about="http://store.steampowered.com/news/17260/">
+			<title><![CDATA[Midweek Madness - Mass Effect 2, 75% Off]]></title>
+			<link><![CDATA[http://store.steampowered.com/news/17260/]]></link>
+			<guid isPermaLink="true"><![CDATA[http://store.steampowered.com/news/17260/]]></guid>
+			<comments>http://steamcommunity.com//discussions/</comments>
+			<pubDate>Tue, 23 Jun 2015 12:12:00 -0700</pubDate>
+			<author>Valve</author>
+			<category>Valve news update</category>
+			<dc:subject>Valve news update</dc:subject>
+			<dc:creator>Valve</dc:creator>
+			<dc:date>2015-06-23T12:12:00-0700</dc:date>
+						<content:encoded><![CDATA[Save 75% on <a href='http://store.steampowered.com/app/24980'>Mass Effect 2</a> during this week's Midweek Madness*!<br><br>From the makers of Star Wars&reg;: Knights of the Old Republic&trade;, Dragon Age: Origins&trade;, and Mass Effect&trade; comes the dark second installment in the thrilling Mass Effect Trilogy! <br><br>Two years after Commander Shepard repelled invading Reapers bent on the destruction of organic life, a mysterious new enemy has emerged. On the fringes of known space, something is silently abducting entire human colonies. Now Shepard must work with Cerberus, a ruthless organization devoted to human survival at any cost, to stop the most terrifying threat mankind has ever faced. <br>To even attempt this perilous mission, Shepard must assemble the galaxy&#146;s most elite team and command the most powerful ship ever built. Even then, they say it would be suicide. Commander Shepard intends to prove them wrong. <br><br>*Offer ends Friday at 10AM  Pacific Time<br><a href="http://store.steampowered.com/app/24980"><img src="http://cdn.akamai.steamstatic.com/steam/apps/24980/capsule_467x181.jpg" style=" float: left; margin-right: 12px; height: 181px; width: 467px;"></a>]]></content:encoded>
+		</item>
+					<item rdf:about="http://store.steampowered.com/news/17256/">
+			<title><![CDATA[Now Available on Steam - Final Fantasy XIV: Heavensward]]></title>
+			<link><![CDATA[http://store.steampowered.com/news/17256/]]></link>
+			<guid isPermaLink="true"><![CDATA[http://store.steampowered.com/news/17256/]]></guid>
+			<comments>http://steamcommunity.com//discussions/</comments>
+			<pubDate>Tue, 23 Jun 2015 10:12:00 -0700</pubDate>
+			<author>Valve</author>
+			<category>Valve news update</category>
+			<dc:subject>Valve news update</dc:subject>
+			<dc:creator>Valve</dc:creator>
+			<dc:date>2015-06-23T10:12:00-0700</dc:date>
+						<content:encoded><![CDATA[Heroes of Eorzea, the time has come to rise once again! Set forth with players across the globe on an adventure that will take you to the heavens and beyond. A whole new FINAL FANTASY XIV awaits! Play <a href="http://store.steampowered.com/app/359480/">Final Fantasy XIV: Heavensward</a> today on Steam! <br><br><a href="http://store.steampowered.com/app/359480/"><img src="http://cdn.akamai.steamstatic.com/steam/apps/359480/capsule_467x181.jpg" style=" float: left; margin-right: 12px; height: 181px; width: 467px;"></a>]]></content:encoded>
+		</item>
+					<item rdf:about="http://store.steampowered.com/news/17255/">
+			<title><![CDATA[Midweek Madness - MASSIVE CHALICE, 50% Off]]></title>
+			<link><![CDATA[http://store.steampowered.com/news/17255/]]></link>
+			<guid isPermaLink="true"><![CDATA[http://store.steampowered.com/news/17255/]]></guid>
+			<comments>http://steamcommunity.com//discussions/</comments>
+			<pubDate>Tue, 23 Jun 2015 10:05:00 -0700</pubDate>
+			<author>Valve</author>
+			<category>Valve news update</category>
+			<dc:subject>Valve news update</dc:subject>
+			<dc:creator>Valve</dc:creator>
+			<dc:date>2015-06-23T10:05:00-0700</dc:date>
+						<content:encoded><![CDATA[Save 50% on <a href='http://store.steampowered.com/app/246110'>MASSIVE CHALICE</a> during this week's Midweek Madness*!<br><br>MASSIVE CHALICE is a tactical strategy game set on an epic timeline from Double Fine Productions. As the Immortal Ruler of the Nation, you'll take command of its heroes, forge marriages to strengthen your Bloodlines, and battle a mysterious enemy known as the Cadence in a war lasting hundreds of years.<br><br>*Offer ends Friday at 10AM  Pacific Time<br><a href="http://store.steampowered.com/app/246110"><img src="http://cdn.akamai.steamstatic.com/steam/apps/246110/capsule_467x181.jpg" style=" float: left; margin-right: 12px; height: 181px; width: 467px;"></a>]]></content:encoded>
+		</item>
+					<item rdf:about="http://store.steampowered.com/news/17254/">
+			<title><![CDATA[Daily Deal - Car Mechanic Simulator 2015, 35% Off]]></title>
+			<link><![CDATA[http://store.steampowered.com/news/17254/]]></link>
+			<guid isPermaLink="true"><![CDATA[http://store.steampowered.com/news/17254/]]></guid>
+			<comments>http://steamcommunity.com//discussions/</comments>
+			<pubDate>Tue, 23 Jun 2015 10:00:00 -0700</pubDate>
+			<author>Valve</author>
+			<category>Valve news update</category>
+			<dc:subject>Valve news update</dc:subject>
+			<dc:creator>Valve</dc:creator>
+			<dc:date>2015-06-23T10:00:00-0700</dc:date>
+						<content:encoded><![CDATA[Today's Deal: Save 35% on <a href='http://store.steampowered.com/app/320300/'>Car Mechanic Simulator 2015</a>!*<br><br>Look for the deals each day on the front page of Steam.  Or follow us on <a href='http://twitter.com/steam_games'>twitter</a> or <a href='http://www.facebook.com/Steam'>Facebook</a> for instant notifications wherever you are!<br><br>*Offer ends Thursday at 10AM Pacific Time<br><a href="http://store.steampowered.com/app/320300/"><img src="http://cdn.akamai.steamstatic.com/steam/apps/320300/capsule_467x181.jpg" style=" float: left; margin-right: 12px; height: 181px; width: 467px;"></a>]]></content:encoded>
+		</item>
+					<item rdf:about="http://store.steampowered.com/news/17252/">
+			<title><![CDATA[Now Available on Steam - Barony, 15% off!]]></title>
+			<link><![CDATA[http://store.steampowered.com/news/17252/]]></link>
+			<guid isPermaLink="true"><![CDATA[http://store.steampowered.com/news/17252/]]></guid>
+			<comments>http://steamcommunity.com//discussions/</comments>
+			<pubDate>Tue, 23 Jun 2015 09:00:39 -0700</pubDate>
+			<author>Valve</author>
+			<category>Valve news update</category>
+			<dc:subject>Valve news update</dc:subject>
+			<dc:creator>Valve</dc:creator>
+			<dc:date>2015-06-23T09:00:39-0700</dc:date>
+						<content:encoded><![CDATA[<a href='http://store.steampowered.com/app/371970/'>Barony</a> is Now Available on Steam and is 15% off!*<br><br>Barony is a 3D, first-person roguelike that brings back the cryptic and intricate designs of classic roguelikes such as <i>Nethack</i> and melds them with RPGs like <i>Ultima Underworld</i>, <i>System Shock</i>, and <i>Daggerfall</i>. Challenge is the calling card of this hard-boiled dungeon-crawler.<br><br>*Offer ends June 30 at 10AM Pacific Time<br><a href="http://store.steampowered.com/app/371970/"><img src="http://cdn.akamai.steamstatic.com/steam/apps/371970/capsule_467x181.jpg" style=" float: left; margin-right: 12px; height: 181px; width: 467px;"></a>]]></content:encoded>
+		</item>
+					<item rdf:about="http://store.steampowered.com/news/17251/">
+			<title><![CDATA[Now Available on Steam - Devil May Cry® 4 Special Edition]]></title>
+			<link><![CDATA[http://store.steampowered.com/news/17251/]]></link>
+			<guid isPermaLink="true"><![CDATA[http://store.steampowered.com/news/17251/]]></guid>
+			<comments>http://steamcommunity.com//discussions/</comments>
+			<pubDate>Tue, 23 Jun 2015 08:56:00 -0700</pubDate>
+			<author>Valve</author>
+			<category>Valve news update</category>
+			<dc:subject>Valve news update</dc:subject>
+			<dc:creator>Valve</dc:creator>
+			<dc:date>2015-06-23T08:56:00-0700</dc:date>
+						<content:encoded><![CDATA[<a href='http://store.steampowered.com/app/329050/'>Devil May Cry&reg; 4 Special Edition</a> is Now Available on Steam!<br><br>The smash-hit stylish action game DMC4 is back and better than ever, boasting new playable characters and game modes!<br><a href="http://store.steampowered.com/app/329050/"><img src="http://cdn.akamai.steamstatic.com/steam/apps/329050/capsule_467x181.jpg" style=" float: left; margin-right: 12px; height: 181px; width: 467px;"></a>]]></content:encoded>
+		</item>
+					<item rdf:about="http://store.steampowered.com/news/17241/">
+			<title><![CDATA[Daily Deal - Guncraft, 80% Off]]></title>
+			<link><![CDATA[http://store.steampowered.com/news/17241/]]></link>
+			<guid isPermaLink="true"><![CDATA[http://store.steampowered.com/news/17241/]]></guid>
+			<comments>http://steamcommunity.com//discussions/</comments>
+			<pubDate>Mon, 22 Jun 2015 10:00:00 -0700</pubDate>
+			<author>Valve</author>
+			<category>Valve news update</category>
+			<dc:subject>Valve news update</dc:subject>
+			<dc:creator>Valve</dc:creator>
+			<dc:date>2015-06-22T10:00:00-0700</dc:date>
+						<content:encoded><![CDATA[Today's Deal: Save 80% on <a href='http://store.steampowered.com/app/241720/'>Guncraft</a>!*<br><br>Look for the deals each day on the front page of Steam.  Or follow us on <a href='http://twitter.com/steam_games'>twitter</a> or <a href='http://www.facebook.com/Steam'>Facebook</a> for instant notifications wherever you are!<br><br>*Offer ends Wednesday at 10AM Pacific Time<br><a href="http://store.steampowered.com/app/241720/"><img src="http://cdn.akamai.steamstatic.com/steam/apps/241720/capsule_467x181.jpg" style=" float: left; margin-right: 12px; height: 181px; width: 467px;"></a>]]></content:encoded>
+		</item>
+					<item rdf:about="http://store.steampowered.com/news/17237/">
+			<title><![CDATA[The Steam Monster Summer Sale Encore Starts Now!]]></title>
+			<link><![CDATA[http://store.steampowered.com/news/17237/]]></link>
+			<guid isPermaLink="true"><![CDATA[http://store.steampowered.com/news/17237/]]></guid>
+			<comments>http://steamcommunity.com//discussions/</comments>
+			<pubDate>Sat, 20 Jun 2015 10:01:00 -0700</pubDate>
+			<author>Valve</author>
+			<category>Valve news update</category>
+			<dc:subject>Valve news update</dc:subject>
+			<dc:creator>Valve</dc:creator>
+			<dc:date>2015-06-20T10:01:00-0700</dc:date>
+						<content:encoded><![CDATA[The <b><a href='http://store.steampowered.com/'>Steam Monster Summer Sale Encore Starts Now!</a></b> <br><br>We brought back 100 of the most popular deals to give you one last chance to pick them up while they are on sale. Only 2 days left to take advantage of huge savings on thousands of games throughout our store. <br><br>The Steam Monster Summer Sale will run from now until 10 AM Pacific, June 22nd. Complete information can be found <a href="http://store.steampowered.com/"> here.</a> <br><a href='http://store.steampowered.com/'><img src="https://steamcdn-a.akamaihd.net/steam/news/17231/News-Day8.jpg?t=1434643999"></a>]]></content:encoded>
+		</item>
+					<item rdf:about="http://store.steampowered.com/news/17235/">
+			<title><![CDATA[The Steam Monster Summer Sale - Day 9 ]]></title>
+			<link><![CDATA[http://store.steampowered.com/news/17235/]]></link>
+			<guid isPermaLink="true"><![CDATA[http://store.steampowered.com/news/17235/]]></guid>
+			<comments>http://steamcommunity.com//discussions/</comments>
+			<pubDate>Fri, 19 Jun 2015 10:05:00 -0700</pubDate>
+			<author>Valve</author>
+			<category>Valve news update</category>
+			<dc:subject>Valve news update</dc:subject>
+			<dc:creator>Valve</dc:creator>
+			<dc:date>2015-06-19T10:05:00-0700</dc:date>
+						<content:encoded><![CDATA[The <b><a href='http://store.steampowered.com/'>Steam Monster Summer Sale is here!</a></b>  For four more days, take advantage of huge savings throughout our store on thousands of games. Check back every 12 hours to see new <b>Daily Deals</b>. You can even help unlock additional discounts by playing our <b><a href='http://steamcommunity.com/minigame/'>Monster Summer Game</a></b>.<br><br>More than four hundred products will be featured as <b>Daily Deals</b> throughout the sale, with new deals popping up every 12 hours.  <br><br>Today's Deals include:<br><br><ul style="padding-bottom: 0px; margin-bottom: 0px;" ><li><i><a href="http://store.steampowered.com/sale/resident-evil/">Resident Evil Franchise</a>up to 75% off<br><li><i><a href="http://store.steampowered.com/sale/ac/">Assassin's Creed Franchise</a> up to 75% off<br><li><i><a href="http://store.steampowered.com/sale/mortal-kombat/">Mortal Kombat Franchise</a> up to 75% off<br><li><i><a href="http://store.steampowered.com/app/313120/">Stranded Deep</a> 34% off<br><li><i><a href="http://store.steampowered.com/sale/fallout/">Fallout Franchise</a> up to 75% off<br><li><i><a href="http://store.steampowered.com/app/265930/">Goat Simulator</a> 75% off<br><li><i><a href="http://store.steampowered.com/app/221910/">The Stanley Parable</a> 75% off<br><li><i><a href="http://store.steampowered.com/app/322920/">The Hunter: Primal</a> 75% off<br><li><i><a href="http://store.steampowered.com/sale/tropico/">Tropico Franchise</a>up to 75% off<br><li><i><a href="http://store.steampowered.com/sale/saints-row/">Saints Row Franchise </a> 80% off<br><li><i><a href="http://store.steampowered.com/app/221380/">Age of Empires II</a> 85% off<br><li><i><a href="http://store.steampowered.com/app/323470/">Dragon Ball Xenoverse</a> 50% off<br><li><i><a href="http://store.steampowered.com/sale/europa-universalis">Europa Universalis Franchise</a> up to 75% off<br><li><i><a href="http://store.steampowered.com/app/220200/">Kerbal Space Program</a>25% off<br><li><i><a href="http://store.steampowered.com/app/232090/">Killing Floor 2</a> 20% off<br><br></ul><br>Along with the sale is the <b><a href='http://steamcommunity.com/minigame/'>Monster Summer Game</a></b>. Join a game and fight the enemy monsters as you help your team level up, unlock new abilities, and achieve community milestones. Plus, get Summer Sale Trading Cards just for playing.  <br><br>With your help, players of the Monster Game can work together to unlock special discounts on select games. Each milestone reached unlocks a new discount on a mystery game, available to everyone on Steam at 10am Pacific time the following day. New milestones each day through June 18.<br><br>The Steam Monster Summer Sale will run from now until 10 AM Pacific, June 22nd. Complete information can be found <a href="http://store.steampowered.com/"> here.</a> <br><a href='http://store.steampowered.com/'><img src="https://steamcdn-a.akamaihd.net/steam/news/17231/News-Day8.jpg?t=1434643999"></a>]]></content:encoded>
+		</item>
+					<item rdf:about="http://store.steampowered.com/news/17231/">
+			<title><![CDATA[The Steam Monster Summer Sale Day 8]]></title>
+			<link><![CDATA[http://store.steampowered.com/news/17231/]]></link>
+			<guid isPermaLink="true"><![CDATA[http://store.steampowered.com/news/17231/]]></guid>
+			<comments>http://steamcommunity.com//discussions/</comments>
+			<pubDate>Thu, 18 Jun 2015 10:00:00 -0700</pubDate>
+			<author>Valve</author>
+			<category>Valve news update</category>
+			<dc:subject>Valve news update</dc:subject>
+			<dc:creator>Valve</dc:creator>
+			<dc:date>2015-06-18T10:00:00-0700</dc:date>
+						<content:encoded><![CDATA[The <b><a href='http://store.steampowered.com/'>Steam Monster Summer Sale is here!</a></b>  For four more days, take advantage of huge savings throughout our store on thousands of games. Check back every 12 hours to see new <b>Daily Deals</b>. You can even help unlock additional discounts by playing our <b><a href='http://steamcommunity.com/minigame/'>Monster Summer Game</a></b>.<br><br>More than four hundred products will be featured as <b>Daily Deals</b> throughout the sale, with new deals popping up every 12 hours.  <br><br>Today's Deals include:<br><br><ul style="padding-bottom: 0px; margin-bottom: 0px;" ><li><i><a href="http://store.steampowered.com/app/273350/">Evolve</a> 50% off<br><li><i><a href="http://store.steampowered.com/app/255220/">GRID Autosport</a> 75% off<br><li><i><a href="http://store.steampowered.com/app/266510/">Hand of Fate</a> 50% off<br><li><i><a href="http://store.steampowered.com/app/319630/">Life is Strange</a> up to 50% off<br><li><i><a href="http://store.steampowered.com/app/333950/">Medieval Engineers</a> 40% off<br><li><i><a href="http://store.steampowered.com/app/261570/">Ori and the Blind Forest</a> 40% off<br><li><i><a href="http://store.steampowered.com/app/346110/">ARK: Survival Evolved</a> 17% off<br><li><i><a href="http://store.steampowered.com/app/298630/">The Escapists</a> 33% off<br><li><i><a href="http://store.steampowered.com/app/239140/">Dying Light</a> 25% off<br><li><i><a href="http://store.steampowered.com/app/261030/">The Walking Dead Season 2</a> up to 75% off<br><li><i><a href="http://store.steampowered.com/app/236110/">Dungeon Defenders II</a> 50% off<br><li><i><a href="http://store.steampowered.com/sale/age-of-wonders/">Age of Wonders Franchise</a> up to 75% off<br><li><i><a href="http://store.steampowered.com/app/48240/">Anno 2070</a> 75% off<br><li><i><a href="http://store.steampowered.com/sale/batman/">Batman Franchise</a> up to 75% off<br><li><i><a href="http://store.steampowered.com/app/250760/">Shovel Knight</a> 33% off<br></ul><br>Along with the sale is the <b><a href='http://steamcommunity.com/minigame/'>Monster Summer Game</a></b>. Join a game and fight the enemy monsters as you help your team level up, unlock new abilities, and achieve community milestones. Plus, get Summer Sale Trading Cards just for playing.  <br><br>With your help, players of the Monster Game can work together to unlock special discounts on select games. Each milestone reached unlocks a new discount on a mystery game, available to everyone on Steam at 10am Pacific time the following day. New milestones each day through June 18.<br><br>The Steam Monster Summer Sale will run from now until 10 AM Pacific, June 22nd. Complete information can be found <a href="http://store.steampowered.com/"> here.</a> <br><a href='http://store.steampowered.com/'><img src="https://steamcdn-a.akamaihd.net/steam/news/17231/News-Day8.jpg?t=1434643999"></a>]]></content:encoded>
+		</item>
+					<item rdf:about="http://store.steampowered.com/news/17233/">
+			<title><![CDATA[Now Available on Steam - In Search of the Most Dangerous Town on the Internet]]></title>
+			<link><![CDATA[http://store.steampowered.com/news/17233/]]></link>
+			<guid isPermaLink="true"><![CDATA[http://store.steampowered.com/news/17233/]]></guid>
+			<comments>http://steamcommunity.com//discussions/</comments>
+			<pubDate>Thu, 18 Jun 2015 09:26:00 -0700</pubDate>
+			<author>Valve</author>
+			<category>Valve news update</category>
+			<dc:subject>Valve news update</dc:subject>
+			<dc:creator>Valve</dc:creator>
+			<dc:date>2015-06-18T09:26:00-0700</dc:date>
+						<content:encoded><![CDATA[<a href='http://store.steampowered.com/app/380890/'>In Search of the Most Dangerous Town on the Internet</a> is Now Available to Watch for Free on Steam!<br><br>Râmnicu Vâlcea, Romania has only 120,000 residents, but among law enforcement experts, it has a nickname: Hackerville. In the last year alone, $1 billion was stolen in the U.S. by Romanian hackers. Others have been caught breaking into the email accounts of NASA, Hillary Clinton and George W. Bush. Is there anything we can do to protect ourselves from the most dangerous town on the internet?<br><a href="http://store.steampowered.com/app/380890/"><img src="http://cdn.akamai.steamstatic.com/steam/apps/380890/capsule_467x181.jpg" style=" float: left; margin-right: 12px; height: 181px; width: 467px;"></a>]]></content:encoded>
+		</item>
+					<item rdf:about="http://store.steampowered.com/news/17232/">
+			<title><![CDATA[Now Available on Steam - Pro Cycling Manager 2015]]></title>
+			<link><![CDATA[http://store.steampowered.com/news/17232/]]></link>
+			<guid isPermaLink="true"><![CDATA[http://store.steampowered.com/news/17232/]]></guid>
+			<comments>http://steamcommunity.com//discussions/</comments>
+			<pubDate>Thu, 18 Jun 2015 09:24:00 -0700</pubDate>
+			<author>Valve</author>
+			<category>Valve news update</category>
+			<dc:subject>Valve news update</dc:subject>
+			<dc:creator>Valve</dc:creator>
+			<dc:date>2015-06-18T09:24:00-0700</dc:date>
+						<content:encoded><![CDATA[<a href='http://store.steampowered.com/app/322850/'>Pro Cycling Manager 2015</a> is Now Available on Steam!<br><br><strong>Become the sporting director</strong> of one of the pro cycling circuit's 90 teams, and compete in a thrilling 2015 season. Participate <strong>in over 200 competitions</strong> (550 stages) and the ultimate challenge:<strong> the prestigious Tour de France 2015 and its official route</strong>. Recruitment, personnel management, finances, contracts with riders and sponsors, training programs and the race calendar: leave nothing to chance. Your role will be equally important during the race, where <strong>every decision will be crucial in your bid for victory</strong>!<br><a href="http://store.steampowered.com/app/322850/"><img src="http://cdn.akamai.steamstatic.com/steam/apps/322850/capsule_467x181.jpg" style=" float: left; margin-right: 12px; height: 181px; width: 467px;"></a>]]></content:encoded>
+		</item>
+					<item rdf:about="http://store.steampowered.com/news/17229/">
+			<title><![CDATA[The Steam Monster Summer Sale Day 7]]></title>
+			<link><![CDATA[http://store.steampowered.com/news/17229/]]></link>
+			<guid isPermaLink="true"><![CDATA[http://store.steampowered.com/news/17229/]]></guid>
+			<comments>http://steamcommunity.com//discussions/</comments>
+			<pubDate>Wed, 17 Jun 2015 14:48:00 -0700</pubDate>
+			<author>Valve</author>
+			<category>Valve news update</category>
+			<dc:subject>Valve news update</dc:subject>
+			<dc:creator>Valve</dc:creator>
+			<dc:date>2015-06-17T14:48:00-0700</dc:date>
+						<content:encoded><![CDATA[The <b><a href='http://store.steampowered.com/'>Steam Monster Summer Sale is here!</a></b>  For five more days, take advantage of huge savings throughout our store on thousands of games. Check back every 12 hours to see new <b>Daily Deals</b>. You can even help unlock additional discounts by playing our <b><a href='http://steamcommunity.com/minigame/'>Monster Summer Game</a></b>.<br><br>More than four hundred products will be featured as <b>Daily Deals</b> throughout the sale, with new deals popping up every 12 hours.  <br><br>Today's Deals include:<br><br><ul style="padding-bottom: 0px; margin-bottom: 0px;" ><li><i><a href="http://store.steampowered.com/app/278080/">DYNASTY WARRIORS 8: Xtreme Legends Complete Edition</a> 66% off</i><br><li><i><a href="http://store.steampowered.com/sale/company-of-heroes/">Company of Heroes Franchise</a> up to 75% off</i><br><li><i><a href="http://store.steampowered.com/sale/arma/">ARMA Franchise</a> up to 85%% off</i><br><li><i><a href="http://store.steampowered.com/app/311340/">Metal Gear Solid V: Ground Zeroes</a> 75% off</i><br><li><i><a href="http://store.steampowered.com/app/227300/">Euro Truck Simulator 2</a> 80% off</i><br><li><i><a href="http://store.steampowered.com/app/246620/">Plague Inc: Evolved</a> 33% off</i><br><li><i><a href="http://store.steampowered.com/app/213670/">South Park&trade;: The Stick of Truth&trade;</a> 66% off</i><br><li><i><a href="http://store.steampowered.com/app/252450/">StarDrive 2</a> 40% off</i><br><li><i><a href="http://store.steampowered.com/app/330840/">Game of Thrones - A Telltale Games Series</a> 50% off</i><br><li><i><a href="http://store.steampowered.com/app/262280/">Dungeons 2</a> 50% off</i><br><li><i><a href="http://store.steampowered.com/app/233250/">Planetary Annihilation</a> 85% off</i><br><li><i><a href="http://store.steampowered.com/app/291650/">Pillars of Eternity</a> 33% off</i><br><li><i><a href="http://store.steampowered.com/sale/elder-scrolls/">The Elder Scrolls Franchise</a> up to 75% off</i><br><li><i><a href="http://store.steampowered.com/app/271240/">Offworld Trading Company</a> 50% off</i><br><li><i><a href="http://store.steampowered.com/app/242920/">Banished</a> 75% off</i><br></ul><br>Along with the sale is the <b><a href='http://steamcommunity.com/minigame/'>Monster Summer Game</a></b>. Join a game and fight the enemy monsters as you help your team level up, unlock new abilities, and achieve community milestones. Plus, get Summer Sale Trading Cards just for playing.  <br><br>With your help, players of the Monster Game can work together to unlock special discounts on select games. Each milestone reached unlocks a new discount on a mystery game, available to everyone on Steam at 10am Pacific time the following day. New milestones each day through June 18.<br><br>The Steam Monster Summer Sale will run from now until 10 AM Pacific, June 22nd. Complete information can be found <a href="http://store.steampowered.com/"> here.</a> <br><a href='http://store.steampowered.com/'><img src="https://steamcdn-a.akamaihd.net/steam/news/17229/News-Day7.jpg?t=1434577795"></a>]]></content:encoded>
+		</item>
+					<item rdf:about="http://store.steampowered.com/news/17228/">
+			<title><![CDATA[Team Fortress 2 Update Released]]></title>
+			<link><![CDATA[http://store.steampowered.com/news/17228/]]></link>
+			<guid isPermaLink="true"><![CDATA[http://store.steampowered.com/news/17228/]]></guid>
+			<comments>http://steamcommunity.com//discussions/</comments>
+			<pubDate>Wed, 17 Jun 2015 13:40:00 -0700</pubDate>
+			<author>Valve</author>
+			<category>Valve news update</category>
+			<dc:subject>Valve news update</dc:subject>
+			<dc:creator>Valve</dc:creator>
+			<dc:date>2015-06-17T13:40:00-0700</dc:date>
+						<content:encoded><![CDATA[An update to Team Fortress 2 has been released. The update will be applied automatically when you restart Team Fortress 2. The major changes include:<br/><br><ul style="padding-bottom: 0px; margin-bottom: 0px;" ><li>Fixed an issue causing dedicated servers to occasionally hang on shutdown<br><li>Hammer tools: Fixed vbsp -onlyents and -onlyprops compiles failing<br><li>Updated localization files<br><li>Updated the Maps Workshop Beta<ul style="padding-bottom: 0px; margin-bottom: 0px;" ><li>Fixed an issue causing clients or servers installed in long path names to be unable to load workshop maps<br><li>Fixed an issue causing clients to occasionally be unable to launch a listen server using a workshop map via the 'map' command<br><li>Fixed an issue causing the initial map load on dedicated servers to fail if the map is a workshop map<br><li>Fixed dedicated servers requiring a reboot to properly handle updated workshop maps if the map name changed</ul></ul>]]></content:encoded>
+		</item>
+					<item rdf:about="http://store.steampowered.com/news/17222/">
+			<title><![CDATA[Pre-Purchase Now - Street Fighter V]]></title>
+			<link><![CDATA[http://store.steampowered.com/news/17222/]]></link>
+			<guid isPermaLink="true"><![CDATA[http://store.steampowered.com/news/17222/]]></guid>
+			<comments>http://steamcommunity.com//discussions/</comments>
+			<pubDate>Tue, 16 Jun 2015 10:10:00 -0700</pubDate>
+			<author>Valve</author>
+			<category>Valve news update</category>
+			<dc:subject>Valve news update</dc:subject>
+			<dc:creator>Valve</dc:creator>
+			<dc:date>2015-06-16T10:10:00-0700</dc:date>
+						<content:encoded><![CDATA[<a href='http://store.steampowered.com/app/310950/'>Street Fighter V</a> is Now Available for Pre-Purchase on Steam.<br><br>Pre-purchase now and get a sneak peek at STREET FIGHTER&reg; V beta for PC this fall!<br>(Beta start date will be announced through Steam in a future update - please stay tuned!)<br><br>The legendary fighting franchise returns with STREET FIGHTER&reg; V! Stunning visuals depict the next generation of World Warriors in unprecedented detail, while exciting and accessible battle mechanics deliver endless fighting fun that both beginners and veterans can enjoy.<br><br><br><a href="http://store.steampowered.com/app/310950/"><img src="http://cdn.akamai.steamstatic.com/steam/apps/310950/capsule_467x181.jpg" style=" float: left; margin-right: 12px; height: 181px; width: 467px;"></a>]]></content:encoded>
+		</item>
+					<item rdf:about="http://store.steampowered.com/news/17223/">
+			<title><![CDATA[The Steam Monster Summer Sale Day 6]]></title>
+			<link><![CDATA[http://store.steampowered.com/news/17223/]]></link>
+			<guid isPermaLink="true"><![CDATA[http://store.steampowered.com/news/17223/]]></guid>
+			<comments>http://steamcommunity.com//discussions/</comments>
+			<pubDate>Tue, 16 Jun 2015 10:00:00 -0700</pubDate>
+			<author>Valve</author>
+			<category>Valve news update</category>
+			<dc:subject>Valve news update</dc:subject>
+			<dc:creator>Valve</dc:creator>
+			<dc:date>2015-06-16T10:00:00-0700</dc:date>
+						<content:encoded><![CDATA[The <b><a href='http://store.steampowered.com/'>Steam Monster Summer Sale is here!</a></b>  For seven more days, take advantage of huge savings throughout our store on thousands of games. Check back every 12 hours to see new <b>Daily Deals</b>. You can even help unlock additional discounts by playing our <b><a href='http://steamcommunity.com/minigame/'>Monster Summer Game</a></b>.<br><br>More than four hundred products will be featured as <b>Daily Deals</b> throughout the sale, with new deals popping up every 12 hours.  <br><br>Today's Deals include:<br><br><ul style="padding-bottom: 0px; margin-bottom: 0px;" ><li><i><a href="http://store.steampowered.com/app/325610">Total War Franchise</a> Up to 75% off<br><li><i><a href="http://store.steampowered.com/app/218620">PAYDAY 2</a> 75% off<br><li><i><a href="http://store.steampowered.com/app/359320">Elite Dangerous</a> 25% off<br><li><i><a href="http://store.steampowered.com/app/241560">The Crew</a> 50% off<br><li><i><a href="http://store.steampowered.com/app/244850">Space Engineers</a> 50% off<br><li><i><a href="http://store.steampowered.com/app/314160">Microsoft Flight Simulator X: Steam Edition</a> 80% off<br><li><i><a href="http://store.steampowered.com/app/257510">The Talos Principle</a> 66% off<br><li><i><a href="http://store.steampowered.com/app/105600">Terraria</a> 75% off<br><li><i><a href="http://store.steampowered.com/app/244210">Assetto Corsa</a> 50% off<br><li><i><a href="http://store.steampowered.com/app/292120">FINAL FANTASY Franchise</a> Up to 50% off<br><li><i><a href="http://store.steampowered.com/app/332500">GRAV</a> 50% off<br><li><i><a href="http://store.steampowered.com/app/307690">Sleeping Dogs</a> 75% off<br><li><i><a href="http://store.steampowered.com/app/242860">Verdun</a> 50% off<br><li><i><a href="http://store.steampowered.com/app/240460">WWE 2K15</a> 50% off<br><li><i><a href="http://store.steampowered.com/app/290080">Life is Feudal: Your Own</a> 50% off<br><br><br></ul><br>Along with the sale is the <b><a href='http://steamcommunity.com/minigame/'>Monster Summer Game</a></b>. Join a game and fight the enemy monsters as you help your team level up, unlock new abilities, and achieve community milestones. Plus, get Summer Sale Trading Cards just for playing.  <br><br>With your help, players of the Monster Game can work together to unlock special discounts on select games. Each milestone reached unlocks a new discount on a mystery game, available to everyone on Steam at 10am Pacific time the following day. New milestones each day through June 18.<br><br>The Steam Monster Summer Sale will run from now until 10 AM Pacific, June 22nd. Complete information can be found <a href="http://store.steampowered.com/"> here.</a> <br><a href='http://store.steampowered.com/'><img src="https://steamcdn-a.akamaihd.net/steam/news/17223/News-Day6.jpg"></a>]]></content:encoded>
+		</item>
+					<item rdf:about="http://store.steampowered.com/news/17221/">
+			<title><![CDATA[The Steam Monster Summer Sale Day 5]]></title>
+			<link><![CDATA[http://store.steampowered.com/news/17221/]]></link>
+			<guid isPermaLink="true"><![CDATA[http://store.steampowered.com/news/17221/]]></guid>
+			<comments>http://steamcommunity.com//discussions/</comments>
+			<pubDate>Mon, 15 Jun 2015 10:00:00 -0700</pubDate>
+			<author>Valve</author>
+			<category>Valve news update</category>
+			<dc:subject>Valve news update</dc:subject>
+			<dc:creator>Valve</dc:creator>
+			<dc:date>2015-06-15T10:00:00-0700</dc:date>
+						<content:encoded><![CDATA[The <b><a href='http://store.steampowered.com/'>Steam Monster Summer Sale is here!</a></b>  For eight more days, take advantage of huge savings throughout our store on thousands of games. Check back every 12 hours to see new <b>Daily Deals</b>. You can even help unlock additional discounts by playing our <b><a href='http://steamcommunity.com/minigame/'>Monster Summer Game</a></b>.<br><br>More than four hundred products will be featured as <b>Daily Deals</b> throughout the sale, with new deals popping up every 12 hours.  <br><br>Today's Deals include:<br><br><ul style="padding-bottom: 0px; margin-bottom: 0px;" ><li><i><a href="http://store.steampowered.com/sale/bioshock/">BioShock Franchise</a></i> Up to 80% Off<br><li><i><a href="http://store.steampowered.com/app/205100">Dishonored</a></i> 75% Off<br><li><i><a href="http://store.steampowered.com/app/">Dead Rising Franchise</a></i> Up to 66% Off<br><li><i><a href="http://store.steampowered.com/app/265300">Lords of the Fallen</a></i> 60% Off<br><li><i><a href="http://store.steampowered.com/app/302510">Ryse: Son of Rome</a></i> 66% Off<br><li><i><a href="http://store.steampowered.com/app/4000">Garry's Mod</a></i> 50% Off<br><li><i><a href="http://store.steampowered.com/sale/shadowrun/">Shadowrun Franchise</a></i> Up to 80% Off<br><li><i><a href="http://store.steampowered.com/app/305620">The Long Dark</a></i> 50% Off<br><li><i><a href="http://store.steampowered.com/app/282900">Hyperdimension Neptunia Re;Birth1</a></i> 70% Off<br><li><i><a href="http://store.steampowered.com/app/108600">Project Zomboid</a></i> 40% Off<br><li><i><a href="http://store.steampowered.com/app/311730">Dead or Alive 5: Last Round</a></i> 50% Off<br><li><i><a href="http://store.steampowered.com/sale/divinity/">Divinity Franchise</a></i> Up to 80% Off<br><li><i><a href="http://store.steampowered.com/app/203770">Crusader Kings II</a></i> 80% Off<br><li><i><a href="http://store.steampowered.com/sale/freddy/">Five Nights at Freddy's Franchise</a></i> Up to 75% Off<br><li><i><a href="http://store.steampowered.com/sale/galactic-civilizations/">Galactic Civilizations Franchise</a></i> Up to 75% Off<br></ul><br>Along with the sale is the <b><a href='http://steamcommunity.com/minigame/'>Monster Summer Game</a></b>. Join a game and fight the enemy monsters as you help your team level up, unlock new abilities, and achieve community milestones. Plus, get Summer Sale Trading Cards just for playing.  <br><br>With your help, players of the Monster Game can work together to unlock special discounts on select games. Each milestone reached unlocks a new discount on a mystery game, available to everyone on Steam at 10am Pacific time the following day. New milestones each day through June 18.<br><br>The Steam Monster Summer Sale will run from now until 10 AM Pacific, June 22nd. Complete information can be found <a href="http://store.steampowered.com/"> here.</a> <br><a href='http://store.steampowered.com/'><img src="https://steamcdn-a.akamaihd.net/steam/news/17221/News-Day5.jpg"></a>]]></content:encoded>
+		</item>
+					<item rdf:about="http://store.steampowered.com/news/17219/">
+			<title><![CDATA[The Steam Monster Summer Sale Day 4]]></title>
+			<link><![CDATA[http://store.steampowered.com/news/17219/]]></link>
+			<guid isPermaLink="true"><![CDATA[http://store.steampowered.com/news/17219/]]></guid>
+			<comments>http://steamcommunity.com//discussions/</comments>
+			<pubDate>Sun, 14 Jun 2015 09:48:00 -0700</pubDate>
+			<author>Valve</author>
+			<category>Valve news update</category>
+			<dc:subject>Valve news update</dc:subject>
+			<dc:creator>Valve</dc:creator>
+			<dc:date>2015-06-14T09:48:00-0700</dc:date>
+						<content:encoded><![CDATA[The <b><a href='http://store.steampowered.com/'>Steam Monster Summer Sale is here!</a></b>  For nine more days, take advantage of huge savings throughout our store on thousands of games. Check back every 12 hours to see new <b>Daily Deals</b>. You can even help unlock additional discounts by playing our <b><a href='http://steamcommunity.com/minigame/'>Monster Summer Game</a></b>.<br><br>More than four hundred products will be featured as <b>Daily Deals</b> throughout the sale, with new deals popping up every 12 hours.  <br><br>Today's Deals include:<br><ul style="padding-bottom: 0px; margin-bottom: 0px;" ><li><i><a href="http://store.steampowered.com/sale/civilization/">Civilization Franchise</a></i> up to 75% off<br><li><i><a href="http://store.steampowered.com/sale/cod/">Call of Duty Franchise</a></i> up to 50% off<br><li><i><a href="http://store.steampowered.com/app/289130/">Endless Legend</a></i> 50% off<br><li><i><a href="http://store.steampowered.com/app/344760/">Reign of Kings</a></i> 40% off<br><li><i><a href="http://store.steampowered.com/app/295110/">H1Z1</a></i> 50% off<br><li><i><a href="http://store.steampowered.com/app/316790/">Grim Fandango Remastered</a></i> 50% off<br><li><i><a href="http://store.steampowered.com/app/239820/">Game Dev Tycoon</a></i> 50% off<br><li><i><a href="http://store.steampowered.com/app/288470/">Fable Anniversary</a></i> 75% off<br><li><i><a href="http://store.steampowered.com/app/222880/">Insurgency</a></i> 75% off<br><li><i><a href="http://store.steampowered.com/sale/aliens/">Alien Franchise</a></i> up to 75% off<br><li><i><a href="http://store.steampowered.com/app/237990/">The Banner Saga</a></i> 75% off<br><li><i><a href="http://store.steampowered.com/app/237930/">Transistor</a></i> 75% off<br><li><i><a href="http://store.steampowered.com/app/258520/">The Vanishing of Ethan Carter</a></i> 66% off<br><li><i><a href="http://store.steampowered.com/sale/far-cry/">Far Cry Franchise</a></i> up to 75% off<br><li><i><a href="http://store.steampowered.com/app/550/">Left 4 Dead 2</a></i> 80% off<br><br></ul><br>Along with the sale is the <b><a href='http://steamcommunity.com/minigame/'>Monster Summer Game</a></b>. Join a game and fight the enemy monsters as you help your team level up, unlock new abilities, and achieve community milestones. Plus, get Summer Sale Trading Cards just for playing.  <br><br>With your help, players of the Monster Game can work together to unlock special discounts on select games. Each milestone reached unlocks a new discount on a mystery game, available to everyone on Steam at 10am Pacific time the following day. New milestones each day through June 18.<br><br>The Steam Monster Summer Sale will run from now until 10 AM Pacific, June 22nd. Complete information can be found <a href="http://store.steampowered.com/"> here.</a>]]></content:encoded>
+		</item>
+					<item rdf:about="http://store.steampowered.com/news/17218/">
+			<title><![CDATA[The Steam Monster Summer Sale Day 3]]></title>
+			<link><![CDATA[http://store.steampowered.com/news/17218/]]></link>
+			<guid isPermaLink="true"><![CDATA[http://store.steampowered.com/news/17218/]]></guid>
+			<comments>http://steamcommunity.com//discussions/</comments>
+			<pubDate>Sat, 13 Jun 2015 11:15:00 -0700</pubDate>
+			<author>Valve</author>
+			<category>Valve news update</category>
+			<dc:subject>Valve news update</dc:subject>
+			<dc:creator>Valve</dc:creator>
+			<dc:date>2015-06-13T11:15:00-0700</dc:date>
+						<content:encoded><![CDATA[The <b><a href='http://store.steampowered.com/'>Steam Monster Summer Sale is here!</a></b>  For nine more days, take advantage of huge savings throughout our store on thousands of games. Check back every 12 hours to see new <b>Daily Deals</b>. You can even help unlock additional discounts by playing our <b><a href='http://steamcommunity.com/minigame/'>Monster Summer Game</a></b>.<br><br>More than four hundred products will be featured as <b>Daily Deals</b> throughout the sale, with new deals popping up every 12 hours.  <br><br>Today's Deals include:<br><ul style="padding-bottom: 0px; margin-bottom: 0px;" ><li><i><a href="http://store.steampowered.com/app/255710/">Cities: Skylines</a></i> 33% off<br><li><i><a href="http://store.steampowered.com/sale/borderlands/">Borderlands Franchise</a></i> up to 75% off<br><li><i><a href="http://store.steampowered.com/app/243470/">Watch_Dogs</a></i> 60% off<br><li><i><a href="http://store.steampowered.com/app/730/">Counter-Strike: Global Offensive</a></i> 50% off<br><li><i><a href="http://store.steampowered.com/app/241930/">Middle-earth Shadow of Mordor</a></i> 50% off<br><li><i><a href="http://store.steampowered.com/app/268050/">The Evil Within</a></i> 75% off<br><li><i><a href="http://store.steampowered.com/app/304650/">Sunless Sea</a></i> 40% off<br><li><i><a href="http://store.steampowered.com/app/233450/">Prison Architect</a></i> 85% off<br><li><i><a href="http://store.steampowered.com/app/266840/">Age of Mythology</a></i> 75% off<br><li><i><a href="http://store.steampowered.com/app/263280/">Spintires</a></i> 50% off<br><li><i><a href="http://store.steampowered.com/app/295270/">Football Manager 2015</a></i> 66% off<br><li><i><a href="http://store.steampowered.com/app/250320/">The Wolf Among Us</a></i> 75% off<br><li><i><a href="http://store.steampowered.com/app/204360/">Castle Crashers</a></i> 90% off<br><li><i><a href="http://store.steampowered.com/app/251570/">7 Days to Die</a></i> 60% off<br><li><i><a href="http://store.steampowered.com/app/219640/">Chivalry: Medieval Warfare</a></i> 90% off<br><br></ul><br>Along with the sale is the <b><a href='http://steamcommunity.com/minigame/'>Monster Summer Game</a></b>. Join a game and fight the enemy monsters as you help your team level up, unlock new abilities, and achieve community milestones. Plus, get Summer Sale Trading Cards just for playing.  <br><br>With your help, players of the Monster Game can work together to unlock special discounts on select games. Each milestone reached unlocks a new discount on a mystery game, available to everyone on Steam at 10am Pacific time the following day. New milestones each day through June 18.<br><br>The Steam Monster Summer Sale will run from now until 10 AM Pacific, June 22nd. Complete information can be found <a href="http://store.steampowered.com/"> here.</a> <br><br><a href='http://store.steampowered.com/'><img src="https://steamcdn-a.akamaihd.net/steam/news/17218/News-Day3.jpg"></a>]]></content:encoded>
+		</item>
+					<item rdf:about="http://store.steampowered.com/news/17217/">
+			<title><![CDATA[Team Fortress 2 Update Released]]></title>
+			<link><![CDATA[http://store.steampowered.com/news/17217/]]></link>
+			<guid isPermaLink="true"><![CDATA[http://store.steampowered.com/news/17217/]]></guid>
+			<comments>http://steamcommunity.com//discussions/</comments>
+			<pubDate>Fri, 12 Jun 2015 13:53:00 -0700</pubDate>
+			<author>Valve</author>
+			<category>Valve news update</category>
+			<dc:subject>Valve news update</dc:subject>
+			<dc:creator>Valve</dc:creator>
+			<dc:date>2015-06-12T13:53:00-0700</dc:date>
+						<content:encoded><![CDATA[An update to Team Fortress 2 has been released. The update will be applied automatically when you restart Team Fortress 2. The major changes include:<br/><br><ul style="padding-bottom: 0px; margin-bottom: 0px;" ><li>Fixed a client crash related to crafting<br></ul>]]></content:encoded>
+		</item>
+	</rdf:RDF>
