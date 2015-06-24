@@ -13,24 +13,23 @@ type Guid struct {
 
 type Item struct {
 	// RSS and Shared fields
-	Title       string
-	Links       []*Link
-	Description string
 	Author      Author
-	Categories  []*Category
+	Categories  []Category
 	Comments    string
-	Enclosures  []*Enclosure
+	Description string
+	Enclosures  []Enclosure
+	Extensions  map[string]map[string][]Extension
 	Guid        *Guid
+	Links       []Link
 	PubDate     string
 	Source      *Source
+	Title       string
 
 	// Atom specific fields
-	Id           string
-	Generator    *Generator
-	Contributors []string
 	Content      *Content
-
-	Extensions map[string]map[string][]Extension
+	Contributors []string
+	Generator    *Generator
+	Id           string
 }
 
 func (i *Item) ParsedPubDate() (time.Time, error) {

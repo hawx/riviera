@@ -1,32 +1,32 @@
 package feed
 
 type Channel struct {
-	Title          string
-	Links          []Link
-	Description    string
-	Language       string
+	Categories     []Category
+	Cloud          Cloud
 	Copyright      string
-	ManagingEditor string
-	WebMaster      string
-	PubDate        string
-	LastBuildDate  string
+	Description    string
 	Docs           string
-	Categories     []*Category
+	Extensions     map[string]map[string][]Extension
 	Generator      Generator
-	TTL            int
-	Rating         string
-	SkipHours      []int
-	SkipDays       []int
 	Image          Image
 	Items          []*Item
-	Cloud          Cloud
+	Language       string
+	LastBuildDate  string
+	Links          []Link
+	ManagingEditor string
+	PubDate        string
+	Rating         string
+	SkipDays       []int
+	SkipHours      []int
+	TTL            int
 	TextInput      Input
-	Extensions     map[string]map[string][]Extension
+	Title          string
+	WebMaster      string
 
 	// Atom fields
+	Author   Author
 	Id       string
 	Rights   string
-	Author   Author
 	SubTitle SubTitle
 }
 

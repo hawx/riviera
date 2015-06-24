@@ -19,7 +19,7 @@ func TestDefaultMapping(t *testing.T) {
 			"standard",
 			&feed.Item{
 				Title: "cool feed thang",
-				Links: []*feed.Link{
+				Links: []feed.Link{
 					{Href: "http://example.com/now"},
 					{Href: "http://example.org/this", Rel: "alternate"},
 					{Href: "http://example.com/what"},
@@ -171,7 +171,7 @@ func TestDefaultMapping(t *testing.T) {
 			&feed.Item{
 				PubDate: "Mon, 02 Jan 2006 20:04:19 UTC",
 				Guid:    &feed.Guid{Guid: "5", IsPermaLink: true},
-				Links: []*feed.Link{
+				Links: []feed.Link{
 					{Href: "cool"},
 					{Href: "ignored"},
 				},
@@ -189,7 +189,7 @@ func TestDefaultMapping(t *testing.T) {
 			&feed.Item{
 				PubDate: "Mon, 02 Jan 2006 20:04:19 UTC",
 				Guid:    &feed.Guid{Guid: "5", IsPermaLink: true},
-				Links: []*feed.Link{
+				Links: []feed.Link{
 					{Href: "cool"},
 					{Href: "alt", Rel: "alternate"},
 				},
@@ -209,7 +209,7 @@ func TestDefaultMapping(t *testing.T) {
 			&feed.Item{
 				PubDate: "Mon, 02 Jan 2006 20:04:19 UTC",
 				Id:      "5",
-				Links: []*feed.Link{
+				Links: []feed.Link{
 					{Href: "what"},
 					{Href: "thing", Type: "media/what", Rel: "enclosure"},
 					{Href: "otherthing", Type: "media/what", Rel: "enclosure"},

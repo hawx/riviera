@@ -14,10 +14,6 @@ import (
 
 func itemHandler(feed *Feed, ch *Channel, newitems []*Item) {}
 
-func charsetReader(name string, r io.Reader) (io.Reader, error) {
-	return charset.NewReader(name, r)
-}
-
 func TestFeed(t *testing.T) {
 	feedlist := []string{
 		"/testdata/cyber.law.harvard.edu-sampleRss091.xml", // "http://cyber.law.harvard.edu/rss/examples/sampleRss091.xml", // Non-utf8 encoding.
