@@ -136,9 +136,22 @@ good engineering culture— is our obsession with aggressively measuring everyth
 		assert.Equal(expected.FeedTitle, f.FeedTitle)
 		assert.Equal(expected.FeedDescription, f.FeedDescription)
 		assert.WithinDuration(expected.WhenLastUpdate.Time, f.WhenLastUpdate.Time, time.Second)
-		assert.Equal(expected.Items, f.Items)
+
+		assert.Equal(1, len(f.Items))
+		assertItemEqual(t, expected.Items[0], f.Items[0])
 
 	case <-time.After(time.Second):
 		t.Fatal("timeout")
 	}
+}
+
+func assertItemEqual(t *testing.T, a, b models.Item) {
+	assert.Equal(t, a.Body, b.Body)
+	assert.Equal(t, a.PermaLink, b.PermaLink)
+	assert.WithinDuration(t, a.PubDate.Time, b.PubDate.Time, time.Second)
+	assert.Equal(t, a.Title, b.Title)
+	assert.Equal(t, a.Link, b.Link)
+	assert.Equal(t, a.Id, b.Id)
+	assert.Equal(t, a.Comments, b.Comments)
+	assert.Equal(t, a.Enclosures, b.Enclosures)
 }
