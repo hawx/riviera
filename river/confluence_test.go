@@ -27,6 +27,16 @@ type dummyTrib struct {
 	fetches chan int
 }
 
+func newDummyTrib(feed models.Feed, name string) *dummyTrib {
+	return &dummyTrib{
+		name:    name,
+		feed:    feed,
+		stopped: true,
+		feeds:   make(chan models.Feed),
+		fetches: make(chan int),
+	}
+}
+
 func (d *dummyTrib) Name() string { return d.name }
 
 func (d *dummyTrib) push() {
@@ -42,16 +52,12 @@ func (d *dummyTrib) Fetches() <-chan int {
 }
 
 func (d *dummyTrib) Start() {
-	d.feeds = make(chan models.Feed)
-	d.fetches = make(chan int)
 	d.stopped = false
 	d.push()
 }
 
 func (d *dummyTrib) Stop() {
 	d.stopped = true
-	close(d.feeds)
-	close(d.fetches)
 }
 
 func TestConfluenceWithTributary(t *testing.T) {
@@ -71,8 +77,8 @@ func TestConfluenceWithTributary(t *testing.T) {
 		WhenLastUpdate: models.RssTime{now.Add(-5 * time.Second)},
 	}
 
-	trib := &dummyTrib{feed: feed, name: "dummy1"}
-	trib2 := &dummyTrib{feed: feed2, name: "dummy2"}
+	trib := newDummyTrib(feed, "dummy1")
+	trib2 := newDummyTrib(feed2, "dummy2")
 
 	c.Add(trib)
 	trib.Start()
@@ -101,7 +107,7 @@ func TestConfluenceWithTributaryWhenTooOld(t *testing.T) {
 		WhenLastUpdate: models.RssTime{time.Now().Add(-5 * time.Minute)},
 	}
 
-	trib := &dummyTrib{name: "dummy3", feed: feed}
+	trib := newDummyTrib(feed, "dummy3")
 	c.Add(trib)
 	trib.Start()
 
