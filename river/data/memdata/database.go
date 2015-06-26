@@ -3,12 +3,14 @@ package memdata
 
 import (
 	"sort"
+	"sync"
 
 	"hawx.me/code/riviera/river/data"
 )
 
 type database struct {
 	buckets map[string]data.Bucket
+	mu      sync.Mutex
 }
 
 // Open a new in memory database.
@@ -17,12 +19,16 @@ func Open() data.Database {
 }
 
 func (db *database) Bucket(name []byte) (data.Bucket, error) {
+	db.mu.Lock()
+
 	if b, ok := db.buckets[string(name)]; ok {
 		return b, nil
 	}
 
 	b := &bucket{kv: map[string][]byte{}}
 	db.buckets[string(name)] = b
+	db.mu.Unlock()
+
 	return b, nil
 }
 
@@ -32,13 +38,20 @@ func (db *database) Close() error {
 
 type bucket struct {
 	kv map[string][]byte
+	mu sync.RWMutex
 }
 
 func (b *bucket) View(t func(data.ReadTx) error) error {
+	b.mu.RLock()
+	defer b.mu.RUnlock()
+
 	return t(tx{b})
 }
 
 func (b *bucket) Update(t func(data.Tx) error) error {
+	b.mu.Lock()
+	defer b.mu.Unlock()
+
 	return t(tx{b})
 }
 
