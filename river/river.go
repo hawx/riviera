@@ -52,7 +52,7 @@ var DefaultOptions = Options{
 	Mapping:   DefaultMapping,
 	CutOff:    -24 * time.Hour,
 	Refresh:   15 * time.Minute,
-	LogLength: 500,
+	LogLength: 0,
 }
 
 // river acts as the top-level factory. It manages the creation of the initial
@@ -66,6 +66,16 @@ type river struct {
 
 // New creates an empty river.
 func New(store data.Database, options Options) River {
+	if options.Mapping == nil {
+		options.Mapping = DefaultOptions.Mapping
+	}
+	if options.CutOff == 0 {
+		options.CutOff = DefaultOptions.CutOff
+	}
+	if options.Refresh == 0 {
+		options.Refresh = DefaultOptions.Refresh
+	}
+
 	rp, _ := persistence.NewRiver(store, options.CutOff)
 
 	return &river{

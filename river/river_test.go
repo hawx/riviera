@@ -14,7 +14,7 @@ import (
 func TestRiver(t *testing.T) {
 	db := memdata.Open()
 
-	r := New(db, DefaultOptions)
+	r := New(db, Options{})
 
 	var buf bytes.Buffer
 	r.WriteTo(&buf)
