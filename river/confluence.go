@@ -2,6 +2,7 @@ package river
 
 import (
 	"net/http"
+	"sync"
 	"time"
 
 	"hawx.me/code/riviera/river/internal/persistence"
@@ -12,14 +13,15 @@ import (
 // single (truncated) list.
 type confluence struct {
 	store   persistence.River
-	streams []Tributary
+	mu      sync.Mutex
+	streams map[string]Tributary
 	evs     *events
 }
 
 func newConfluence(store persistence.River, evs *events) *confluence {
 	return &confluence{
 		store:   store,
-		streams: []Tributary{},
+		streams: map[string]Tributary{},
 		evs:     evs,
 	}
 }
@@ -33,9 +35,17 @@ func (c *confluence) Log() []Event {
 }
 
 func (c *confluence) Add(stream Tributary) {
-	c.streams = append(c.streams, stream)
+	name := stream.Name()
+	c.mu.Lock()
 
-	go func() {
+	if _, exists := c.streams[name]; exists {
+		return
+	}
+
+	c.streams[name] = stream
+	c.mu.Unlock()
+
+	go func(stream Tributary, name string) {
 		feeds := stream.Feeds()
 		fetches := stream.Fetches()
 
@@ -46,7 +56,7 @@ func (c *confluence) Add(stream Tributary) {
 
 			case code := <-fetches:
 				if code == http.StatusGone {
-					c.Remove(stream.Name())
+					c.Remove(name)
 				}
 
 				c.evs.Prepend(Event{
@@ -56,20 +66,18 @@ func (c *confluence) Add(stream Tributary) {
 				})
 			}
 		}
-	}()
+	}(stream, name)
 }
 
 func (c *confluence) Remove(uri string) bool {
-	idx := -1
+	c.mu.Lock()
+	defer c.mu.Unlock()
 
-	for i, stream := range c.streams {
-		if stream.Name() == uri {
-			idx = i
-			stream.Stop()
-			break
-		}
+	if stream, exists := c.streams[uri]; exists {
+		stream.Stop()
+		delete(c.streams, uri)
+		return true
 	}
 
-	c.streams = append(c.streams[:idx], c.streams[idx+1:]...)
-	return idx > 0
+	return false
 }
