@@ -3,7 +3,6 @@ package river
 import (
 	"net/http"
 	"sync"
-	"time"
 
 	"hawx.me/code/riviera/river/internal/persistence"
 	"hawx.me/code/riviera/river/models"
@@ -15,15 +14,24 @@ type confluence struct {
 	store   persistence.River
 	mu      sync.Mutex
 	streams map[string]Tributary
+	feeds   chan models.Feed
+	events  chan Event
 	evs     *events
+	quit    chan struct{}
 }
 
 func newConfluence(store persistence.River, evs *events) *confluence {
-	return &confluence{
+	c := &confluence{
 		store:   store,
 		streams: map[string]Tributary{},
+		feeds:   make(chan models.Feed),
+		events:  make(chan Event),
 		evs:     evs,
+		quit:    make(chan struct{}),
 	}
+
+	go c.run()
+	return c
 }
 
 func (c *confluence) Latest() []models.Feed {
@@ -45,28 +53,32 @@ func (c *confluence) Add(stream Tributary) {
 	c.streams[name] = stream
 	c.mu.Unlock()
 
-	go func(stream Tributary, name string) {
-		feeds := stream.Feeds()
-		fetches := stream.Fetches()
+	stream.Feeds(c.feeds)
+	stream.Events(c.events)
+}
 
-		for {
-			select {
-			case feed := <-feeds:
-				c.store.Add(feed)
+func (c *confluence) run() {
+loop:
+	for {
+		select {
+		case feed := <-c.feeds:
+			c.store.Add(feed)
 
-			case code := <-fetches:
-				if code == http.StatusGone {
-					c.Remove(name)
-				}
-
-				c.evs.Prepend(Event{
-					At:   time.Now().UTC(),
-					Uri:  stream.Name(),
-					Code: code,
-				})
+		case event := <-c.events:
+			if event.Code == http.StatusGone {
+				c.Remove(event.Uri)
 			}
+			c.evs.Prepend(event)
+
+		case <-c.quit:
+			for _, trib := range c.streams {
+				trib.Stop()
+			}
+			break loop
 		}
-	}(stream, name)
+	}
+
+	close(c.quit)
 }
 
 func (c *confluence) Remove(uri string) bool {
@@ -80,4 +92,11 @@ func (c *confluence) Remove(uri string) bool {
 	}
 
 	return false
+}
+
+func (c *confluence) Close() error {
+	c.quit <- struct{}{}
+	<-c.quit
+
+	return nil
 }

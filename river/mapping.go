@@ -22,7 +22,7 @@ type Mapping func(*feed.Item) *models.Item
 func DefaultMapping(item *feed.Item) *models.Item {
 	pubDate, err := item.ParsedPubDate()
 	if err != nil {
-		log.Println(err)
+		log.Println("DefaultMapping/time:", err)
 		pubDate = time.Now()
 	}
 

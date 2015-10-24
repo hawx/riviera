@@ -59,8 +59,11 @@ func TestTributary(t *testing.T) {
 
 	assert := assert.New(t)
 
+	feeds := make(chan models.Feed)
+	tributary.Feeds(feeds)
+
 	select {
-	case f := <-tributary.Feeds():
+	case f := <-feeds:
 		assert.Equal(expected.FeedUrl, f.FeedUrl)
 		assert.Equal(expected.WebsiteUrl, f.WebsiteUrl)
 		assert.Equal(expected.FeedTitle, f.FeedTitle)
@@ -129,8 +132,11 @@ good engineering culture— is our obsession with aggressively measuring everyth
 
 	assert := assert.New(t)
 
+	feeds := make(chan models.Feed)
+	tributary.Feeds(feeds)
+
 	select {
-	case f := <-tributary.Feeds():
+	case f := <-feeds:
 		assert.Equal(expected.FeedUrl, f.FeedUrl)
 		assert.Equal(expected.WebsiteUrl, f.WebsiteUrl)
 		assert.Equal(expected.FeedTitle, f.FeedTitle)

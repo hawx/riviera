@@ -9,6 +9,7 @@ import (
 	"log"
 	"net/http"
 	"strings"
+	"sync"
 	"time"
 
 	"gopkg.in/fsnotify.v1"
@@ -146,6 +147,15 @@ func main() {
 		return
 	}
 
+	var wg sync.WaitGroup
+	waitFor := func(f func() error) {
+		wg.Add(1)
+		if err := f(); err != nil {
+			log.Println("waitFor:", err)
+		}
+		wg.Done()
+	}
+
 	opmlPath := flag.Arg(0)
 
 	duration, err := time.ParseDuration(*cutOff)
@@ -162,7 +172,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer store.Close()
+	defer waitFor(store.Close)
 
 	outline, err := opml.Load(opmlPath)
 	if err != nil {
@@ -177,6 +187,7 @@ func main() {
 		Refresh:   cacheTimeout,
 		LogLength: 500,
 	})
+	defer waitFor(feeds.Close)
 
 	for _, sub := range subs.List() {
 		feeds.Add(sub.Uri)
@@ -210,7 +221,8 @@ func main() {
 	if err != nil {
 		log.Printf("could not start watching %s: %v\n", opmlPath, err)
 	}
-	defer watcher.Close()
+	defer waitFor(watcher.Close)
 
 	serve.Serve(*port, *socket, http.DefaultServeMux)
+	wg.Wait()
 }

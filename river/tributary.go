@@ -17,11 +17,12 @@ type Tributary interface {
 	// Name returns a unique name to refer to the tributary.
 	Name() string
 
-	// Feeds returns a channel that sends out the latest updates to the tributary.
-	Feeds() <-chan models.Feed
+	// Feeds sets a channel that is used to send out the latest updates to the
+	// tributary.
+	Feeds(chan<- models.Feed)
 
-	// Fetches returns a channel that sends out the status code for each fetch.
-	Fetches() <-chan int
+	// Events sets a channel that is used to send out events for the tributary.
+	Events(chan<- Event)
 
 	// Start polling for updates.
 	Start()
@@ -35,8 +36,8 @@ type tributary struct {
 	feed    *feed.Feed
 	client  *http.Client
 	mapping Mapping
-	feeds   chan models.Feed
-	fetches chan int
+	feeds   chan<- models.Feed
+	events  chan<- Event
 	quit    chan struct{}
 }
 
@@ -46,8 +47,6 @@ func newTributary(store persistence.Bucket, uri string, cacheTimeout time.Durati
 	p := &tributary{
 		uri:     parsedUri,
 		mapping: mapping,
-		feeds:   make(chan models.Feed),
-		fetches: make(chan int),
 		quit:    make(chan struct{}),
 	}
 
@@ -61,12 +60,12 @@ func (t *tributary) Name() string {
 	return t.uri.String()
 }
 
-func (t *tributary) Feeds() <-chan models.Feed {
-	return t.feeds
+func (t *tributary) Feeds(feeds chan<- models.Feed) {
+	t.feeds = feeds
 }
 
-func (t *tributary) Fetches() <-chan int {
-	return t.fetches
+func (t *tributary) Events(events chan<- Event) {
+	t.events = events
 }
 
 func (t *tributary) Start() {
@@ -77,20 +76,22 @@ func (t *tributary) Start() {
 	loop:
 		for {
 			select {
-			case <-t.quit:
-				break loop
 			case <-time.After(t.feed.DurationTillUpdate()):
 				log.Printf("fetching %s\n", t.uri)
 				t.fetch()
+			case <-t.quit:
+				break loop
 			}
 		}
 
 		log.Printf("stopped fetching %s\n", t.uri)
+		close(t.quit)
 	}()
 }
 
 func (t *tributary) Stop() {
-	close(t.quit)
+	t.quit <- struct{}{}
+	<-t.quit
 }
 
 type statusTransport struct {
@@ -127,7 +128,11 @@ func (t *statusTransport) RoundTrip(req *http.Request) (resp *http.Response, err
 // fetch retrieves the feed for the tributary.
 func (t *tributary) fetch() {
 	code, err := t.feed.Fetch(t.uri.String(), t.client, charset.NewReader)
-	t.fetches <- code
+	t.events <- Event{
+		At:   time.Now().UTC(),
+		Uri:  t.Name(),
+		Code: code,
+	}
 
 	if err != nil {
 		log.Printf("error fetching %s: %d %s\n", t.uri, code, err)

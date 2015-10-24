@@ -23,8 +23,8 @@ type dummyTrib struct {
 	name    string
 	feed    models.Feed
 	stopped bool
-	feeds   chan models.Feed
-	fetches chan int
+	feeds   chan<- models.Feed
+	events  chan<- Event
 }
 
 func newDummyTrib(feed models.Feed, name string) *dummyTrib {
@@ -32,8 +32,6 @@ func newDummyTrib(feed models.Feed, name string) *dummyTrib {
 		name:    name,
 		feed:    feed,
 		stopped: true,
-		feeds:   make(chan models.Feed),
-		fetches: make(chan int),
 	}
 }
 
@@ -43,17 +41,18 @@ func (d *dummyTrib) push() {
 	d.feeds <- d.feed
 }
 
-func (d *dummyTrib) Feeds() <-chan models.Feed {
-	return d.feeds
+func (d *dummyTrib) Feeds(feeds chan<- models.Feed) {
+	d.feeds = feeds
 }
 
-func (d *dummyTrib) Fetches() <-chan int {
-	return d.fetches
+func (d *dummyTrib) Events(events chan<- Event) {
+	d.events = events
 }
 
 func (d *dummyTrib) Start() {
 	d.stopped = false
 	d.push()
+	time.Sleep(time.Millisecond)
 }
 
 func (d *dummyTrib) Stop() {

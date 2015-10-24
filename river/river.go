@@ -28,6 +28,9 @@ type River interface {
 
 	// Remove unsubscribes the river from the feed at url.
 	Remove(uri string)
+
+	// Close gracefully stops feeds from being checked.
+	Close() error
 }
 
 type Options struct {
@@ -119,4 +122,9 @@ func (r *river) Remove(uri string) {
 
 func (r *river) Log() []Event {
 	return r.confluence.Log()
+}
+
+func (r *river) Close() error {
+	r.confluence.Close()
+	return nil
 }
