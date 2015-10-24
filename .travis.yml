@@ -1,0 +1,19 @@
+go_import_path: hawx.me/code/riviera
+
+language: go
+
+install:
+  - go get -v -t -insecure hawx.me/code/serve
+  - go get -v -t code.google.com/p/go-charset/charset
+  - go get -v -t code.google.com/p/go-charset/data
+  - go get -v -t github.com/boltdb/bolt
+  - go get -v -t github.com/jteeuwen/go-pkg-xmlx
+  - go get -v -t github.com/kennygrant/sanitize
+  - go get -v -t github.com/stretchr/testify/assert
+  - go get -v -t gopkg.in/fsnotify.v1
+
+go:
+  - 1.5
+
+notifications:
+  email: false
