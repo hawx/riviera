@@ -160,23 +160,27 @@ func main() {
 
 	duration, err := time.ParseDuration(*cutOff)
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
+		return
 	}
 
 	cacheTimeout, err := time.ParseDuration(*refresh)
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
+		return
 	}
 
 	store, err := loadDatastore()
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
+		return
 	}
 	defer waitFor(store.Close)
 
 	outline, err := opml.Load(opmlPath)
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
+		return
 	}
 
 	subs := subscriptions.FromOpml(outline)

@@ -32,6 +32,8 @@ import (
 	xmlx "github.com/jteeuwen/go-pkg-xmlx"
 )
 
+const userAgent = "riviera golang"
+
 type ItemHandler func(f *Feed, ch *Channel, newitems []*Item)
 
 type Feed struct {
@@ -84,17 +86,24 @@ func (f *Feed) Fetch(uri string, client *http.Client, charset xmlx.CharsetFunc) 
 
 	f.url = uri
 
-	r, err := client.Get(uri)
+	req, err := http.NewRequest("GET", uri, nil)
 	if err != nil {
 		return -1, err
 	}
-	defer r.Body.Close()
 
-	if r.StatusCode != http.StatusOK {
-		return r.StatusCode, nil
+	req.Header.Set("User-Agent", userAgent)
+
+	resp, err := client.Do(req)
+	if err != nil {
+		return -1, err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return resp.StatusCode, nil
 	}
 
-	return r.StatusCode, f.load(r.Body, charset)
+	return resp.StatusCode, f.load(resp.Body, charset)
 }
 
 func Parse(r io.Reader, charset xmlx.CharsetFunc) (chs []*Channel, err error) {

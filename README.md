@@ -38,7 +38,7 @@ See `riviera --help` for a full list of options.
 
 The output from riviera should be compatible with any application that can read
 riverjs format feeds. I currently use [rivelin][] to read my feeds, but I have
-in the previously used [necolas/newsriver-ui][newsriver-ui].
+in the past used [necolas/newsriver-ui][newsriver-ui].
 
 In either case you will need to follow the instructions given and put the
 correct url to the generated file, remembering that it will be
