@@ -96,7 +96,9 @@ func watchFile(path string, f func()) (io.Closer, error) {
 					f()
 				}
 			case err := <-watcher.Errors:
-				log.Println("error:", err)
+				if err != nil {
+					log.Printf("error watching %s: %v", path, err)
+				}
 			}
 		}
 	}()
@@ -148,12 +150,14 @@ func main() {
 	}
 
 	var wg sync.WaitGroup
-	waitFor := func(f func() error) {
+	waitFor := func(name string, f func() error) {
+		log.Println(name, "waiting to close")
 		wg.Add(1)
 		if err := f(); err != nil {
 			log.Println("waitFor:", err)
 		}
 		wg.Done()
+		log.Println(name, "closed")
 	}
 
 	opmlPath := flag.Arg(0)
@@ -175,7 +179,7 @@ func main() {
 		log.Println(err)
 		return
 	}
-	defer waitFor(store.Close)
+	defer waitFor("datastore", store.Close)
 
 	outline, err := opml.Load(opmlPath)
 	if err != nil {
@@ -191,7 +195,7 @@ func main() {
 		Refresh:   cacheTimeout,
 		LogLength: 500,
 	})
-	defer waitFor(feeds.Close)
+	defer waitFor("feeds", feeds.Close)
 
 	for _, sub := range subs.List() {
 		feeds.Add(sub.Uri)
@@ -225,7 +229,7 @@ func main() {
 	if err != nil {
 		log.Printf("could not start watching %s: %v\n", opmlPath, err)
 	}
-	defer waitFor(watcher.Close)
+	defer waitFor("watcher", watcher.Close)
 
 	serve.Serve(*port, *socket, http.DefaultServeMux)
 	wg.Wait()
