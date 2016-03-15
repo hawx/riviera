@@ -92,6 +92,7 @@ func (f *Feed) Fetch(uri string, client *http.Client, charset xmlx.CharsetFunc) 
 	}
 
 	req.Header.Set("User-Agent", userAgent)
+	req.Header.Set("If-Modified-Since", f.lastupdate.Format(time.RFC1123))
 
 	resp, err := client.Do(req)
 	if err != nil {
