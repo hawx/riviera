@@ -8,8 +8,7 @@ import (
 	"testing"
 	"time"
 
-	"code.google.com/p/go-charset/charset"
-	_ "code.google.com/p/go-charset/data"
+	"golang.org/x/net/html/charset"
 )
 
 func itemHandler(feed *Feed, ch *Channel, newitems []*Item) {}
@@ -35,7 +34,7 @@ func TestFeed(t *testing.T) {
 	for _, uri := range feedlist {
 		feed = New(5, itemHandler, NewDatabase())
 
-		if _, err = feed.Fetch(s.URL+uri, http.DefaultClient, charset.NewReader); err != nil {
+		if _, err = feed.Fetch(s.URL+uri, http.DefaultClient, charset.NewReaderLabel); err != nil {
 			t.Errorf("%s >>> %s", uri, err)
 			return
 		}
@@ -141,7 +140,10 @@ func Test_ItemExtensions(t *testing.T) {
 	feed := New(1, func(_ *Feed, _ *Channel, newitems []*Item) {
 		itemCh <- newitems[0]
 	}, NewDatabase())
-	feed.load(file, nil)
+
+	if err := feed.load(file, nil); err != nil {
+		t.Fatal(err)
+	}
 
 	select {
 	case item := <-itemCh:
@@ -177,7 +179,9 @@ func Test_ChannelExtensions(t *testing.T) {
 		channelCh <- ch
 	}, NewDatabase())
 
-	feed.load(file, nil)
+	if err := feed.load(file, nil); err != nil {
+		t.Fatal(err)
+	}
 
 	select {
 	case channel := <-channelCh:

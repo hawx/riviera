@@ -7,8 +7,7 @@ import (
 	"io"
 	"os"
 
-	"code.google.com/p/go-charset/charset"
-	_ "code.google.com/p/go-charset/data"
+	"golang.org/x/net/html/charset"
 )
 
 type Opml struct {
@@ -72,7 +71,7 @@ func Load(path string) (doc Opml, err error) {
 // Read parses an OPML document.
 func Read(r io.Reader) (doc Opml, err error) {
 	d := xml.NewDecoder(r)
-	d.CharsetReader = charset.NewReader
+	d.CharsetReader = charset.NewReaderLabel
 	err = d.Decode(&doc)
 	return
 }
