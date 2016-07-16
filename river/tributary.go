@@ -6,8 +6,7 @@ import (
 	"net/url"
 	"time"
 
-	"code.google.com/p/go-charset/charset"
-	_ "code.google.com/p/go-charset/data"
+	"golang.org/x/net/html/charset"
 	"hawx.me/code/riviera/feed"
 	"hawx.me/code/riviera/river/internal/persistence"
 	"hawx.me/code/riviera/river/models"
@@ -127,7 +126,7 @@ func (t *statusTransport) RoundTrip(req *http.Request) (resp *http.Response, err
 
 // fetch retrieves the feed for the tributary.
 func (t *tributary) fetch() {
-	code, err := t.feed.Fetch(t.uri.String(), t.client, charset.NewReader)
+	code, err := t.feed.Fetch(t.uri.String(), t.client, charset.NewReaderLabel)
 	t.events <- Event{
 		At:   time.Now().UTC(),
 		Uri:  t.Name(),
