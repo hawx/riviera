@@ -132,26 +132,24 @@ type Change struct {
 }
 
 // Diff finds the difference between two subscription lists.
-func Diff(a, b *Subscriptions) []Change {
-	var changes []Change
-
+func Diff(a, b *Subscriptions) (added, removed []string) {
 	a.mu.RLock()
 	b.mu.RLock()
 
 	for _, s := range a.m {
 		if _, ok := b.m[s.Uri]; !ok {
-			changes = append(changes, Change{Removed, s.Uri})
+			removed = append(removed, s.Uri)
 		}
 	}
 
 	for _, s := range b.m {
 		if _, ok := a.m[s.Uri]; !ok {
-			changes = append(changes, Change{Added, s.Uri})
+			added = append(added, s.Uri)
 		}
 	}
 
 	a.mu.RUnlock()
 	b.mu.RUnlock()
 
-	return changes
+	return added, removed
 }

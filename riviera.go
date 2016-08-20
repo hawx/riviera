@@ -187,8 +187,6 @@ func main() {
 		return
 	}
 
-	subs := subscriptions.FromOpml(outline)
-
 	feeds := river.New(store, river.Options{
 		Mapping:   river.DefaultMapping,
 		CutOff:    duration,
@@ -197,11 +195,12 @@ func main() {
 	})
 	defer waitFor("feeds", feeds.Close)
 
+	subs := subscriptions.FromOpml(outline)
 	for _, sub := range subs.List() {
 		feeds.Add(sub.Uri)
 	}
 
-	updateSubs := func() {
+	watcher, err := watchFile(opmlPath, func() {
 		log.Printf("reading %s\n", opmlPath)
 		outline, err := opml.Load(opmlPath)
 		if err != nil {
@@ -209,27 +208,22 @@ func main() {
 			return
 		}
 
-		newsubs := subscriptions.FromOpml(outline)
-
-		for _, change := range subscriptions.Diff(subs, newsubs) {
-			switch change.Type {
-			case subscriptions.Removed:
-				feeds.Remove(change.Uri)
-				subs.Remove(change.Uri)
-			case subscriptions.Added:
-				feeds.Add(change.Uri)
-				subs.Add(change.Uri)
-			}
+		added, removed := subscriptions.Diff(subs, subscriptions.FromOpml(outline))
+		for _, uri := range added {
+			feeds.Add(uri)
+			subs.Add(uri)
 		}
-	}
-
-	http.Handle("/river/", http.StripPrefix("/river", newRiverHandler(feeds)))
-
-	watcher, err := watchFile(opmlPath, updateSubs)
+		for _, uri := range removed {
+			feeds.Remove(uri)
+			subs.Remove(uri)
+		}
+	})
 	if err != nil {
 		log.Printf("could not start watching %s: %v\n", opmlPath, err)
 	}
 	defer waitFor("watcher", watcher.Close)
+
+	http.Handle("/river/", http.StripPrefix("/river", newRiverHandler(feeds)))
 
 	serve.Serve(*port, *socket, http.DefaultServeMux)
 	wg.Wait()

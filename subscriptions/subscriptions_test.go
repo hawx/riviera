@@ -51,10 +51,9 @@ func TestDiffWhenChanged(t *testing.T) {
 	b.Add("http://example.com/feed")
 	b.Add("http://example.org/xml")
 
-	assert.Equal(t, []Change{
-		Change{Removed, "http://example.com/feed2"},
-		Change{Added, "http://example.org/xml"},
-	}, Diff(a, b))
+	added, removed := Diff(a, b)
+	assert.Equal(t, []string{"http://example.org/xml"}, added)
+	assert.Equal(t, []string{"http://example.com/feed2"}, removed)
 }
 
 func TestFromOpml(t *testing.T) {
