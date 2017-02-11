@@ -268,3 +268,43 @@ func Test_Link(t *testing.T) {
 		t.Fatal("timeout")
 	}
 }
+
+func Test_FetchWithETag(t *testing.T) {
+	file, _ := os.Open("testdata/boing.rss")
+	defer file.Close()
+
+	eTag := "I am an ETag"
+	noneMatchCh := make(chan string, 1)
+
+	rssServer := httptest.NewServer(http.HandlerFunc(
+		func(w http.ResponseWriter, r *http.Request) {
+			noneMatchCh <- r.Header.Get("If-None-Match")
+
+			w.Header().Set("ETag", eTag)
+			io.Copy(w, file)
+		},
+	))
+
+	httpClient := http.DefaultClient
+	feed := New(0, func(_ *Feed, _ *Channel, _ []*Item) {}, NewDatabase())
+
+	feed.Fetch(rssServer.URL, httpClient, charset.NewReaderLabel)
+	select {
+	case noneMatch := <-noneMatchCh:
+		if noneMatch != "" {
+			t.Fatalf("Expected no If-None-Match header, but instead got %s", noneMatch)
+		}
+	case <-time.After(time.Second):
+		t.Fatal("timeout")
+	}
+
+	feed.Fetch(rssServer.URL, httpClient, charset.NewReaderLabel)
+	select {
+	case noneMatch := <-noneMatchCh:
+		if noneMatch != eTag {
+			t.Fatalf("Expected an If-None-Match header with value %s, but instead got %s", eTag, noneMatch)
+		}
+	case <-time.After(time.Second):
+		t.Fatal("timeout2")
+	}
+}

@@ -59,6 +59,9 @@ type Feed struct {
 	// Last time content was fetched. Used in conjunction with CacheTimeout
 	// to ensure we don't get content too often.
 	lastupdate time.Time
+
+	// The latest value of the ETag header returned from the last fetch.
+	eTag string
 }
 
 func New(cachetimeout time.Duration, ih ItemHandler, database Database) *Feed {
@@ -93,6 +96,9 @@ func (f *Feed) Fetch(uri string, client *http.Client, charset xmlx.CharsetFunc) 
 
 	req.Header.Set("User-Agent", userAgent)
 	req.Header.Set("If-Modified-Since", f.lastupdate.Format(time.RFC1123))
+	if f.eTag != "" {
+		req.Header.Set("If-None-Match", f.eTag)
+	}
 
 	resp, err := client.Do(req)
 	if err != nil {
@@ -103,6 +109,8 @@ func (f *Feed) Fetch(uri string, client *http.Client, charset xmlx.CharsetFunc) 
 	if resp.StatusCode != http.StatusOK {
 		return resp.StatusCode, nil
 	}
+
+	f.eTag = resp.Header.Get("ETag")
 
 	return resp.StatusCode, f.load(resp.Body, charset)
 }
