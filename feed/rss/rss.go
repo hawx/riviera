@@ -1,15 +1,14 @@
 package rss
 
+// http://www.rssboard.org/rss-specification
+
 import (
 	"encoding/xml"
-	"errors"
 	"io"
 	"strconv"
 	"strings"
 
 	"hawx.me/code/riviera/feed/data"
-
-	xmlx "github.com/jteeuwen/go-pkg-xmlx"
 )
 
 var days = map[string]int{
@@ -55,224 +54,265 @@ func (Parser) CanRead(r io.Reader, charset func(charset string, input io.Reader)
 	return false
 }
 
-func (Parser) Read(doc *xmlx.Document) (foundChannels []*data.Channel, err error) {
-	const ns = "*"
+func (Parser) Read(r io.Reader, charset func(charset string, input io.Reader) (io.Reader, error)) (foundChannels []*data.Channel, err error) {
+	decoder := xml.NewDecoder(r)
+	decoder.CharsetReader = charset
 
-	root := doc.SelectNode(ns, "rss")
-	if root == nil {
-		return foundChannels, errors.New("Failed to find rss node in XML.")
+	var feed rssFeed
+	if err = decoder.Decode(&feed); err != nil {
+		return
 	}
 
-	for _, node := range root.SelectNodes(ns, "channel") {
-		foundChannels = append(foundChannels, readRssChannel(ns, doc, node))
-	}
-
-	return foundChannels, err
-}
-
-func readRssChannel(ns string, doc *xmlx.Document, node *xmlx.Node) *data.Channel {
 	ch := &data.Channel{
-		Title:          node.S(ns, "title"),
-		Description:    node.S(ns, "description"),
-		Language:       node.S(ns, "language"),
-		Copyright:      node.S(ns, "copyright"),
-		ManagingEditor: node.S(ns, "managingEditor"),
-		WebMaster:      node.S(ns, "webMaster"),
-		PubDate:        node.S(ns, "pubDate"),
-		LastBuildDate:  node.S(ns, "lastBuildDate"),
-		Docs:           node.S(ns, "docs"),
-		TTL:            node.I(ns, "ttl"),
-		Rating:         node.S(ns, "rating"),
+		Title:          feed.Channel.Title,
+		Description:    feed.Channel.Description,
+		Language:       feed.Channel.Language,
+		Copyright:      feed.Channel.Copyright,
+		ManagingEditor: feed.Channel.ManagingEditor,
+		WebMaster:      feed.Channel.WebMaster,
+		PubDate:        feed.Channel.PubDate,
+		LastBuildDate:  feed.Channel.LastBuildDate,
+		Docs:           feed.Channel.Docs,
+		TTL:            feed.Channel.TTL,
+		Rating:         feed.Channel.Rating,
 	}
 
-	for _, v := range node.SelectNodes(ns, "link") {
-		lnk := data.Link{}
-		if v.Name.Space == "http://www.w3.org/2005/Atom" && v.Name.Local == "link" {
-			lnk.Href = v.As("", "href")
-			lnk.Rel = v.As("", "rel")
-			lnk.Type = v.As("", "type")
-			lnk.HrefLang = v.As("", "hreflang")
-		} else {
-			lnk.Href = v.GetValue()
-		}
-
-		ch.Links = append(ch.Links, lnk)
-	}
-
-	for _, v := range node.SelectNodes(ns, "category") {
-		ch.Categories = append(ch.Categories, data.Category{
-			Domain: v.As(ns, "domain"),
-			Text:   v.GetValue(),
-		})
-	}
-
-	if n := node.SelectNode(ns, "generator"); n != nil {
-		ch.Generator = data.Generator{
-			Text: n.GetValue(),
-		}
-	}
-
-	for _, v := range node.SelectNodes(ns, "hour") {
-		ch.SkipHours = append(ch.SkipHours, v.I(ns, "hour"))
-	}
-
-	for _, v := range node.SelectNodes(ns, "days") {
-		ch.SkipDays = append(ch.SkipDays, days[v.GetValue()])
-	}
-
-	if n := node.SelectNode(ns, "image"); n != nil {
-		ch.Image = data.Image{
-			Title:       n.S(ns, "title"),
-			Url:         n.S(ns, "url"),
-			Link:        n.S(ns, "link"),
-			Width:       n.I(ns, "width"),
-			Height:      n.I(ns, "height"),
-			Description: n.S(ns, "description"),
-		}
-	}
-
-	if n := node.SelectNode(ns, "cloud"); n != nil {
-		ch.Cloud = data.Cloud{
-			Domain:            n.As(ns, "domain"),
-			Port:              n.Ai(ns, "port"),
-			Path:              n.As(ns, "path"),
-			RegisterProcedure: n.As(ns, "registerProcedure"),
-			Protocol:          n.As(ns, "protocol"),
-		}
-	}
-
-	if n := node.SelectNode(ns, "textInput"); n != nil {
-		ch.TextInput = data.Input{
-			Title:       n.S(ns, "title"),
-			Description: n.S(ns, "description"),
-			Name:        n.S(ns, "name"),
-			Link:        n.S(ns, "link"),
-		}
-	}
-
-	list := node.SelectNodes(ns, "item")
-	if len(list) == 0 {
-		list = doc.SelectNodes(ns, "item")
-	}
-
-	for _, item := range list {
-		ch.Items = append(ch.Items, readRssItem(ns, item))
-	}
-
-	ch.Extensions = make(map[string]map[string][]data.Extension)
-	for _, v := range node.Children {
-		getExtensions(&ch.Extensions, v)
-	}
-
-	return ch
-}
-
-func readRssItem(ns string, item *xmlx.Node) *data.Item {
-	i := &data.Item{
-		Title:       item.S(ns, "title"),
-		Description: item.S(ns, "description"),
-		Comments:    item.S(ns, "comments"),
-		PubDate:     item.S(ns, "pubDate"),
-	}
-
-	for _, v := range item.SelectNodes(ns, "link") {
-		if v.Name.Space == "http://www.w3.org/2005/Atom" && v.Name.Local == "link" {
-			i.Links = append(i.Links, data.Link{
-				Href:     v.As("", "href"),
-				Rel:      v.As("", "rel"),
-				Type:     v.As("", "type"),
-				HrefLang: v.As("", "hreflang"),
+	for _, link := range feed.Channel.Links {
+		if link.XMLName.Space == "http://www.w3.org/2005/Atom" {
+			ch.Links = append(ch.Links, data.Link{
+				Href:     link.Href,
+				Rel:      link.Rel,
+				Type:     link.Type,
+				HrefLang: link.HrefLang,
 			})
 		} else {
-			i.Links = append(i.Links, data.Link{Href: v.GetValue()})
+			ch.Links = append(ch.Links, data.Link{
+				Href: link.Text,
+			})
 		}
 	}
 
-	if n := item.SelectNode(ns, "author"); n != nil {
-		i.Author.Name = n.GetValue()
-
-	} else if n := item.SelectNode(ns, "creator"); n != nil {
-		i.Author.Name = n.GetValue()
-	}
-
-	if n := item.SelectNode(ns, "guid"); n != nil {
-		i.Guid = &data.Guid{Guid: n.GetValue(), IsPermaLink: n.As("", "isPermalink") == "true"}
-	}
-
-	for _, lv := range item.SelectNodes(ns, "category") {
-		i.Categories = append(i.Categories, data.Category{
-			Domain: lv.As(ns, "domain"),
-			Text:   lv.GetValue(),
+	for _, category := range feed.Channel.Category {
+		ch.Categories = append(ch.Categories, data.Category{
+			Domain: category.Domain,
+			Text:   category.Text,
 		})
 	}
 
-	for _, lv := range item.SelectNodes(ns, "enclosure") {
-		i.Enclosures = append(i.Enclosures, data.Enclosure{
-			Url:    lv.As(ns, "url"),
-			Length: lv.Ai64(ns, "length"),
-			Type:   lv.As(ns, "type"),
-		})
-	}
-
-	if src := item.SelectNode(ns, "source"); src != nil {
-		i.Source = &data.Source{
-			Url:  src.As(ns, "url"),
-			Text: src.GetValue(),
+	if feed.Channel.Generator != nil {
+		ch.Generator = data.Generator{
+			Text: *feed.Channel.Generator,
 		}
 	}
 
-	for _, lv := range item.SelectNodes("http://purl.org/rss/1.0/modules/content/", "*") {
-		if lv.Name.Local == "encoded" {
-			i.Content = &data.Content{
-				Text: lv.String(),
+	if feed.Channel.SkipHours != nil {
+		for _, hour := range feed.Channel.SkipHours.Hours {
+			ch.SkipHours = append(ch.SkipHours, hour)
+		}
+	}
+
+	if feed.Channel.SkipDays != nil {
+		for _, day := range feed.Channel.SkipDays.Days {
+			ch.SkipDays = append(ch.SkipDays, days[day])
+		}
+	}
+
+	if feed.Channel.Image != nil {
+		ch.Image = data.Image{
+			Title:       feed.Channel.Image.Title,
+			Url:         feed.Channel.Image.URL,
+			Link:        feed.Channel.Image.Link,
+			Width:       feed.Channel.Image.Width,
+			Height:      feed.Channel.Image.Height,
+			Description: feed.Channel.Image.Description,
+		}
+	}
+
+	if feed.Channel.Cloud != nil {
+		ch.Cloud = data.Cloud{
+			Domain:            feed.Channel.Cloud.Domain,
+			Port:              feed.Channel.Cloud.Port,
+			Path:              feed.Channel.Cloud.Path,
+			RegisterProcedure: feed.Channel.Cloud.RegisterProcedure,
+			Protocol:          feed.Channel.Cloud.Protocol,
+		}
+	}
+
+	for _, item := range feed.Channel.Items {
+		i := &data.Item{
+			Title:       item.Title,
+			Description: strings.TrimSpace(item.Description),
+			Comments:    item.Comments,
+			PubDate:     item.PubDate,
+		}
+
+		for _, link := range item.Links {
+			if link.XMLName.Space == "http://www.w3.org/2005/Atom" {
+				i.Links = append(i.Links, data.Link{
+					Href:     link.Href,
+					Rel:      link.Rel,
+					Type:     link.Type,
+					HrefLang: link.HrefLang,
+				})
+			} else {
+				i.Links = append(i.Links, data.Link{
+					Href: link.Text,
+				})
 			}
-			break
 		}
+
+		if item.Author != nil {
+			i.Author.Name = *item.Author
+		} else if item.Creator != nil {
+			i.Author.Name = *item.Creator
+		}
+
+		if item.Guid != nil {
+			i.Guid = &data.Guid{
+				Guid:        item.Guid.Text,
+				IsPermaLink: item.Guid.IsPermaLink == "true",
+			}
+		}
+
+		for _, category := range item.Category {
+			i.Categories = append(i.Categories, data.Category{
+				Domain: category.Domain,
+				Text:   category.Text,
+			})
+		}
+
+		for _, enclosure := range item.Enclosure {
+			i.Enclosures = append(i.Enclosures, data.Enclosure{
+				Url:    enclosure.URL,
+				Length: enclosure.Length,
+				Type:   enclosure.Type,
+			})
+		}
+
+		if item.Source != nil {
+			i.Source = &data.Source{
+				Url:  item.Source.URL,
+				Text: item.Source.Text,
+			}
+		}
+
+		ch.Items = append(ch.Items, i)
 	}
 
-	i.Extensions = make(map[string]map[string][]data.Extension)
-	for _, lv := range item.Children {
-		getExtensions(&i.Extensions, lv)
-	}
+	foundChannels = append(foundChannels, ch)
 
-	return i
+	return
 }
 
-func getExtensions(extensionsX *map[string]map[string][]data.Extension, node *xmlx.Node) {
-	extentions := *extensionsX
+// Commentary taken from http://www.rssboard.org/rss-specification
 
-	if ext, ok := getExtension(node); ok {
-		if len(extentions[node.Name.Space]) == 0 {
-			extentions[node.Name.Space] = make(map[string][]data.Extension, 0)
-		}
-		if len(extentions[node.Name.Space][node.Name.Local]) == 0 {
-			extentions[node.Name.Space][node.Name.Local] = make([]data.Extension, 0)
-		}
-		extentions[node.Name.Space][node.Name.Local] = append(extentions[node.Name.Space][node.Name.Local], ext)
-	}
+// At the top level, a RSS document is a <rss> element, with a mandatory
+// attribute called version, that specifies the version of RSS that the document
+// conforms to. If it conforms to this specification, the version attribute must
+// be 2.0.
+type rssFeed struct {
+	XMLName xml.Name `xml:"rss"`
+
+	// Subordinate to the <rss> element is a single <channel> element, which
+	// contains information about the channel (metadata) and its contents.
+	Channel rssChannel `xml:"channel"`
 }
 
-func getExtension(node *xmlx.Node) (extension data.Extension, ok bool) {
-	if node.Name.Space == "" {
-		return extension, false
-	}
+type rssChannel struct {
+	Items []rssItem `xml:"item"`
 
-	extension = data.Extension{
-		Name:      node.Name.Local,
-		Value:     node.GetValue(),
-		Attrs:     make(map[string]string),
-		Childrens: make(map[string][]data.Extension, 0),
-	}
+	// required elements
+	Title       string    `xml:"title"`
+	Links       []rssLink `xml:"link"`
+	Description string    `xml:"description"`
 
-	for _, attr := range node.Attributes {
-		extension.Attrs[attr.Name.Local] = attr.Value
-	}
+	// optional elements
+	Language       string        `xml:"language"`
+	Copyright      string        `xml:"copyright"`
+	ManagingEditor string        `xml:"managingEditor"`
+	WebMaster      string        `xml:"webMaster"`
+	PubDate        string        `xml:"pubDate"`
+	LastBuildDate  string        `xml:"lastBuildDate"`
+	Category       []rssCategory `xml:"category"`
+	Generator      *string       `xml:"generator"`
+	Docs           string        `xml:"docs"`
+	Cloud          *rssCloud     `xml:"cloud"`
+	TTL            int           `xml:"ttl"`
+	Image          *rssImage     `xml:"image"`
+	Rating         string        `xml:"rating"`
+	SkipHours      *rssSkipHours `xml:"skipHours"`
+	SkipDays       *rssSkipDays  `xml:"skipDays"`
+}
 
-	for _, child := range node.Children {
-		if ext, ok := getExtension(child); ok {
-			extension.Childrens[child.Name.Local] = append(extension.Childrens[child.Name.Local], ext)
-		}
-	}
+type rssLink struct {
+	XMLName xml.Name
 
-	return extension, true
+	// rss value
+	Text string `xml:",chardata"`
+
+	// atom attributes
+	Href     string `xml:"href,attr"`
+	Rel      string `xml:"rel,attr"`
+	Type     string `xml:"type,attr"`
+	HrefLang string `xml:"hreflang,attr"`
+}
+
+type rssSkipHours struct {
+	Hours []int `xml:"hour"`
+}
+
+type rssSkipDays struct {
+	Days []string `xml:"day"`
+}
+
+type rssImage struct {
+	URL         string `xml:"url"`
+	Title       string `xml:"title"`
+	Link        string `xml:"link"`
+	Width       int    `xml:"width"`
+	Height      int    `xml:"height"`
+	Description string `xml:"description"`
+}
+
+type rssCloud struct {
+	Domain            string `xml:"domain,attr"`
+	Port              int    `xml:"port,attr"`
+	Path              string `xml:"path,attr"`
+	RegisterProcedure string `xml:"registerProcedure,attr"`
+	Protocol          string `xml:"protocol,attr"`
+}
+
+type rssItem struct {
+	Title       string         `xml:"title"`
+	Links       []rssLink      `xml:"link"`
+	Description string         `xml:"description"`
+	Author      *string        `xml:"author"`
+	Creator     *string        `xml:"http://purl.org/dc/elements/1.1/ creator"`
+	Category    []rssCategory  `xml:"category"`
+	Comments    string         `xml:"comments"`
+	Enclosure   []rssEnclosure `xml:"enclosure"`
+	Guid        *rssGuid       `xml:"guid"`
+	PubDate     string         `xml:"pubDate"`
+	Source      *rssSource     `xml:"source"`
+}
+
+type rssCategory struct {
+	Domain string `xml:"domain,attr"`
+	Text   string `xml:",chardata"`
+}
+
+type rssEnclosure struct {
+	URL    string `xml:"url,attr"`
+	Length int64  `xml:"length,attr"`
+	Type   string `xml:"type,attr"`
+}
+
+type rssGuid struct {
+	IsPermaLink string `xml:"isPermaLink,attr"`
+	Text        string `xml:",chardata"`
+}
+
+type rssSource struct {
+	URL  string `xml:"url,attr"`
+	Text string `xml:",chardata"`
 }

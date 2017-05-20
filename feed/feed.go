@@ -148,7 +148,7 @@ func Parse(r io.Reader, charset xmlx.CharsetFunc) (chs []*data.Channel, err erro
 		return atomParser.Read(bufio.NewReader(bytes.NewReader(data)), charset)
 	}
 	if rssParser.CanRead(bufio.NewReader(bytes.NewReader(data)), charset) {
-		return rssParser.Read(doc)
+		return rssParser.Read(bufio.NewReader(bytes.NewReader(data)), charset)
 	}
 	if rdfParser.CanRead(bufio.NewReader(bytes.NewReader(data)), charset) {
 		return rdfParser.Read(doc)
