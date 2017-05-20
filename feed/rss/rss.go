@@ -1,7 +1,9 @@
-package feed
+package rss
 
 import (
 	"errors"
+
+	"hawx.me/code/riviera/feed/data"
 
 	xmlx "github.com/jteeuwen/go-pkg-xmlx"
 )
@@ -16,7 +18,7 @@ var days = map[string]int{
 	"Sunday":    7,
 }
 
-func readRss2(doc *xmlx.Document) (foundChannels []*Channel, err error) {
+func Read(doc *xmlx.Document) (foundChannels []*data.Channel, err error) {
 	const ns = "*"
 
 	root := doc.SelectNode(ns, "rss")
@@ -35,8 +37,8 @@ func readRss2(doc *xmlx.Document) (foundChannels []*Channel, err error) {
 	return foundChannels, err
 }
 
-func readRssChannel(ns string, doc *xmlx.Document, node *xmlx.Node) *Channel {
-	ch := &Channel{
+func readRssChannel(ns string, doc *xmlx.Document, node *xmlx.Node) *data.Channel {
+	ch := &data.Channel{
 		Title:          node.S(ns, "title"),
 		Description:    node.S(ns, "description"),
 		Language:       node.S(ns, "language"),
@@ -51,7 +53,7 @@ func readRssChannel(ns string, doc *xmlx.Document, node *xmlx.Node) *Channel {
 	}
 
 	for _, v := range node.SelectNodes(ns, "link") {
-		lnk := Link{}
+		lnk := data.Link{}
 		if v.Name.Space == "http://www.w3.org/2005/Atom" && v.Name.Local == "link" {
 			lnk.Href = v.As("", "href")
 			lnk.Rel = v.As("", "rel")
@@ -65,14 +67,14 @@ func readRssChannel(ns string, doc *xmlx.Document, node *xmlx.Node) *Channel {
 	}
 
 	for _, v := range node.SelectNodes(ns, "category") {
-		ch.Categories = append(ch.Categories, Category{
+		ch.Categories = append(ch.Categories, data.Category{
 			Domain: v.As(ns, "domain"),
 			Text:   v.GetValue(),
 		})
 	}
 
 	if n := node.SelectNode(ns, "generator"); n != nil {
-		ch.Generator = Generator{
+		ch.Generator = data.Generator{
 			Text: n.GetValue(),
 		}
 	}
@@ -86,7 +88,7 @@ func readRssChannel(ns string, doc *xmlx.Document, node *xmlx.Node) *Channel {
 	}
 
 	if n := node.SelectNode(ns, "image"); n != nil {
-		ch.Image = Image{
+		ch.Image = data.Image{
 			Title:       n.S(ns, "title"),
 			Url:         n.S(ns, "url"),
 			Link:        n.S(ns, "link"),
@@ -97,7 +99,7 @@ func readRssChannel(ns string, doc *xmlx.Document, node *xmlx.Node) *Channel {
 	}
 
 	if n := node.SelectNode(ns, "cloud"); n != nil {
-		ch.Cloud = Cloud{
+		ch.Cloud = data.Cloud{
 			Domain:            n.As(ns, "domain"),
 			Port:              n.Ai(ns, "port"),
 			Path:              n.As(ns, "path"),
@@ -107,7 +109,7 @@ func readRssChannel(ns string, doc *xmlx.Document, node *xmlx.Node) *Channel {
 	}
 
 	if n := node.SelectNode(ns, "textInput"); n != nil {
-		ch.TextInput = Input{
+		ch.TextInput = data.Input{
 			Title:       n.S(ns, "title"),
 			Description: n.S(ns, "description"),
 			Name:        n.S(ns, "name"),
@@ -124,7 +126,7 @@ func readRssChannel(ns string, doc *xmlx.Document, node *xmlx.Node) *Channel {
 		ch.Items = append(ch.Items, readRssItem(ns, item))
 	}
 
-	ch.Extensions = make(map[string]map[string][]Extension)
+	ch.Extensions = make(map[string]map[string][]data.Extension)
 	for _, v := range node.Children {
 		getExtensions(&ch.Extensions, v)
 	}
@@ -132,8 +134,8 @@ func readRssChannel(ns string, doc *xmlx.Document, node *xmlx.Node) *Channel {
 	return ch
 }
 
-func readRssItem(ns string, item *xmlx.Node) *Item {
-	i := &Item{
+func readRssItem(ns string, item *xmlx.Node) *data.Item {
+	i := &data.Item{
 		Title:       item.S(ns, "title"),
 		Description: item.S(ns, "description"),
 		Comments:    item.S(ns, "comments"),
@@ -142,14 +144,14 @@ func readRssItem(ns string, item *xmlx.Node) *Item {
 
 	for _, v := range item.SelectNodes(ns, "link") {
 		if v.Name.Space == "http://www.w3.org/2005/Atom" && v.Name.Local == "link" {
-			i.Links = append(i.Links, Link{
+			i.Links = append(i.Links, data.Link{
 				Href:     v.As("", "href"),
 				Rel:      v.As("", "rel"),
 				Type:     v.As("", "type"),
 				HrefLang: v.As("", "hreflang"),
 			})
 		} else {
-			i.Links = append(i.Links, Link{Href: v.GetValue()})
+			i.Links = append(i.Links, data.Link{Href: v.GetValue()})
 		}
 	}
 
@@ -161,18 +163,18 @@ func readRssItem(ns string, item *xmlx.Node) *Item {
 	}
 
 	if n := item.SelectNode(ns, "guid"); n != nil {
-		i.Guid = &Guid{Guid: n.GetValue(), IsPermaLink: n.As("", "isPermalink") == "true"}
+		i.Guid = &data.Guid{Guid: n.GetValue(), IsPermaLink: n.As("", "isPermalink") == "true"}
 	}
 
 	for _, lv := range item.SelectNodes(ns, "category") {
-		i.Categories = append(i.Categories, Category{
+		i.Categories = append(i.Categories, data.Category{
 			Domain: lv.As(ns, "domain"),
 			Text:   lv.GetValue(),
 		})
 	}
 
 	for _, lv := range item.SelectNodes(ns, "enclosure") {
-		i.Enclosures = append(i.Enclosures, Enclosure{
+		i.Enclosures = append(i.Enclosures, data.Enclosure{
 			Url:    lv.As(ns, "url"),
 			Length: lv.Ai64(ns, "length"),
 			Type:   lv.As(ns, "type"),
@@ -180,21 +182,22 @@ func readRssItem(ns string, item *xmlx.Node) *Item {
 	}
 
 	if src := item.SelectNode(ns, "source"); src != nil {
-		i.Source = new(Source)
-		i.Source.Url = src.As(ns, "url")
-		i.Source.Text = src.GetValue()
+		i.Source = &data.Source{
+			Url:  src.As(ns, "url"),
+			Text: src.GetValue(),
+		}
 	}
 
 	for _, lv := range item.SelectNodes("http://purl.org/rss/1.0/modules/content/", "*") {
 		if lv.Name.Local == "encoded" {
-			i.Content = &Content{
+			i.Content = &data.Content{
 				Text: lv.String(),
 			}
 			break
 		}
 	}
 
-	i.Extensions = make(map[string]map[string][]Extension)
+	i.Extensions = make(map[string]map[string][]data.Extension)
 	for _, lv := range item.Children {
 		getExtensions(&i.Extensions, lv)
 	}
@@ -202,30 +205,30 @@ func readRssItem(ns string, item *xmlx.Node) *Item {
 	return i
 }
 
-func getExtensions(extensionsX *map[string]map[string][]Extension, node *xmlx.Node) {
+func getExtensions(extensionsX *map[string]map[string][]data.Extension, node *xmlx.Node) {
 	extentions := *extensionsX
 
 	if ext, ok := getExtension(node); ok {
 		if len(extentions[node.Name.Space]) == 0 {
-			extentions[node.Name.Space] = make(map[string][]Extension, 0)
+			extentions[node.Name.Space] = make(map[string][]data.Extension, 0)
 		}
 		if len(extentions[node.Name.Space][node.Name.Local]) == 0 {
-			extentions[node.Name.Space][node.Name.Local] = make([]Extension, 0)
+			extentions[node.Name.Space][node.Name.Local] = make([]data.Extension, 0)
 		}
 		extentions[node.Name.Space][node.Name.Local] = append(extentions[node.Name.Space][node.Name.Local], ext)
 	}
 }
 
-func getExtension(node *xmlx.Node) (extension Extension, ok bool) {
+func getExtension(node *xmlx.Node) (extension data.Extension, ok bool) {
 	if node.Name.Space == "" {
 		return extension, false
 	}
 
-	extension = Extension{
+	extension = data.Extension{
 		Name:      node.Name.Local,
 		Value:     node.GetValue(),
 		Attrs:     make(map[string]string),
-		Childrens: make(map[string][]Extension, 0),
+		Childrens: make(map[string][]data.Extension, 0),
 	}
 
 	for _, attr := range node.Attributes {

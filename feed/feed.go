@@ -30,11 +30,14 @@ import (
 	"time"
 
 	xmlx "github.com/jteeuwen/go-pkg-xmlx"
+	"hawx.me/code/riviera/feed/atom"
+	"hawx.me/code/riviera/feed/data"
+	"hawx.me/code/riviera/feed/rss"
 )
 
 const userAgent = "riviera golang"
 
-type ItemHandler func(f *Feed, ch *Channel, newitems []*Item)
+type ItemHandler func(f *Feed, ch *data.Channel, newitems []*data.Item)
 
 type Feed struct {
 	// Custom cache timeout.
@@ -44,7 +47,7 @@ type Feed struct {
 	format string
 
 	// Channels with content.
-	channels []*Channel
+	channels []*data.Channel
 
 	// Url from which this feed was created.
 	url string
@@ -115,7 +118,7 @@ func (f *Feed) Fetch(uri string, client *http.Client, charset xmlx.CharsetFunc) 
 	return resp.StatusCode, f.load(resp.Body, charset)
 }
 
-func Parse(r io.Reader, charset xmlx.CharsetFunc) (chs []*Channel, err error) {
+func Parse(r io.Reader, charset xmlx.CharsetFunc) (chs []*data.Channel, err error) {
 	doc := xmlx.New()
 
 	if err = doc.LoadStream(r, charset); err != nil {
@@ -148,7 +151,7 @@ func (f *Feed) load(r io.Reader, charset xmlx.CharsetFunc) (err error) {
 
 func (f *Feed) notifyListeners() {
 	for _, channel := range f.channels {
-		var newitems []*Item
+		var newitems []*data.Item
 
 		for _, item := range channel.Items {
 			if !f.known.Contains(item.Key()) {
@@ -204,12 +207,12 @@ func (f *Feed) DurationTillUpdate() time.Duration {
 	return f.cacheTimeout - time.Now().UTC().Sub(f.lastupdate)
 }
 
-func buildFeed(format string, doc *xmlx.Document) ([]*Channel, error) {
+func buildFeed(format string, doc *xmlx.Document) ([]*data.Channel, error) {
 	switch format {
 	case "atom":
-		return readAtom(doc)
+		return atom.Read(doc)
 	default:
-		return readRss2(doc)
+		return rss.Read(doc)
 	}
 }
 

@@ -1,4 +1,4 @@
-package feed
+package data
 
 type Author struct {
 	Name  string

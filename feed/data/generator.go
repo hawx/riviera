@@ -1,4 +1,4 @@
-package feed
+package data
 
 type Generator struct {
 	Uri     string

@@ -1,4 +1,4 @@
-package feed
+package data
 
 type Cloud struct {
 	Domain            string

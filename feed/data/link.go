@@ -1,4 +1,4 @@
-package feed
+package data
 
 type Link struct {
 	Href     string

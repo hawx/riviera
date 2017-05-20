@@ -1,4 +1,4 @@
-package feed
+package data
 
 type Content struct {
 	Type string

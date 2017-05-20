@@ -1,4 +1,4 @@
-package feed
+package data
 
 type Input struct {
 	Title       string

@@ -1,8 +1,11 @@
-package feed
+package atom
 
-import xmlx "github.com/jteeuwen/go-pkg-xmlx"
+import (
+	xmlx "github.com/jteeuwen/go-pkg-xmlx"
+	"hawx.me/code/riviera/feed/data"
+)
 
-func readAtom(doc *xmlx.Document) (foundChannels []*Channel, err error) {
+func Read(doc *xmlx.Document) (foundChannels []*data.Channel, err error) {
 	const ns = "http://www.w3.org/2005/Atom"
 
 	for _, node := range doc.SelectNodes(ns, "feed") {
@@ -12,8 +15,8 @@ func readAtom(doc *xmlx.Document) (foundChannels []*Channel, err error) {
 	return foundChannels, err
 }
 
-func readAtomChannel(ns string, node *xmlx.Node) *Channel {
-	ch := &Channel{
+func readAtomChannel(ns string, node *xmlx.Node) *data.Channel {
+	ch := &data.Channel{
 		Title:         node.S(ns, "title"),
 		LastBuildDate: node.S(ns, "updated"),
 		Id:            node.S(ns, "id"),
@@ -21,7 +24,7 @@ func readAtomChannel(ns string, node *xmlx.Node) *Channel {
 	}
 
 	for _, v := range node.SelectNodesDirect(ns, "link") {
-		ch.Links = append(ch.Links, Link{
+		ch.Links = append(ch.Links, data.Link{
 			Href:     v.As("", "href"),
 			Rel:      v.As("", "rel"),
 			Type:     v.As("", "type"),
@@ -30,14 +33,14 @@ func readAtomChannel(ns string, node *xmlx.Node) *Channel {
 	}
 
 	if tn := node.SelectNode(ns, "subtitle"); tn != nil {
-		ch.SubTitle = SubTitle{
+		ch.SubTitle = data.SubTitle{
 			Type: tn.As("", "type"),
 			Text: tn.GetValue(),
 		}
 	}
 
 	if tn := node.SelectNode(ns, "generator"); tn != nil {
-		ch.Generator = Generator{
+		ch.Generator = data.Generator{
 			Uri:     tn.As("", "uri"),
 			Version: tn.As("", "version"),
 			Text:    tn.GetValue(),
@@ -45,7 +48,7 @@ func readAtomChannel(ns string, node *xmlx.Node) *Channel {
 	}
 
 	if tn := node.SelectNode(ns, "author"); tn != nil {
-		ch.Author = Author{
+		ch.Author = data.Author{
 			Name:  tn.S("", "name"),
 			Uri:   tn.S("", "uri"),
 			Email: tn.S("", "email"),
@@ -59,8 +62,8 @@ func readAtomChannel(ns string, node *xmlx.Node) *Channel {
 	return ch
 }
 
-func readAtomItem(ns string, item *xmlx.Node) *Item {
-	i := &Item{
+func readAtomItem(ns string, item *xmlx.Node) *data.Item {
+	i := &data.Item{
 		Title:       item.S(ns, "title"),
 		Id:          item.S(ns, "id"),
 		PubDate:     item.S(ns, "updated"),
@@ -69,12 +72,12 @@ func readAtomItem(ns string, item *xmlx.Node) *Item {
 
 	for _, v := range item.SelectNodes(ns, "link") {
 		if v.As(ns, "rel") == "enclosure" {
-			i.Enclosures = append(i.Enclosures, Enclosure{
+			i.Enclosures = append(i.Enclosures, data.Enclosure{
 				Url:  v.As("", "href"),
 				Type: v.As("", "type"),
 			})
 		} else {
-			i.Links = append(i.Links, Link{
+			i.Links = append(i.Links, data.Link{
 				Href:     v.As("", "href"),
 				Rel:      v.As("", "rel"),
 				Type:     v.As("", "type"),
@@ -88,14 +91,14 @@ func readAtomItem(ns string, item *xmlx.Node) *Item {
 	}
 
 	for _, cv := range item.SelectNodes(ns, "category") {
-		i.Categories = append(i.Categories, Category{
+		i.Categories = append(i.Categories, data.Category{
 			Domain: "",
 			Text:   cv.As("", "term"),
 		})
 	}
 
 	if tn := item.SelectNode(ns, "content"); tn != nil {
-		i.Content = &Content{
+		i.Content = &data.Content{
 			Type: tn.As("", "type"),
 			Lang: tn.S("xml", "lang"),
 			Base: tn.S("xml", "base"),
@@ -104,7 +107,7 @@ func readAtomItem(ns string, item *xmlx.Node) *Item {
 	}
 
 	if tn := item.SelectNode(ns, "author"); tn != nil {
-		i.Author = Author{
+		i.Author = data.Author{
 			Name:  tn.S(ns, "name"),
 			Uri:   tn.S(ns, "uri"),
 			Email: tn.S(ns, "email"),

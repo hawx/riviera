@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/kennygrant/sanitize"
-	"hawx.me/code/riviera/feed"
+	feed "hawx.me/code/riviera/feed/data"
 	"hawx.me/code/riviera/river/models"
 )
 

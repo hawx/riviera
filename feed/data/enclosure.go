@@ -1,4 +1,4 @@
-package feed
+package data
 
 type Enclosure struct {
 	Url    string
