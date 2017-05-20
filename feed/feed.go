@@ -21,8 +21,11 @@
 package feed
 
 import (
+	"bufio"
+	"bytes"
 	"errors"
 	"io"
+	"io/ioutil"
 	"net/http"
 	"time"
 
@@ -115,22 +118,35 @@ func (f *Feed) Fetch(uri string, client *http.Client, charset xmlx.CharsetFunc) 
 	return resp.StatusCode, f.load(resp.Body, charset)
 }
 
-var parsers = []data.Parser{
-	atom.Parser{},
-	rss.Parser{},
-}
+// var parsers = []data.Parser{
+// 	atom.Parser{},
+// 	rss.Parser{},
+// }
 
 func Parse(r io.Reader, charset xmlx.CharsetFunc) (chs []*data.Channel, err error) {
+
+	data, _ := ioutil.ReadAll(r)
+
 	doc := xmlx.New()
 
-	if err = doc.LoadStream(r, charset); err != nil {
+	if err = doc.LoadStream(bytes.NewReader(data), charset); err != nil {
 		return
 	}
 
-	for _, parser := range parsers {
-		if parser.CanRead(doc) {
-			return parser.Read(doc)
-		}
+	// for _, parser := range parsers {
+	// 	if parser.CanRead(doc) {
+	// 		return parser.Read(doc)
+	// 	}
+	// }
+
+	atomParser := atom.Parser{}
+	rssParser := rss.Parser{}
+
+	if atomParser.CanRead(bufio.NewReader(bytes.NewReader(data))) {
+		return atomParser.Read(bufio.NewReader(bytes.NewReader(data)))
+	}
+	if rssParser.CanRead(doc) {
+		return rssParser.Read(doc)
 	}
 
 	return nil, errors.New("Unsupported feed")
