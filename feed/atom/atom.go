@@ -9,8 +9,9 @@ import (
 
 type Parser struct{}
 
-func (Parser) CanRead(r io.Reader) bool {
+func (Parser) CanRead(r io.Reader, charset func(charset string, input io.Reader) (io.Reader, error)) bool {
 	decoder := xml.NewDecoder(r)
+	decoder.CharsetReader = charset
 
 	var token xml.Token
 	var err error
@@ -29,9 +30,12 @@ func (Parser) CanRead(r io.Reader) bool {
 	return false
 }
 
-func (Parser) Read(r io.Reader) (foundChannels []*data.Channel, err error) {
+func (Parser) Read(r io.Reader, charset func(charset string, input io.Reader) (io.Reader, error)) (foundChannels []*data.Channel, err error) {
+	decoder := xml.NewDecoder(r)
+	decoder.CharsetReader = charset
+
 	var feed atomFeed
-	if err = xml.NewDecoder(r).Decode(&feed); err != nil {
+	if err = decoder.Decode(&feed); err != nil {
 		return
 	}
 

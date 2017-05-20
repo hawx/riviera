@@ -1,7 +1,9 @@
 package rss
 
 import (
+	"encoding/xml"
 	"errors"
+	"io"
 	"strconv"
 	"strings"
 
@@ -22,18 +24,42 @@ var days = map[string]int{
 
 type Parser struct{}
 
-func (Parser) CanRead(doc *xmlx.Document) bool {
-	if node := doc.SelectNode("", "rss"); node != nil {
-		version := node.As("", "version")
-		p := strings.Index(version, ".")
-		major, _ := strconv.Atoi(version[0:p])
-		minor, _ := strconv.Atoi(version[p+1 : len(version)])
+func (Parser) CanRead(r io.Reader, charset func(charset string, input io.Reader) (io.Reader, error)) bool {
+	decoder := xml.NewDecoder(r)
+	decoder.CharsetReader = charset
 
-		return !(major > 2 || (major == 2 && minor > 0))
+	var token xml.Token
+	var err error
+	for {
+		if token, err = decoder.Token(); err != nil || token == nil {
+			return false
+		}
+
+		if t, ok := token.(xml.StartElement); ok {
+			if t.Name.Space == "" && t.Name.Local == "rss" {
+				for _, attr := range t.Attr {
+					if attr.Name.Space == "" && attr.Name.Local == "version" {
+						p := strings.Index(attr.Value, ".")
+						major, _ := strconv.Atoi(attr.Value[0:p])
+						minor, _ := strconv.Atoi(attr.Value[p+1 : len(attr.Value)])
+
+						return !(major > 2 || (major == 2 && minor > 0))
+					}
+				}
+
+				return false
+			}
+
+			// issue#5: Some documents have an RDF root node instead of rss.
+			if t.Name.Space == "http://www.w3.org/1999/02/22-rdf-syntax-ns#" && t.Name.Local == "RDF" {
+				return true
+			}
+
+			return false
+		}
 	}
 
-	// issue#5: Some documents have an RDF root node instead of rss.
-	return doc.SelectNode("http://www.w3.org/1999/02/22-rdf-syntax-ns#", "RDF") != nil
+	return false
 }
 
 func (Parser) Read(doc *xmlx.Document) (foundChannels []*data.Channel, err error) {

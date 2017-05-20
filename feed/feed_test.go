@@ -18,7 +18,7 @@ func itemHandler(feed *Feed, ch *data.Channel, newitems []*data.Item) {}
 func TestFeed(t *testing.T) {
 	feedlist := []string{
 		"/testdata/cyber.law.harvard.edu-sampleRss091.xml", // "http://cyber.law.harvard.edu/rss/examples/sampleRss091.xml", // Non-utf8 encoding.
-		"/testdata/store.steampowered.com-news.xml",        // "http://store.steampowered.com/feeds/news.xml", // This feed violates the rss spec.
+		"/testdata/store.steampowered.com-news.xml",        // "http://store.steampowered.com/feeds/news.xml", // this feed violates the rss spec.
 		"/testdata/cyber.law.harvard.edu-sampleRss092.xml", // "http://cyber.law.harvard.edu/rss/examples/sampleRss092.xml",
 		"/testdata/cyber.law.harvard.edu-rss2sample.xml",   // "http://cyber.law.harvard.edu/rss/examples/rss2sample.xml",
 		"/testdata/blog.case.edu-feed.atom",                // "http://blog.case.edu/news/feed.atom",
