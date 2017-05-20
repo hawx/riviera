@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
-	"hawx.me/code/riviera/feed"
+	feed "hawx.me/code/riviera/feed/data"
 	"hawx.me/code/riviera/river/models"
 )
 

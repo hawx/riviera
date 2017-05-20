@@ -8,10 +8,12 @@ import (
 	"testing"
 	"time"
 
+	"hawx.me/code/riviera/feed/data"
+
 	"golang.org/x/net/html/charset"
 )
 
-func itemHandler(feed *Feed, ch *Channel, newitems []*Item) {}
+func itemHandler(feed *Feed, ch *data.Channel, newitems []*data.Item) {}
 
 func TestFeed(t *testing.T) {
 	feedlist := []string{
@@ -44,8 +46,8 @@ func TestFeed(t *testing.T) {
 func Test_NewItem(t *testing.T) {
 	file, _ := os.Open("testdata/initial.atom")
 
-	itemsCh := make(chan []*Item, 2)
-	feed := New(1, func(_ *Feed, _ *Channel, newitems []*Item) {
+	itemsCh := make(chan []*data.Item, 2)
+	feed := New(1, func(_ *Feed, _ *data.Channel, newitems []*data.Item) {
 		itemsCh <- newitems
 	}, NewDatabase())
 	err := feed.load(file, nil)
@@ -94,8 +96,8 @@ func Test_AtomAuthor(t *testing.T) {
 	}
 	defer file.Close()
 
-	itemCh := make(chan *Item, 1)
-	feed := New(1, func(f *Feed, ch *Channel, newitems []*Item) {
+	itemCh := make(chan *data.Item, 1)
+	feed := New(1, func(f *Feed, ch *data.Channel, newitems []*data.Item) {
 		itemCh <- newitems[0]
 	}, NewDatabase())
 	err = feed.load(file, nil)
@@ -115,8 +117,8 @@ func Test_RssAuthor(t *testing.T) {
 	file, _ := os.Open("testdata/boing.rss")
 	defer file.Close()
 
-	itemCh := make(chan *Item, 1)
-	feed := New(1, func(f *Feed, ch *Channel, newitems []*Item) {
+	itemCh := make(chan *data.Item, 1)
+	feed := New(1, func(f *Feed, ch *data.Channel, newitems []*data.Item) {
 		itemCh <- newitems[0]
 	}, NewDatabase())
 	feed.load(file, nil)
@@ -136,8 +138,8 @@ func Test_ItemExtensions(t *testing.T) {
 	file, _ := os.Open("testdata/extension.rss")
 	defer file.Close()
 
-	itemCh := make(chan *Item, 1)
-	feed := New(1, func(_ *Feed, _ *Channel, newitems []*Item) {
+	itemCh := make(chan *data.Item, 1)
+	feed := New(1, func(_ *Feed, _ *data.Channel, newitems []*data.Item) {
 		itemCh <- newitems[0]
 	}, NewDatabase())
 
@@ -174,8 +176,8 @@ func Test_ChannelExtensions(t *testing.T) {
 	file, _ := os.Open("testdata/extension.rss")
 	defer file.Close()
 
-	channelCh := make(chan *Channel, 1)
-	feed := New(1, func(_ *Feed, ch *Channel, _ []*Item) {
+	channelCh := make(chan *data.Channel, 1)
+	feed := New(1, func(_ *Feed, ch *data.Channel, _ []*data.Item) {
 		channelCh <- ch
 	}, NewDatabase())
 
@@ -216,8 +218,8 @@ func Test_CData(t *testing.T) {
 	file, _ := os.Open("testdata/iosBoardGameGeek.rss")
 	defer file.Close()
 
-	itemCh := make(chan *Item, 1)
-	feed := New(1, func(_ *Feed, _ *Channel, newitems []*Item) {
+	itemCh := make(chan *data.Item, 1)
+	feed := New(1, func(_ *Feed, _ *data.Channel, newitems []*data.Item) {
 		itemCh <- newitems[0]
 	}, NewDatabase())
 
@@ -239,12 +241,12 @@ func Test_Link(t *testing.T) {
 	defer file.Close()
 
 	type pair struct {
-		Item    *Item
-		Channel *Channel
+		Item    *data.Item
+		Channel *data.Channel
 	}
 	itemCh := make(chan pair, 1)
 
-	feed := New(1, func(_ *Feed, ch *Channel, newitems []*Item) {
+	feed := New(1, func(_ *Feed, ch *data.Channel, newitems []*data.Item) {
 		itemCh <- pair{newitems[0], ch}
 	}, NewDatabase())
 	feed.load(file, nil)
@@ -286,7 +288,7 @@ func Test_FetchWithETag(t *testing.T) {
 	))
 
 	httpClient := http.DefaultClient
-	feed := New(0, func(_ *Feed, _ *Channel, _ []*Item) {}, NewDatabase())
+	feed := New(0, func(_ *Feed, _ *data.Channel, _ []*data.Item) {}, NewDatabase())
 
 	feed.Fetch(rssServer.URL, httpClient, charset.NewReaderLabel)
 	select {
