@@ -1,11 +1,11 @@
-package rss
+package rdf
+
+// http://web.resource.org/rss/1.0/spec
 
 import (
 	"encoding/xml"
 	"errors"
 	"io"
-	"strconv"
-	"strings"
 
 	"hawx.me/code/riviera/feed/data"
 
@@ -36,19 +36,7 @@ func (Parser) CanRead(r io.Reader, charset func(charset string, input io.Reader)
 		}
 
 		if t, ok := token.(xml.StartElement); ok {
-			if t.Name.Space == "" && t.Name.Local == "rss" {
-				for _, attr := range t.Attr {
-					if attr.Name.Space == "" && attr.Name.Local == "version" {
-						p := strings.Index(attr.Value, ".")
-						major, _ := strconv.Atoi(attr.Value[0:p])
-						minor, _ := strconv.Atoi(attr.Value[p+1 : len(attr.Value)])
-
-						return !(major > 2 || (major == 2 && minor > 0))
-					}
-				}
-			}
-
-			return false
+			return t.Name.Space == "http://www.w3.org/1999/02/22-rdf-syntax-ns#" && t.Name.Local == "RDF"
 		}
 	}
 
@@ -58,9 +46,9 @@ func (Parser) CanRead(r io.Reader, charset func(charset string, input io.Reader)
 func (Parser) Read(doc *xmlx.Document) (foundChannels []*data.Channel, err error) {
 	const ns = "*"
 
-	root := doc.SelectNode(ns, "rss")
+	root := doc.SelectNode(ns, "RDF")
 	if root == nil {
-		return foundChannels, errors.New("Failed to find rss node in XML.")
+		return foundChannels, errors.New("Failed to find rdf node in XML.")
 	}
 
 	for _, node := range root.SelectNodes(ns, "channel") {

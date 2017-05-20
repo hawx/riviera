@@ -32,6 +32,7 @@ import (
 	xmlx "github.com/jteeuwen/go-pkg-xmlx"
 	"hawx.me/code/riviera/feed/atom"
 	"hawx.me/code/riviera/feed/data"
+	"hawx.me/code/riviera/feed/rdf"
 	"hawx.me/code/riviera/feed/rss"
 )
 
@@ -141,12 +142,16 @@ func Parse(r io.Reader, charset xmlx.CharsetFunc) (chs []*data.Channel, err erro
 
 	atomParser := atom.Parser{}
 	rssParser := rss.Parser{}
+	rdfParser := rdf.Parser{}
 
 	if atomParser.CanRead(bufio.NewReader(bytes.NewReader(data)), charset) {
 		return atomParser.Read(bufio.NewReader(bytes.NewReader(data)), charset)
 	}
 	if rssParser.CanRead(bufio.NewReader(bytes.NewReader(data)), charset) {
 		return rssParser.Read(doc)
+	}
+	if rdfParser.CanRead(bufio.NewReader(bytes.NewReader(data)), charset) {
+		return rdfParser.Read(doc)
 	}
 
 	return nil, errors.New("Unsupported feed")
