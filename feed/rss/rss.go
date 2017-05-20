@@ -2,6 +2,8 @@ package rss
 
 import (
 	"errors"
+	"strconv"
+	"strings"
 
 	"hawx.me/code/riviera/feed/data"
 
@@ -18,7 +20,23 @@ var days = map[string]int{
 	"Sunday":    7,
 }
 
-func Read(doc *xmlx.Document) (foundChannels []*data.Channel, err error) {
+type Parser struct{}
+
+func (Parser) CanRead(doc *xmlx.Document) bool {
+	if node := doc.SelectNode("", "rss"); node != nil {
+		version := node.As("", "version")
+		p := strings.Index(version, ".")
+		major, _ := strconv.Atoi(version[0:p])
+		minor, _ := strconv.Atoi(version[p+1 : len(version)])
+
+		return !(major > 2 || (major == 2 && minor > 0))
+	}
+
+	// issue#5: Some documents have an RDF root node instead of rss.
+	return doc.SelectNode("http://www.w3.org/1999/02/22-rdf-syntax-ns#", "RDF") != nil
+}
+
+func (Parser) Read(doc *xmlx.Document) (foundChannels []*data.Channel, err error) {
 	const ns = "*"
 
 	root := doc.SelectNode(ns, "rss")

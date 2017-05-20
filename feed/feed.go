@@ -22,11 +22,8 @@ package feed
 
 import (
 	"errors"
-	"fmt"
 	"io"
 	"net/http"
-	"strconv"
-	"strings"
 	"time"
 
 	xmlx "github.com/jteeuwen/go-pkg-xmlx"
@@ -118,6 +115,11 @@ func (f *Feed) Fetch(uri string, client *http.Client, charset xmlx.CharsetFunc) 
 	return resp.StatusCode, f.load(resp.Body, charset)
 }
 
+var parsers = []data.Parser{
+	atom.Parser{},
+	rss.Parser{},
+}
+
 func Parse(r io.Reader, charset xmlx.CharsetFunc) (chs []*data.Channel, err error) {
 	doc := xmlx.New()
 
@@ -125,13 +127,13 @@ func Parse(r io.Reader, charset xmlx.CharsetFunc) (chs []*data.Channel, err erro
 		return
 	}
 
-	format, version := GetVersionInfo(doc)
-	if ok := testVersions(format, version); !ok {
-		err = errors.New(fmt.Sprintf("Unsupported feed: %s, version: %+v", format, version))
-		return
+	for _, parser := range parsers {
+		if parser.CanRead(doc) {
+			return parser.Read(doc)
+		}
 	}
 
-	return buildFeed(format, doc)
+	return nil, errors.New("Unsupported feed")
 }
 
 func (f *Feed) load(r io.Reader, charset xmlx.CharsetFunc) (err error) {
@@ -205,54 +207,4 @@ func (f *Feed) CanUpdate() bool {
 // before the feed should update.
 func (f *Feed) DurationTillUpdate() time.Duration {
 	return f.cacheTimeout - time.Now().UTC().Sub(f.lastupdate)
-}
-
-func buildFeed(format string, doc *xmlx.Document) ([]*data.Channel, error) {
-	switch format {
-	case "atom":
-		return atom.Read(doc)
-	default:
-		return rss.Read(doc)
-	}
-}
-
-func testVersions(format string, version [2]int) bool {
-	switch format {
-	case "rss":
-		if version[0] > 2 || (version[0] == 2 && version[1] > 0) {
-			return false
-		}
-
-	case "atom":
-		if version[0] > 1 || (version[0] == 1 && version[1] > 0) {
-			return false
-		}
-
-	default:
-		return false
-	}
-
-	return true
-}
-
-func GetVersionInfo(doc *xmlx.Document) (string, [2]int) {
-	if node := doc.SelectNode("http://www.w3.org/2005/Atom", "feed"); node != nil {
-		return "atom", [2]int{1, 0}
-	}
-
-	if node := doc.SelectNode("", "rss"); node != nil {
-		version := node.As("", "version")
-		p := strings.Index(version, ".")
-		major, _ := strconv.Atoi(version[0:p])
-		minor, _ := strconv.Atoi(version[p+1 : len(version)])
-
-		return "rss", [2]int{major, minor}
-	}
-
-	// issue#5: Some documents have an RDF root node instead of rss.
-	if node := doc.SelectNode("http://www.w3.org/1999/02/22-rdf-syntax-ns#", "RDF"); node != nil {
-		return "rss", [2]int{1, 1}
-	}
-
-	return "unknown", [2]int{0, 0}
 }

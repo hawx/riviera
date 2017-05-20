@@ -5,7 +5,13 @@ import (
 	"hawx.me/code/riviera/feed/data"
 )
 
-func Read(doc *xmlx.Document) (foundChannels []*data.Channel, err error) {
+type Parser struct{}
+
+func (Parser) CanRead(doc *xmlx.Document) bool {
+	return doc.SelectNode("http://www.w3.org/2005/Atom", "feed") != nil
+}
+
+func (Parser) Read(doc *xmlx.Document) (foundChannels []*data.Channel, err error) {
 	const ns = "http://www.w3.org/2005/Atom"
 
 	for _, node := range doc.SelectNodes(ns, "feed") {
