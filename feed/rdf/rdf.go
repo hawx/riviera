@@ -4,12 +4,9 @@ package rdf
 
 import (
 	"encoding/xml"
-	"errors"
 	"io"
 
 	"hawx.me/code/riviera/feed/data"
-
-	xmlx "github.com/jteeuwen/go-pkg-xmlx"
 )
 
 var days = map[string]int{
@@ -43,224 +40,77 @@ func (Parser) CanRead(r io.Reader, charset func(charset string, input io.Reader)
 	return false
 }
 
-func (Parser) Read(doc *xmlx.Document) (foundChannels []*data.Channel, err error) {
-	const ns = "*"
+func (Parser) Read(r io.Reader, charset func(string, io.Reader) (io.Reader, error)) (foundChannels []*data.Channel, err error) {
+	decoder := xml.NewDecoder(r)
+	decoder.CharsetReader = charset
 
-	root := doc.SelectNode(ns, "RDF")
-	if root == nil {
-		return foundChannels, errors.New("Failed to find rdf node in XML.")
+	var feed rdfFeed
+	if err = decoder.Decode(&feed); err != nil {
+		return
 	}
 
-	for _, node := range root.SelectNodes(ns, "channel") {
-		foundChannels = append(foundChannels, readRssChannel(ns, doc, node))
-	}
-
-	return foundChannels, err
-}
-
-func readRssChannel(ns string, doc *xmlx.Document, node *xmlx.Node) *data.Channel {
 	ch := &data.Channel{
-		Title:          node.S(ns, "title"),
-		Description:    node.S(ns, "description"),
-		Language:       node.S(ns, "language"),
-		Copyright:      node.S(ns, "copyright"),
-		ManagingEditor: node.S(ns, "managingEditor"),
-		WebMaster:      node.S(ns, "webMaster"),
-		PubDate:        node.S(ns, "pubDate"),
-		LastBuildDate:  node.S(ns, "lastBuildDate"),
-		Docs:           node.S(ns, "docs"),
-		TTL:            node.I(ns, "ttl"),
-		Rating:         node.S(ns, "rating"),
+		Title:       feed.Channel.Title,
+		Description: feed.Channel.Description,
+		Links: []data.Link{
+			data.Link{Href: feed.Channel.Link},
+		},
 	}
 
-	for _, v := range node.SelectNodes(ns, "link") {
-		lnk := data.Link{}
-		if v.Name.Space == "http://www.w3.org/2005/Atom" && v.Name.Local == "link" {
-			lnk.Href = v.As("", "href")
-			lnk.Rel = v.As("", "rel")
-			lnk.Type = v.As("", "type")
-			lnk.HrefLang = v.As("", "hreflang")
-		} else {
-			lnk.Href = v.GetValue()
-		}
-
-		ch.Links = append(ch.Links, lnk)
-	}
-
-	for _, v := range node.SelectNodes(ns, "category") {
-		ch.Categories = append(ch.Categories, data.Category{
-			Domain: v.As(ns, "domain"),
-			Text:   v.GetValue(),
-		})
-	}
-
-	if n := node.SelectNode(ns, "generator"); n != nil {
-		ch.Generator = data.Generator{
-			Text: n.GetValue(),
-		}
-	}
-
-	for _, v := range node.SelectNodes(ns, "hour") {
-		ch.SkipHours = append(ch.SkipHours, v.I(ns, "hour"))
-	}
-
-	for _, v := range node.SelectNodes(ns, "days") {
-		ch.SkipDays = append(ch.SkipDays, days[v.GetValue()])
-	}
-
-	if n := node.SelectNode(ns, "image"); n != nil {
+	if feed.Channel.Image != nil {
 		ch.Image = data.Image{
-			Title:       n.S(ns, "title"),
-			Url:         n.S(ns, "url"),
-			Link:        n.S(ns, "link"),
-			Width:       n.I(ns, "width"),
-			Height:      n.I(ns, "height"),
-			Description: n.S(ns, "description"),
+			Title: feed.Image.Title,
+			Url:   feed.Image.URL,
+			Link:  feed.Image.Link,
 		}
 	}
 
-	if n := node.SelectNode(ns, "cloud"); n != nil {
-		ch.Cloud = data.Cloud{
-			Domain:            n.As(ns, "domain"),
-			Port:              n.Ai(ns, "port"),
-			Path:              n.As(ns, "path"),
-			RegisterProcedure: n.As(ns, "registerProcedure"),
-			Protocol:          n.As(ns, "protocol"),
-		}
-	}
-
-	if n := node.SelectNode(ns, "textInput"); n != nil {
-		ch.TextInput = data.Input{
-			Title:       n.S(ns, "title"),
-			Description: n.S(ns, "description"),
-			Name:        n.S(ns, "name"),
-			Link:        n.S(ns, "link"),
-		}
-	}
-
-	list := node.SelectNodes(ns, "item")
-	if len(list) == 0 {
-		list = doc.SelectNodes(ns, "item")
-	}
-
-	for _, item := range list {
-		ch.Items = append(ch.Items, readRssItem(ns, item))
-	}
-
-	ch.Extensions = make(map[string]map[string][]data.Extension)
-	for _, v := range node.Children {
-		getExtensions(&ch.Extensions, v)
-	}
-
-	return ch
+	return
 }
 
-func readRssItem(ns string, item *xmlx.Node) *data.Item {
-	i := &data.Item{
-		Title:       item.S(ns, "title"),
-		Description: item.S(ns, "description"),
-		Comments:    item.S(ns, "comments"),
-		PubDate:     item.S(ns, "pubDate"),
-	}
+type rdfFeed struct {
+	XMLName xml.Name `xml:"http://www.w3.org/1999/02/22-rdf-syntax-ns# RDF"`
 
-	for _, v := range item.SelectNodes(ns, "link") {
-		if v.Name.Space == "http://www.w3.org/2005/Atom" && v.Name.Local == "link" {
-			i.Links = append(i.Links, data.Link{
-				Href:     v.As("", "href"),
-				Rel:      v.As("", "rel"),
-				Type:     v.As("", "type"),
-				HrefLang: v.As("", "hreflang"),
-			})
-		} else {
-			i.Links = append(i.Links, data.Link{Href: v.GetValue()})
-		}
-	}
-
-	if n := item.SelectNode(ns, "author"); n != nil {
-		i.Author.Name = n.GetValue()
-
-	} else if n := item.SelectNode(ns, "creator"); n != nil {
-		i.Author.Name = n.GetValue()
-	}
-
-	if n := item.SelectNode(ns, "guid"); n != nil {
-		i.Guid = &data.Guid{Guid: n.GetValue(), IsPermaLink: n.As("", "isPermalink") == "true"}
-	}
-
-	for _, lv := range item.SelectNodes(ns, "category") {
-		i.Categories = append(i.Categories, data.Category{
-			Domain: lv.As(ns, "domain"),
-			Text:   lv.GetValue(),
-		})
-	}
-
-	for _, lv := range item.SelectNodes(ns, "enclosure") {
-		i.Enclosures = append(i.Enclosures, data.Enclosure{
-			Url:    lv.As(ns, "url"),
-			Length: lv.Ai64(ns, "length"),
-			Type:   lv.As(ns, "type"),
-		})
-	}
-
-	if src := item.SelectNode(ns, "source"); src != nil {
-		i.Source = &data.Source{
-			Url:  src.As(ns, "url"),
-			Text: src.GetValue(),
-		}
-	}
-
-	for _, lv := range item.SelectNodes("http://purl.org/rss/1.0/modules/content/", "*") {
-		if lv.Name.Local == "encoded" {
-			i.Content = &data.Content{
-				Text: lv.String(),
-			}
-			break
-		}
-	}
-
-	i.Extensions = make(map[string]map[string][]data.Extension)
-	for _, lv := range item.Children {
-		getExtensions(&i.Extensions, lv)
-	}
-
-	return i
+	Channel rdfChannel    `xml:"channel"`
+	Image   *rdfFeedImage `xml:"image"`
+	Items   []rdfItem     `xml:"item"`
 }
 
-func getExtensions(extensionsX *map[string]map[string][]data.Extension, node *xmlx.Node) {
-	extentions := *extensionsX
-
-	if ext, ok := getExtension(node); ok {
-		if len(extentions[node.Name.Space]) == 0 {
-			extentions[node.Name.Space] = make(map[string][]data.Extension, 0)
-		}
-		if len(extentions[node.Name.Space][node.Name.Local]) == 0 {
-			extentions[node.Name.Space][node.Name.Local] = make([]data.Extension, 0)
-		}
-		extentions[node.Name.Space][node.Name.Local] = append(extentions[node.Name.Space][node.Name.Local], ext)
-	}
+type rdfChannel struct {
+	About       string    `xml:"http://www.w3.org/1999/02/22-rdf-syntax-ns# about,attr"`
+	Title       string    `xml:"title"`
+	Link        string    `xml:"link"`
+	Description string    `xml:"description"`
+	Image       *rdfImage `xml:"image"`
+	Items       rdfItems  `xml:"items"`
 }
 
-func getExtension(node *xmlx.Node) (extension data.Extension, ok bool) {
-	if node.Name.Space == "" {
-		return extension, false
-	}
+type rdfImage struct {
+	Resource string `xml:"http://www.w3.org/1999/02/22-rdf-syntax-ns# resource,attr"`
+}
 
-	extension = data.Extension{
-		Name:      node.Name.Local,
-		Value:     node.GetValue(),
-		Attrs:     make(map[string]string),
-		Childrens: make(map[string][]data.Extension, 0),
-	}
+type rdfItems struct {
+	Seq rdfSeq `xml:"http://www.w3.org/1999/02/22-rdf-syntax-ns# Seq"`
+}
 
-	for _, attr := range node.Attributes {
-		extension.Attrs[attr.Name.Local] = attr.Value
-	}
+type rdfSeq struct {
+	Li rdfLi `xml:"http://www.w3.org/1999/02/22-rdf-syntax-ns# li"`
+}
 
-	for _, child := range node.Children {
-		if ext, ok := getExtension(child); ok {
-			extension.Childrens[child.Name.Local] = append(extension.Childrens[child.Name.Local], ext)
-		}
-	}
+type rdfLi struct {
+	Resource string `xml:"resource,attr"`
+}
 
-	return extension, true
+type rdfFeedImage struct {
+	About string `xml:"http://www.w3.org/1999/02/22-rdf-syntax-ns# about,attr"`
+	Title string `xml:"title"`
+	Link  string `xml:"link"`
+	URL   string `xml:"url"`
+}
+
+type rdfItem struct {
+	About       string `xml:"http://www.w3.org/1999/02/22-rdf-syntax-ns# about,attr"`
+	Title       string `xml:"title"`
+	Link        string `xml:"link"`
+	Description string `xml:"description"`
 }

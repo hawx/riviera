@@ -1,7 +1,5 @@
 package rss
 
-// http://www.rssboard.org/rss-specification
-
 import (
 	"encoding/xml"
 	"io"

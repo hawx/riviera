@@ -1,8 +1,8 @@
 package data
 
-import "github.com/jteeuwen/go-pkg-xmlx"
+import "io"
 
 type Parser interface {
-	CanRead(*xmlx.Document) bool
-	Read(*xmlx.Document) ([]*Channel, error)
+	CanRead(io.Reader, func(charset string, input io.Reader) (io.Reader, error)) bool
+	Read(io.Reader, func(charset string, input io.Reader) (io.Reader, error)) ([]*Channel, error)
 }

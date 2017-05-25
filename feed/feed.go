@@ -21,7 +21,6 @@
 package feed
 
 import (
-	"bufio"
 	"bytes"
 	"errors"
 	"io"
@@ -119,10 +118,11 @@ func (f *Feed) Fetch(uri string, client *http.Client, charset xmlx.CharsetFunc) 
 	return resp.StatusCode, f.load(resp.Body, charset)
 }
 
-// var parsers = []data.Parser{
-// 	atom.Parser{},
-// 	rss.Parser{},
-// }
+var parsers = []data.Parser{
+	atom.Parser{},
+	rss.Parser{},
+	rdf.Parser{},
+}
 
 func Parse(r io.Reader, charset xmlx.CharsetFunc) (chs []*data.Channel, err error) {
 
@@ -134,24 +134,10 @@ func Parse(r io.Reader, charset xmlx.CharsetFunc) (chs []*data.Channel, err erro
 		return
 	}
 
-	// for _, parser := range parsers {
-	// 	if parser.CanRead(doc) {
-	// 		return parser.Read(doc)
-	// 	}
-	// }
-
-	atomParser := atom.Parser{}
-	rssParser := rss.Parser{}
-	rdfParser := rdf.Parser{}
-
-	if atomParser.CanRead(bufio.NewReader(bytes.NewReader(data)), charset) {
-		return atomParser.Read(bufio.NewReader(bytes.NewReader(data)), charset)
-	}
-	if rssParser.CanRead(bufio.NewReader(bytes.NewReader(data)), charset) {
-		return rssParser.Read(bufio.NewReader(bytes.NewReader(data)), charset)
-	}
-	if rdfParser.CanRead(bufio.NewReader(bytes.NewReader(data)), charset) {
-		return rdfParser.Read(doc)
+	for _, parser := range parsers {
+		if parser.CanRead(bytes.NewReader(data), charset) {
+			return parser.Read(bytes.NewReader(data), charset)
+		}
 	}
 
 	return nil, errors.New("Unsupported feed")
