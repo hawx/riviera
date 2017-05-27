@@ -5,6 +5,7 @@ package rdf
 import (
 	"encoding/xml"
 	"io"
+	"time"
 
 	"hawx.me/code/riviera/feed/data"
 )
@@ -57,13 +58,32 @@ func (Parser) Read(r io.Reader, charset func(string, io.Reader) (io.Reader, erro
 		},
 	}
 
-	if feed.Channel.Image != nil {
+	if feed.Image != nil {
 		ch.Image = data.Image{
 			Title: feed.Image.Title,
 			Url:   feed.Image.URL,
 			Link:  feed.Image.Link,
 		}
 	}
+
+	for _, item := range feed.Items {
+		i := &data.Item{
+			Title: item.Title,
+			Links: []data.Link{
+				data.Link{Href: item.Link},
+			},
+			Author:  data.Author{Name: item.DcCreator},
+			PubDate: item.DcDate,
+			Categories: []data.Category{
+				data.Category{Domain: "", Text: item.DcSubject},
+			},
+			Content: &data.Content{Text: item.ContentEncoded},
+		}
+
+		ch.Items = append(ch.Items, i)
+	}
+
+	foundChannels = append(foundChannels, ch)
 
 	return
 }
@@ -83,6 +103,9 @@ type rdfChannel struct {
 	Description string    `xml:"description"`
 	Image       *rdfImage `xml:"image"`
 	Items       rdfItems  `xml:"items"`
+
+	dcModule
+	syModule
 }
 
 type rdfImage struct {
@@ -106,6 +129,8 @@ type rdfFeedImage struct {
 	Title string `xml:"title"`
 	Link  string `xml:"link"`
 	URL   string `xml:"url"`
+
+	dcModule
 }
 
 type rdfItem struct {
@@ -113,4 +138,39 @@ type rdfItem struct {
 	Title       string `xml:"title"`
 	Link        string `xml:"link"`
 	Description string `xml:"description"`
+
+	dcModule
+	contentModule
+}
+
+// http://web.resource.org/rss/1.0/modules/dc/
+type dcModule struct {
+	DcTitle       string `xml:"http://purl.org/dc/elements/1.1/ title"`
+	DcCreator     string `xml:"http://purl.org/dc/elements/1.1/ creator"`
+	DcSubject     string `xml:"http://purl.org/dc/elements/1.1/ subject"`
+	DcDescription string `xml:"http://purl.org/dc/elements/1.1/ description"`
+	DcPublisher   string `xml:"http://purl.org/dc/elements/1.1/ publisher"`
+	DcContributor string `xml:"http://purl.org/dc/elements/1.1/ contributor"`
+	DcDate        string `xml:"http://purl.org/dc/elements/1.1/ date"`
+	DcType        string `xml:"http://purl.org/dc/elements/1.1/ type"`
+	DcFormat      string `xml:"http://purl.org/dc/elements/1.1/ format"`
+	DcIdentifier  string `xml:"http://purl.org/dc/elements/1.1/ identifier"`
+	DcSource      string `xml:"http://purl.org/dc/elements/1.1/ source"`
+	DcLanguage    string `xml:"http://purl.org/dc/elements/1.1/ language"`
+	DcRelation    string `xml:"http://purl.org/dc/elements/1.1/ relation"`
+	DcCoverage    string `xml:"http://purl.org/dc/elements/1.1/ coverage"`
+	DcRights      string `xml:"http://purl.org/dc/elements/1.1/ rights"`
+}
+
+// http://web.resource.org/rss/1.0/modules/syndication/
+type syModule struct {
+	// 'hourly' | 'daily' | 'weekly' | 'monthly' | 'yearly'
+	SyUpdatePeriod    string    `xml:"http://purl.org/rss/1.0/modules/syndication/ updatePeriod"`
+	SyUpdateFrequency uint      `xml:"http://purl.org/rss/1.0/modules/syndication/ updateFrequency"`
+	SyUpdateBase      time.Time `xml:"http://purl.org/rss/1.0/modules/syndication/ updateBase"`
+}
+
+// http://web.resource.org/rss/1.0/modules/content/
+type contentModule struct {
+	ContentEncoded string `xml:"http://purl.org/rss/1.0/modules/content/ encoded"`
 }
