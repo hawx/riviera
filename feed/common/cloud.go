@@ -1,4 +1,4 @@
-package data
+package common
 
 type Cloud struct {
 	Domain            string

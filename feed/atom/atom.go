@@ -4,7 +4,7 @@ import (
 	"encoding/xml"
 	"io"
 
-	"hawx.me/code/riviera/feed/data"
+	"hawx.me/code/riviera/feed/common"
 )
 
 type Parser struct{}
@@ -30,7 +30,7 @@ func (Parser) CanRead(r io.Reader, charset func(charset string, input io.Reader)
 	return false
 }
 
-func (Parser) Read(r io.Reader, charset func(charset string, input io.Reader) (io.Reader, error)) (foundChannels []*data.Channel, err error) {
+func (Parser) Read(r io.Reader, charset func(charset string, input io.Reader) (io.Reader, error)) (foundChannels []*common.Channel, err error) {
 	decoder := xml.NewDecoder(r)
 	decoder.CharsetReader = charset
 
@@ -39,7 +39,7 @@ func (Parser) Read(r io.Reader, charset func(charset string, input io.Reader) (i
 		return
 	}
 
-	ch := &data.Channel{
+	ch := &common.Channel{
 		Title:         feed.Title.Text,
 		LastBuildDate: feed.Updated,
 		Id:            feed.ID,
@@ -47,7 +47,7 @@ func (Parser) Read(r io.Reader, charset func(charset string, input io.Reader) (i
 	}
 
 	for _, link := range feed.Links {
-		ch.Links = append(ch.Links, data.Link{
+		ch.Links = append(ch.Links, common.Link{
 			Href:     link.Href,
 			Rel:      link.Rel,
 			Type:     link.Type,
@@ -56,14 +56,14 @@ func (Parser) Read(r io.Reader, charset func(charset string, input io.Reader) (i
 	}
 
 	if feed.SubTitle != nil {
-		ch.SubTitle = data.SubTitle{
+		ch.SubTitle = common.SubTitle{
 			Type: feed.SubTitle.Type,
 			Text: feed.SubTitle.Text,
 		}
 	}
 
 	if feed.Generator != nil {
-		ch.Generator = data.Generator{
+		ch.Generator = common.Generator{
 			Uri:     feed.Generator.URI,
 			Version: feed.Generator.Version,
 			Text:    feed.Generator.Text,
@@ -71,7 +71,7 @@ func (Parser) Read(r io.Reader, charset func(charset string, input io.Reader) (i
 	}
 
 	if len(feed.Authors) > 0 {
-		ch.Author = data.Author{
+		ch.Author = common.Author{
 			Name:  feed.Authors[0].Name,
 			Uri:   feed.Authors[0].URI,
 			Email: feed.Authors[0].Email,
@@ -79,7 +79,7 @@ func (Parser) Read(r io.Reader, charset func(charset string, input io.Reader) (i
 	}
 
 	for _, entry := range feed.Entries {
-		i := &data.Item{
+		i := &common.Item{
 			Title:       entry.Title,
 			Id:          entry.ID,
 			PubDate:     entry.Updated,
@@ -88,12 +88,12 @@ func (Parser) Read(r io.Reader, charset func(charset string, input io.Reader) (i
 
 		for _, link := range entry.Links {
 			if link.Rel == "enclosure" {
-				i.Enclosures = append(i.Enclosures, data.Enclosure{
+				i.Enclosures = append(i.Enclosures, common.Enclosure{
 					Url:  link.Href,
 					Type: link.Type,
 				})
 			} else {
-				i.Links = append(i.Links, data.Link{
+				i.Links = append(i.Links, common.Link{
 					Href:     link.Href,
 					Rel:      link.Rel,
 					Type:     link.Type,
@@ -107,14 +107,14 @@ func (Parser) Read(r io.Reader, charset func(charset string, input io.Reader) (i
 		}
 
 		for _, category := range entry.Categories {
-			i.Categories = append(i.Categories, data.Category{
+			i.Categories = append(i.Categories, common.Category{
 				Domain: "",
 				Text:   category.Term,
 			})
 		}
 
 		if entry.Content != nil {
-			i.Content = &data.Content{
+			i.Content = &common.Content{
 				Type: entry.Content.Type,
 				Lang: entry.Content.Lang,
 				Base: entry.Content.Base,
@@ -123,7 +123,7 @@ func (Parser) Read(r io.Reader, charset func(charset string, input io.Reader) (i
 		}
 
 		if len(entry.Authors) > 0 {
-			i.Author = data.Author{
+			i.Author = common.Author{
 				Name:  entry.Authors[0].Name,
 				Uri:   entry.Authors[0].URI,
 				Email: entry.Authors[0].Email,

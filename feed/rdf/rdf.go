@@ -7,7 +7,7 @@ import (
 	"io"
 	"time"
 
-	"hawx.me/code/riviera/feed/data"
+	"hawx.me/code/riviera/feed/common"
 )
 
 var days = map[string]int{
@@ -41,7 +41,7 @@ func (Parser) CanRead(r io.Reader, charset func(charset string, input io.Reader)
 	return false
 }
 
-func (Parser) Read(r io.Reader, charset func(string, io.Reader) (io.Reader, error)) (foundChannels []*data.Channel, err error) {
+func (Parser) Read(r io.Reader, charset func(string, io.Reader) (io.Reader, error)) (foundChannels []*common.Channel, err error) {
 	decoder := xml.NewDecoder(r)
 	decoder.CharsetReader = charset
 
@@ -50,16 +50,16 @@ func (Parser) Read(r io.Reader, charset func(string, io.Reader) (io.Reader, erro
 		return
 	}
 
-	ch := &data.Channel{
+	ch := &common.Channel{
 		Title:       feed.Channel.Title,
 		Description: feed.Channel.Description,
-		Links: []data.Link{
-			data.Link{Href: feed.Channel.Link},
+		Links: []common.Link{
+			common.Link{Href: feed.Channel.Link},
 		},
 	}
 
 	if feed.Image != nil {
-		ch.Image = data.Image{
+		ch.Image = common.Image{
 			Title: feed.Image.Title,
 			Url:   feed.Image.URL,
 			Link:  feed.Image.Link,
@@ -67,17 +67,17 @@ func (Parser) Read(r io.Reader, charset func(string, io.Reader) (io.Reader, erro
 	}
 
 	for _, item := range feed.Items {
-		i := &data.Item{
+		i := &common.Item{
 			Title: item.Title,
-			Links: []data.Link{
-				data.Link{Href: item.Link},
+			Links: []common.Link{
+				common.Link{Href: item.Link},
 			},
-			Author:  data.Author{Name: item.DcCreator},
+			Author:  common.Author{Name: item.DcCreator},
 			PubDate: item.DcDate,
-			Categories: []data.Category{
-				data.Category{Domain: "", Text: item.DcSubject},
+			Categories: []common.Category{
+				common.Category{Domain: "", Text: item.DcSubject},
 			},
-			Content: &data.Content{Text: item.ContentEncoded},
+			Content: &common.Content{Text: item.ContentEncoded},
 		}
 
 		ch.Items = append(ch.Items, i)

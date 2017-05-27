@@ -1,4 +1,4 @@
-package data
+package common
 
 type Channel struct {
 	Categories     []Category

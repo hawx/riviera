@@ -1,4 +1,4 @@
-package data
+package common
 
 type Extension struct {
 	Name      string

@@ -1,4 +1,4 @@
-package data
+package common
 
 type Author struct {
 	Name  string

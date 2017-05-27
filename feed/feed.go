@@ -29,14 +29,14 @@ import (
 	"time"
 
 	"hawx.me/code/riviera/feed/atom"
-	"hawx.me/code/riviera/feed/data"
+	"hawx.me/code/riviera/feed/common"
 	"hawx.me/code/riviera/feed/rdf"
 	"hawx.me/code/riviera/feed/rss"
 )
 
 const userAgent = "riviera golang"
 
-type ItemHandler func(f *Feed, ch *data.Channel, newitems []*data.Item)
+type ItemHandler func(f *Feed, ch *common.Channel, newitems []*common.Item)
 
 type Feed struct {
 	// Custom cache timeout.
@@ -46,7 +46,7 @@ type Feed struct {
 	format string
 
 	// Channels with content.
-	channels []*data.Channel
+	channels []*common.Channel
 
 	// Url from which this feed was created.
 	url string
@@ -132,13 +132,13 @@ func (f *Feed) load(r io.Reader, charset func(charset string, input io.Reader) (
 	return
 }
 
-var parsers = []data.Parser{
+var parsers = []common.Parser{
 	atom.Parser{},
 	rss.Parser{},
 	rdf.Parser{},
 }
 
-func Parse(r io.Reader, charset func(charset string, input io.Reader) (io.Reader, error)) (chs []*data.Channel, err error) {
+func Parse(r io.Reader, charset func(charset string, input io.Reader) (io.Reader, error)) (chs []*common.Channel, err error) {
 	data, _ := ioutil.ReadAll(r)
 	br := bytes.NewReader(data)
 
@@ -155,7 +155,7 @@ func Parse(r io.Reader, charset func(charset string, input io.Reader) (io.Reader
 
 func (f *Feed) notifyListeners() {
 	for _, channel := range f.channels {
-		var newitems []*data.Item
+		var newitems []*common.Item
 
 		for _, item := range channel.Items {
 			if !f.known.Contains(item.Key()) {

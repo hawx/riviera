@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"strings"
 
-	"hawx.me/code/riviera/feed/data"
+	"hawx.me/code/riviera/feed/common"
 )
 
 var days = map[string]int{
@@ -52,7 +52,7 @@ func (Parser) CanRead(r io.Reader, charset func(charset string, input io.Reader)
 	return false
 }
 
-func (Parser) Read(r io.Reader, charset func(charset string, input io.Reader) (io.Reader, error)) (foundChannels []*data.Channel, err error) {
+func (Parser) Read(r io.Reader, charset func(charset string, input io.Reader) (io.Reader, error)) (foundChannels []*common.Channel, err error) {
 	decoder := xml.NewDecoder(r)
 	decoder.CharsetReader = charset
 
@@ -61,7 +61,7 @@ func (Parser) Read(r io.Reader, charset func(charset string, input io.Reader) (i
 		return
 	}
 
-	ch := &data.Channel{
+	ch := &common.Channel{
 		Title:          feed.Channel.Title,
 		Description:    feed.Channel.Description,
 		Language:       feed.Channel.Language,
@@ -77,28 +77,28 @@ func (Parser) Read(r io.Reader, charset func(charset string, input io.Reader) (i
 
 	for _, link := range feed.Channel.Links {
 		if link.XMLName.Space == "http://www.w3.org/2005/Atom" {
-			ch.Links = append(ch.Links, data.Link{
+			ch.Links = append(ch.Links, common.Link{
 				Href:     link.Href,
 				Rel:      link.Rel,
 				Type:     link.Type,
 				HrefLang: link.HrefLang,
 			})
 		} else {
-			ch.Links = append(ch.Links, data.Link{
+			ch.Links = append(ch.Links, common.Link{
 				Href: link.Text,
 			})
 		}
 	}
 
 	for _, category := range feed.Channel.Category {
-		ch.Categories = append(ch.Categories, data.Category{
+		ch.Categories = append(ch.Categories, common.Category{
 			Domain: category.Domain,
 			Text:   category.Text,
 		})
 	}
 
 	if feed.Channel.Generator != nil {
-		ch.Generator = data.Generator{
+		ch.Generator = common.Generator{
 			Text: *feed.Channel.Generator,
 		}
 	}
@@ -116,7 +116,7 @@ func (Parser) Read(r io.Reader, charset func(charset string, input io.Reader) (i
 	}
 
 	if feed.Channel.Image != nil {
-		ch.Image = data.Image{
+		ch.Image = common.Image{
 			Title:       feed.Channel.Image.Title,
 			Url:         feed.Channel.Image.URL,
 			Link:        feed.Channel.Image.Link,
@@ -127,7 +127,7 @@ func (Parser) Read(r io.Reader, charset func(charset string, input io.Reader) (i
 	}
 
 	if feed.Channel.Cloud != nil {
-		ch.Cloud = data.Cloud{
+		ch.Cloud = common.Cloud{
 			Domain:            feed.Channel.Cloud.Domain,
 			Port:              feed.Channel.Cloud.Port,
 			Path:              feed.Channel.Cloud.Path,
@@ -137,7 +137,7 @@ func (Parser) Read(r io.Reader, charset func(charset string, input io.Reader) (i
 	}
 
 	for _, item := range feed.Channel.Items {
-		i := &data.Item{
+		i := &common.Item{
 			Title:       item.Title,
 			Description: strings.TrimSpace(item.Description),
 			Comments:    item.Comments,
@@ -146,14 +146,14 @@ func (Parser) Read(r io.Reader, charset func(charset string, input io.Reader) (i
 
 		for _, link := range item.Links {
 			if link.XMLName.Space == "http://www.w3.org/2005/Atom" {
-				i.Links = append(i.Links, data.Link{
+				i.Links = append(i.Links, common.Link{
 					Href:     link.Href,
 					Rel:      link.Rel,
 					Type:     link.Type,
 					HrefLang: link.HrefLang,
 				})
 			} else {
-				i.Links = append(i.Links, data.Link{
+				i.Links = append(i.Links, common.Link{
 					Href: link.Text,
 				})
 			}
@@ -166,21 +166,21 @@ func (Parser) Read(r io.Reader, charset func(charset string, input io.Reader) (i
 		}
 
 		if item.Guid != nil {
-			i.Guid = &data.Guid{
+			i.Guid = &common.Guid{
 				Guid:        item.Guid.Text,
 				IsPermaLink: item.Guid.IsPermaLink == "true",
 			}
 		}
 
 		for _, category := range item.Category {
-			i.Categories = append(i.Categories, data.Category{
+			i.Categories = append(i.Categories, common.Category{
 				Domain: category.Domain,
 				Text:   category.Text,
 			})
 		}
 
 		for _, enclosure := range item.Enclosure {
-			i.Enclosures = append(i.Enclosures, data.Enclosure{
+			i.Enclosures = append(i.Enclosures, common.Enclosure{
 				Url:    enclosure.URL,
 				Length: enclosure.Length,
 				Type:   enclosure.Type,
@@ -188,7 +188,7 @@ func (Parser) Read(r io.Reader, charset func(charset string, input io.Reader) (i
 		}
 
 		if item.Source != nil {
-			i.Source = &data.Source{
+			i.Source = &common.Source{
 				Url:  item.Source.URL,
 				Text: item.Source.Text,
 			}

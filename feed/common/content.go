@@ -1,4 +1,4 @@
-package data
+package common
 
 type Content struct {
 	Type string
