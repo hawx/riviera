@@ -117,6 +117,21 @@ func (f *Feed) Fetch(uri string, client *http.Client, charset func(charset strin
 	return resp.StatusCode, f.load(resp.Body, charset)
 }
 
+func (f *Feed) load(r io.Reader, charset func(charset string, input io.Reader) (io.Reader, error)) (err error) {
+	f.channels, err = Parse(r, charset)
+	if err != nil || len(f.channels) == 0 {
+		return
+	}
+
+	// reset cache timeout values according to feed specified values (TTL)
+	if f.cacheTimeout < time.Minute*time.Duration(f.channels[0].TTL) {
+		f.cacheTimeout = time.Minute * time.Duration(f.channels[0].TTL)
+	}
+
+	f.notifyListeners()
+	return
+}
+
 var parsers = []data.Parser{
 	atom.Parser{},
 	rss.Parser{},
@@ -136,21 +151,6 @@ func Parse(r io.Reader, charset func(charset string, input io.Reader) (io.Reader
 	}
 
 	return nil, errors.New("Unsupported feed")
-}
-
-func (f *Feed) load(r io.Reader, charset func(charset string, input io.Reader) (io.Reader, error)) (err error) {
-	f.channels, err = Parse(r, charset)
-	if err != nil || len(f.channels) == 0 {
-		return
-	}
-
-	// reset cache timeout values according to feed specified values (TTL)
-	if f.cacheTimeout < time.Minute*time.Duration(f.channels[0].TTL) {
-		f.cacheTimeout = time.Minute * time.Duration(f.channels[0].TTL)
-	}
-
-	f.notifyListeners()
-	return
 }
 
 func (f *Feed) notifyListeners() {
