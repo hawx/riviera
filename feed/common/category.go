@@ -1,4 +1,4 @@
-package feed
+package common
 
 type Category struct {
 	Domain string

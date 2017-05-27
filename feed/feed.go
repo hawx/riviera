@@ -1,40 +1,33 @@
-/*
- Package feed provides an RSS and Atom feed fetcher.
-
- They are parsed into an object tree which is a hybrid of both the RSS and Atom
- standards.
-
- Supported feeds are:
- 	- RSS v0.91, 0.91 and 2.0
- 	- Atom 1.0
-
- The package allows us to maintain cache timeout management. This prevents
- querying the servers for feed updates too often. Apart from setting a cache
- timeout manually, the package also optionally adheres to the TTL, SkipDays and
- SkipHours values specified in RSS feeds.
-
- Because the object structure is a hybrid between both RSS and Atom specs, not
- all fields will be filled when requesting either an RSS or Atom feed. As many
- shared fields as possible are used but some of them simply do not occur in
- either the RSS or Atom spec.
-*/
+// Package feed provides an RSS and Atom feed fetcher
+//
+// Feeds are parsed into a common/hybrid object tree. Because of this not all
+// fields will be filled when requesting either an RSS or Atom feed. As many
+// shared fields as possible are used but some of them simply do not occur in
+// either the RSS or Atom spec.
+//
+// The package allows us to maintain cache timeout management. This prevents
+// querying the servers for feed updates too often. Apart from setting a cache
+// timeout manually, the package also optionally adheres to the TTL, SkipDays
+// and SkipHours values specified in RSS feeds.
 package feed
 
 import (
+	"bytes"
 	"errors"
-	"fmt"
 	"io"
+	"io/ioutil"
 	"net/http"
-	"strconv"
-	"strings"
 	"time"
 
-	xmlx "github.com/jteeuwen/go-pkg-xmlx"
+	"hawx.me/code/riviera/feed/atom"
+	"hawx.me/code/riviera/feed/common"
+	"hawx.me/code/riviera/feed/rdf"
+	"hawx.me/code/riviera/feed/rss"
 )
 
 const userAgent = "riviera golang"
 
-type ItemHandler func(f *Feed, ch *Channel, newitems []*Item)
+type ItemHandler func(f *Feed, ch *common.Channel, newitems []*common.Item)
 
 type Feed struct {
 	// Custom cache timeout.
@@ -44,7 +37,7 @@ type Feed struct {
 	format string
 
 	// Channels with content.
-	channels []*Channel
+	channels []*common.Channel
 
 	// Url from which this feed was created.
 	url string
@@ -82,7 +75,7 @@ func New(cachetimeout time.Duration, ih ItemHandler, database Database) *Feed {
 //
 // The client parameter allows the use of arbitrary network connections, for
 // example the Google App Engine "URL Fetch" service.
-func (f *Feed) Fetch(uri string, client *http.Client, charset xmlx.CharsetFunc) (int, error) {
+func (f *Feed) Fetch(uri string, client *http.Client, charset func(charset string, input io.Reader) (io.Reader, error)) (int, error) {
 	if !f.CanUpdate() {
 		return -1, nil
 	}
@@ -115,23 +108,7 @@ func (f *Feed) Fetch(uri string, client *http.Client, charset xmlx.CharsetFunc) 
 	return resp.StatusCode, f.load(resp.Body, charset)
 }
 
-func Parse(r io.Reader, charset xmlx.CharsetFunc) (chs []*Channel, err error) {
-	doc := xmlx.New()
-
-	if err = doc.LoadStream(r, charset); err != nil {
-		return
-	}
-
-	format, version := GetVersionInfo(doc)
-	if ok := testVersions(format, version); !ok {
-		err = errors.New(fmt.Sprintf("Unsupported feed: %s, version: %+v", format, version))
-		return
-	}
-
-	return buildFeed(format, doc)
-}
-
-func (f *Feed) load(r io.Reader, charset xmlx.CharsetFunc) (err error) {
+func (f *Feed) load(r io.Reader, charset func(charset string, input io.Reader) (io.Reader, error)) (err error) {
 	f.channels, err = Parse(r, charset)
 	if err != nil || len(f.channels) == 0 {
 		return
@@ -146,9 +123,30 @@ func (f *Feed) load(r io.Reader, charset xmlx.CharsetFunc) (err error) {
 	return
 }
 
+var parsers = []common.Parser{
+	atom.Parser{},
+	rss.Parser{},
+	rdf.Parser{},
+}
+
+func Parse(r io.Reader, charset func(charset string, input io.Reader) (io.Reader, error)) (chs []*common.Channel, err error) {
+	data, _ := ioutil.ReadAll(r)
+	br := bytes.NewReader(data)
+
+	for _, parser := range parsers {
+		if parser.CanRead(br, charset) {
+			br.Seek(0, io.SeekStart)
+			return parser.Read(br, charset)
+		}
+		br.Seek(0, io.SeekStart)
+	}
+
+	return nil, errors.New("Unsupported feed")
+}
+
 func (f *Feed) notifyListeners() {
 	for _, channel := range f.channels {
-		var newitems []*Item
+		var newitems []*common.Item
 
 		for _, item := range channel.Items {
 			if !f.known.Contains(item.Key()) {
@@ -202,54 +200,4 @@ func (f *Feed) CanUpdate() bool {
 // before the feed should update.
 func (f *Feed) DurationTillUpdate() time.Duration {
 	return f.cacheTimeout - time.Now().UTC().Sub(f.lastupdate)
-}
-
-func buildFeed(format string, doc *xmlx.Document) ([]*Channel, error) {
-	switch format {
-	case "atom":
-		return readAtom(doc)
-	default:
-		return readRss2(doc)
-	}
-}
-
-func testVersions(format string, version [2]int) bool {
-	switch format {
-	case "rss":
-		if version[0] > 2 || (version[0] == 2 && version[1] > 0) {
-			return false
-		}
-
-	case "atom":
-		if version[0] > 1 || (version[0] == 1 && version[1] > 0) {
-			return false
-		}
-
-	default:
-		return false
-	}
-
-	return true
-}
-
-func GetVersionInfo(doc *xmlx.Document) (string, [2]int) {
-	if node := doc.SelectNode("http://www.w3.org/2005/Atom", "feed"); node != nil {
-		return "atom", [2]int{1, 0}
-	}
-
-	if node := doc.SelectNode("", "rss"); node != nil {
-		version := node.As("", "version")
-		p := strings.Index(version, ".")
-		major, _ := strconv.Atoi(version[0:p])
-		minor, _ := strconv.Atoi(version[p+1 : len(version)])
-
-		return "rss", [2]int{major, minor}
-	}
-
-	// issue#5: Some documents have an RDF root node instead of rss.
-	if node := doc.SelectNode("http://www.w3.org/1999/02/22-rdf-syntax-ns#", "RDF"); node != nil {
-		return "rss", [2]int{1, 1}
-	}
-
-	return "unknown", [2]int{0, 0}
 }

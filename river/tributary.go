@@ -8,6 +8,7 @@ import (
 
 	"golang.org/x/net/html/charset"
 	"hawx.me/code/riviera/feed"
+	"hawx.me/code/riviera/feed/common"
 	"hawx.me/code/riviera/river/internal/persistence"
 	"hawx.me/code/riviera/river/models"
 )
@@ -148,7 +149,7 @@ func maybeResolvedLink(root *url.URL, other string) string {
 	return other
 }
 
-func (t *tributary) itemHandler(feed *feed.Feed, ch *feed.Channel, newitems []*feed.Item) {
+func (t *tributary) itemHandler(feed *feed.Feed, ch *common.Channel, newitems []*common.Item) {
 	items := []models.Item{}
 	for _, item := range newitems {
 		converted := t.mapping(item)

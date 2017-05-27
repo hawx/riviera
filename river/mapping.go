@@ -7,19 +7,19 @@ import (
 	"time"
 
 	"github.com/kennygrant/sanitize"
-	"hawx.me/code/riviera/feed"
+	"hawx.me/code/riviera/feed/common"
 	"hawx.me/code/riviera/river/models"
 )
 
 // A Mapping takes an item from a feed and returns an item for the river, if nil
 // is returned the item will not be added to the river.
-type Mapping func(*feed.Item) *models.Item
+type Mapping func(*common.Item) *models.Item
 
 // DefaultMapping will always return an item. It: attempts to parse the PubDate,
 // otherwise uses the current time; truncates the description to 280 characters;
 // finds the correct Link and PermaLink; copies any Enclosures; and fills out
 // the other properties by copying the correct values.
-func DefaultMapping(item *feed.Item) *models.Item {
+func DefaultMapping(item *common.Item) *models.Item {
 	pubDate, err := item.ParsedPubDate()
 	if err != nil {
 		log.Println("DefaultMapping/time:", err)

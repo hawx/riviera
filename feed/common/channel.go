@@ -1,4 +1,4 @@
-package feed
+package common
 
 type Channel struct {
 	Categories     []Category

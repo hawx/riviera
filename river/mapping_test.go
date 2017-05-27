@@ -5,21 +5,21 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
-	"hawx.me/code/riviera/feed"
+	"hawx.me/code/riviera/feed/common"
 	"hawx.me/code/riviera/river/models"
 )
 
 func TestDefaultMapping(t *testing.T) {
 	testcases := []struct {
 		name       string
-		feedItem   *feed.Item
+		feedItem   *common.Item
 		modelsItem *models.Item
 	}{
 		{
 			"standard",
-			&feed.Item{
+			&common.Item{
 				Title: "cool feed thang",
-				Links: []feed.Link{
+				Links: []common.Link{
 					{Href: "http://example.com/now"},
 					{Href: "http://example.org/this", Rel: "alternate"},
 					{Href: "http://example.com/what"},
@@ -42,7 +42,7 @@ func TestDefaultMapping(t *testing.T) {
 		// Description
 		{
 			"description truncated",
-			&feed.Item{
+			&common.Item{
 				Title:       "cool feed thang",
 				Description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec a diam lectus. Sed sit amet ipsum mauris. Maecenas congue ligula ac quam viverra nec consectetur ante hendrerit. Donec et mollis dolor. Praesent et diam eget libero egestas mattis sit amet vitae augue. Nam tincidunt congue enim, ut porta lorem lacinia consectetur. Donec ut libero sed arcu vehicula ultricies a non tortor. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean ut gravida lorem. Ut turpis felis, pulvinar a semper sed, adipiscing id dolor. Pellentesque auctor nisi id magna consequat sagittis. Curabitur dapibus enim sit amet elit pharetra tincidunt feugiat nisl imperdiet. Ut convallis libero in urna ultrices accumsan. Donec sed odio eros. Donec viverra mi quis quam pulvinar at malesuada arcu rhoncus. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. In rutrum accumsan ultricies. Mauris vitae nisi at sem facilisis semper ac in est.",
 				PubDate:     "Mon, 02 Jan 2006 20:04:19 UTC",
@@ -57,7 +57,7 @@ func TestDefaultMapping(t *testing.T) {
 		},
 		{
 			"description unescaped",
-			&feed.Item{
+			&common.Item{
 				Description: "&apos;",
 				PubDate:     "Mon, 02 Jan 2006 20:04:19 UTC",
 				Id:          "5",
@@ -73,7 +73,7 @@ func TestDefaultMapping(t *testing.T) {
 		// Title
 		{
 			"title unescaped",
-			&feed.Item{
+			&common.Item{
 				Title:   "&#8220;The purpose of the IoT is to give humans superpowers&#8221;",
 				PubDate: "Mon, 02 Jan 2006 20:04:19 UTC",
 				Id:      "5",
@@ -89,7 +89,7 @@ func TestDefaultMapping(t *testing.T) {
 		// Pubdate
 		{
 			"pubdate",
-			&feed.Item{
+			&common.Item{
 				PubDate: "Mon, 02 Jan 2006 20:04:19 UTC",
 				Id:      "-",
 			},
@@ -101,7 +101,7 @@ func TestDefaultMapping(t *testing.T) {
 		},
 		{
 			"pubdate in other format", // am I going to do all of these?
-			&feed.Item{
+			&common.Item{
 				PubDate: "2006-01-02T20:04:19+00:00",
 				Id:      "-",
 			},
@@ -115,7 +115,7 @@ func TestDefaultMapping(t *testing.T) {
 		// Id
 		{
 			"id from id",
-			&feed.Item{
+			&common.Item{
 				PubDate: "Mon, 02 Jan 2006 20:04:19 UTC",
 				Id:      "5",
 			},
@@ -127,9 +127,9 @@ func TestDefaultMapping(t *testing.T) {
 		},
 		{
 			"id from guid",
-			&feed.Item{
+			&common.Item{
 				PubDate: "Mon, 02 Jan 2006 20:04:19 UTC",
-				Guid:    &feed.Guid{Guid: "200823-4545345-435543-45"},
+				Guid:    &common.Guid{Guid: "200823-4545345-435543-45"},
 			},
 			&models.Item{
 				PubDate:    models.RssTime{time.Date(2006, 1, 2, 20, 4, 19, 0, time.UTC)},
@@ -139,7 +139,7 @@ func TestDefaultMapping(t *testing.T) {
 		},
 		{
 			"id from title and pubdate",
-			&feed.Item{
+			&common.Item{
 				PubDate: "Mon, 02 Jan 2006 20:04:19 UTC",
 				Title:   "hey",
 			},
@@ -154,9 +154,9 @@ func TestDefaultMapping(t *testing.T) {
 		// PermaLink and Link
 		{
 			"links from guid",
-			&feed.Item{
+			&common.Item{
 				PubDate: "Mon, 02 Jan 2006 20:04:19 UTC",
-				Guid:    &feed.Guid{Guid: "5", IsPermaLink: true},
+				Guid:    &common.Guid{Guid: "5", IsPermaLink: true},
 			},
 			&models.Item{
 				Link:       "5",
@@ -168,10 +168,10 @@ func TestDefaultMapping(t *testing.T) {
 		},
 		{
 			"links from (first) links",
-			&feed.Item{
+			&common.Item{
 				PubDate: "Mon, 02 Jan 2006 20:04:19 UTC",
-				Guid:    &feed.Guid{Guid: "5", IsPermaLink: true},
-				Links: []feed.Link{
+				Guid:    &common.Guid{Guid: "5", IsPermaLink: true},
+				Links: []common.Link{
 					{Href: "cool"},
 					{Href: "ignored"},
 				},
@@ -186,10 +186,10 @@ func TestDefaultMapping(t *testing.T) {
 		},
 		{
 			"links from alternate links",
-			&feed.Item{
+			&common.Item{
 				PubDate: "Mon, 02 Jan 2006 20:04:19 UTC",
-				Guid:    &feed.Guid{Guid: "5", IsPermaLink: true},
-				Links: []feed.Link{
+				Guid:    &common.Guid{Guid: "5", IsPermaLink: true},
+				Links: []common.Link{
 					{Href: "cool"},
 					{Href: "alt", Rel: "alternate"},
 				},
@@ -206,10 +206,10 @@ func TestDefaultMapping(t *testing.T) {
 		// Enclosure
 		{
 			"enclosure",
-			&feed.Item{
+			&common.Item{
 				PubDate: "Mon, 02 Jan 2006 20:04:19 UTC",
 				Id:      "5",
-				Links: []feed.Link{
+				Links: []common.Link{
 					{Href: "what"},
 					{Href: "thing", Type: "media/what", Rel: "enclosure"},
 					{Href: "otherthing", Type: "media/what", Rel: "enclosure"},

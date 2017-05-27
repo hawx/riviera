@@ -1,4 +1,4 @@
-package feed
+package common
 
 import (
 	"crypto/md5"

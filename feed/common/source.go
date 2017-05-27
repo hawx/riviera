@@ -1,4 +1,4 @@
-package feed
+package common
 
 type Source struct {
 	Url  string

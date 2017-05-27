@@ -1,0 +1,294 @@
+<?xml version="1.0" encoding="UTF-8" ?><rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:sy="http://purl.org/rss/1.0/modules/syndication/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:cc="http://web.resource.org/cc/" xmlns:steam="http://www.steampowered.com" xmlns="http://purl.org/rss/1.0/">
+	<channel rdf:about="http://www.steampowered.com">
+		<title>Steam RSS News Feed</title> 
+		<link>http://www.steampowered.com/</link> 
+		<description>All Steam news, all the time!</description> 
+		<language>en</language> 
+				<pubDate>Thu, 25 May 2017 10:15:00 -0700</pubDate>
+		<generator>http://www.steampowered.com/</generator> 
+		<items>
+			<rdf:Seq>
+							<rdf:li rdf:resource="http://store.steampowered.com/news/29654/" />
+							<rdf:li rdf:resource="http://store.steampowered.com/news/29643/" />
+							<rdf:li rdf:resource="http://store.steampowered.com/news/29615/" />
+							<rdf:li rdf:resource="http://store.steampowered.com/news/29646/" />
+							<rdf:li rdf:resource="http://store.steampowered.com/news/29652/" />
+							<rdf:li rdf:resource="http://store.steampowered.com/news/29647/" />
+							<rdf:li rdf:resource="http://store.steampowered.com/news/29638/" />
+							<rdf:li rdf:resource="http://store.steampowered.com/news/29627/" />
+							<rdf:li rdf:resource="http://store.steampowered.com/news/29634/" />
+							<rdf:li rdf:resource="http://store.steampowered.com/news/29630/" />
+							<rdf:li rdf:resource="http://store.steampowered.com/news/29572/" />
+							<rdf:li rdf:resource="http://store.steampowered.com/news/29621/" />
+							<rdf:li rdf:resource="http://store.steampowered.com/news/29482/" />
+							<rdf:li rdf:resource="http://store.steampowered.com/news/29607/" />
+							<rdf:li rdf:resource="http://store.steampowered.com/news/29605/" />
+							<rdf:li rdf:resource="http://store.steampowered.com/news/29571/" />
+							<rdf:li rdf:resource="http://store.steampowered.com/news/29609/" />
+							<rdf:li rdf:resource="http://store.steampowered.com/news/29606/" />
+							<rdf:li rdf:resource="http://store.steampowered.com/news/29588/" />
+							<rdf:li rdf:resource="http://store.steampowered.com/news/29570/" />
+						</rdf:Seq>
+		</items>
+	</channel>
+					<item rdf:about="http://store.steampowered.com/news/29654/">
+			<title><![CDATA[Free Weekend - Fallout 4 - 67% Off]]></title>
+			<link><![CDATA[http://store.steampowered.com/news/29654/]]></link>
+			<guid isPermaLink="true"><![CDATA[http://store.steampowered.com/news/29654/]]></guid>
+			<comments>http://steamcommunity.com//discussions/</comments>
+			<pubDate>Thu, 25 May 2017 10:15:00 -0700</pubDate>
+			<author>Valve</author>
+			<category>Valve news update</category>
+			<dc:subject>Valve news update</dc:subject>
+			<dc:creator>Valve</dc:creator>
+			<dc:date>2017-05-25T10:15:00-0700</dc:date>
+						<content:encoded><![CDATA[Play <a href='http://store.steampowered.com/app/377160/'>Fallout 4</a> for FREE starting now through Sunday at 1PM Pacific Time. You can also pickup <a href='http://store.steampowered.com/app/377160/'>Fallout 4</a> at 67% off the regular price!*<br><br>If you already have Steam installed, <a href='steam://run/377160'>click here</a> to install or play Fallout 4.  If you don't have Steam, you can download it <a href='http://store.steampowered.com/about/'>here</a>.<br><br>*Offer ends Monday at 10AM Pacific Time<br><a href="http://store.steampowered.com/app/377160/"><img src="https://steamcdn-a.akamaihd.net/steam/apps/377160/capsule_467x181.jpg" style=" float: left; margin-right: 12px; height: 181px; width: 467px;"></a>]]></content:encoded>
+					</item>
+					<item rdf:about="http://store.steampowered.com/news/29643/">
+			<title><![CDATA[Weekend Deal - Don't Starve, 75% Off]]></title>
+			<link><![CDATA[http://store.steampowered.com/news/29643/]]></link>
+			<guid isPermaLink="true"><![CDATA[http://store.steampowered.com/news/29643/]]></guid>
+			<comments>http://steamcommunity.com//discussions/</comments>
+			<pubDate>Thu, 25 May 2017 10:05:00 -0700</pubDate>
+			<author>Valve</author>
+			<category>Valve news update</category>
+			<dc:subject>Valve news update</dc:subject>
+			<dc:creator>Valve</dc:creator>
+			<dc:date>2017-05-25T10:05:00-0700</dc:date>
+						<content:encoded><![CDATA[Save up to 75% on the <a href='http://store.steampowered.com/sale/dontstarve/'>Don't Starve series</a> as part of this week's Weekend Deal*!<br><br>*Offer ends Monday at 10AM Pacific Time<br><br><a href="http://store.steampowered.com/app/219740/"><img src="https://steamcdn-a.akamaihd.net/steam/apps/219740/capsule_467x181.jpg" style=" float: left; margin-right: 12px; height: 181px; width: 467px;"></a><br><br><a href="http://store.steampowered.com/app/322330/"><img src="https://steamcdn-a.akamaihd.net/steam/apps/322330/capsule_467x181.jpg" style=" float: left; margin-right: 12px; height: 181px; width: 467px;"></a>]]></content:encoded>
+					</item>
+					<item rdf:about="http://store.steampowered.com/news/29615/">
+			<title><![CDATA[Daily Deal - Glittermitten Grove, 40% Off]]></title>
+			<link><![CDATA[http://store.steampowered.com/news/29615/]]></link>
+			<guid isPermaLink="true"><![CDATA[http://store.steampowered.com/news/29615/]]></guid>
+			<comments>http://steamcommunity.com//discussions/</comments>
+			<pubDate>Thu, 25 May 2017 10:00:00 -0700</pubDate>
+			<author>Valve</author>
+			<category>Valve news update</category>
+			<dc:subject>Valve news update</dc:subject>
+			<dc:creator>Valve</dc:creator>
+			<dc:date>2017-05-25T10:00:00-0700</dc:date>
+						<content:encoded><![CDATA[Today's Deal: Save 40% on <a href='http://store.steampowered.com/app/536890/'>Glittermitten Grove</a>!*<br><br>Look for the deals each day on the front page of Steam.  Or follow us on <a href='http://twitter.com/steam_games'>twitter</a> or <a href='http://www.facebook.com/Steam'>Facebook</a> for instant notifications wherever you are!<br><br>*Offer ends Saturday at 10AM Pacific Time<br><a href="http://store.steampowered.com/app/536890/"><img src="https://steamcdn-a.akamaihd.net/steam/apps/536890/capsule_467x181.jpg" style=" float: left; margin-right: 12px; height: 181px; width: 467px;"></a>]]></content:encoded>
+					</item>
+					<item rdf:about="http://store.steampowered.com/news/29646/">
+			<title><![CDATA[Now Available on Steam - SUPERHOT VR, 20% off!]]></title>
+			<link><![CDATA[http://store.steampowered.com/news/29646/]]></link>
+			<guid isPermaLink="true"><![CDATA[http://store.steampowered.com/news/29646/]]></guid>
+			<comments>http://steamcommunity.com//discussions/</comments>
+			<pubDate>Thu, 25 May 2017 09:14:00 -0700</pubDate>
+			<author>Valve</author>
+			<category>Valve news update</category>
+			<dc:subject>Valve news update</dc:subject>
+			<dc:creator>Valve</dc:creator>
+			<dc:date>2017-05-25T09:14:00-0700</dc:date>
+						<content:encoded><![CDATA[<a href='http://store.steampowered.com/app/617830/'>SUPERHOT VR</a> is Now Available on Steam and is 20% off!*<br><br>Lose track of whatâ€&trade;s real. Commit yourself, body and mind. Confront the evocative, elegantly brutal world of SUPERHOT VR. Enemies pouring into the room from all sides, a dozen bullets coursing through the air.... wait.<br /><br><br /><br>Something is different here....<br><br>*Offer ends June 1 at 10AM Pacific Time<br><a href="http://store.steampowered.com/app/617830/"><img src="https://steamcdn-a.akamaihd.net/steam/apps/617830/capsule_467x181.jpg" style=" float: left; margin-right: 12px; height: 181px; width: 467px;"></a>]]></content:encoded>
+					</item>
+					<item rdf:about="http://store.steampowered.com/news/29652/">
+			<title><![CDATA[Now Available on Steam - Vanquish]]></title>
+			<link><![CDATA[http://store.steampowered.com/news/29652/]]></link>
+			<guid isPermaLink="true"><![CDATA[http://store.steampowered.com/news/29652/]]></guid>
+			<comments>http://steamcommunity.com//discussions/</comments>
+			<pubDate>Thu, 25 May 2017 08:09:00 -0700</pubDate>
+			<author>Valve</author>
+			<category>Valve news update</category>
+			<dc:subject>Valve news update</dc:subject>
+			<dc:creator>Valve</dc:creator>
+			<dc:date>2017-05-25T08:09:00-0700</dc:date>
+						<content:encoded><![CDATA[<a href='http://store.steampowered.com/app/460810/'>Vanquish</a> is Now Available on Steam!<br><br>PlatinumGamesâ€&trade; revolutionary sci-fi action shooter slide-boosts onto PC. Battle legions of future-tech enemies using a vast arsenal of weapons, including all DLC. Fully unlocked framerate and gorgeous HD resolutions up to 4K. The definitive way to play: war has accelerated.<br><br><a href="http://store.steampowered.com/app/460810/"><img src="https://steamcdn-a.akamaihd.net/steam/apps/460810/capsule_467x181.jpg" style=" float: left; margin-right: 12px; height: 181px; width: 467px;"></a>]]></content:encoded>
+					</item>
+					<item rdf:about="http://store.steampowered.com/news/29647/">
+			<title><![CDATA[Now Available on Steam Early Access - Planet Nomads, 10% off!]]></title>
+			<link><![CDATA[http://store.steampowered.com/news/29647/]]></link>
+			<guid isPermaLink="true"><![CDATA[http://store.steampowered.com/news/29647/]]></guid>
+			<comments>http://steamcommunity.com//discussions/</comments>
+			<pubDate>Thu, 25 May 2017 07:01:20 -0700</pubDate>
+			<author>Valve</author>
+			<category>Valve news update</category>
+			<dc:subject>Valve news update</dc:subject>
+			<dc:creator>Valve</dc:creator>
+			<dc:date>2017-05-25T07:01:20-0700</dc:date>
+						<content:encoded><![CDATA[<a href='http://store.steampowered.com/app/504050/'>Planet Nomads</a> is Now Available on Steam Early Access and is 10% off!*<br><br>A sci-fi sandbox game of constructing your own planetary fate. Become a scientist astronaut determined to beat the odds and build great things. The particle-manipulating multitool and enviro-protec suit are your best friends on this journey.<br><br>*Offer ends June 1 at 10AM Pacific Time<br><a href="http://store.steampowered.com/app/504050/"><img src="https://steamcdn-a.akamaihd.net/steam/apps/504050/capsule_467x181.jpg" style=" float: left; margin-right: 12px; height: 181px; width: 467px;"></a>]]></content:encoded>
+					</item>
+					<item rdf:about="http://store.steampowered.com/news/29638/">
+			<title><![CDATA[Dota 2 Update - May 24th, 2017]]></title>
+			<link><![CDATA[http://store.steampowered.com/news/29638/]]></link>
+			<guid isPermaLink="true"><![CDATA[http://store.steampowered.com/news/29638/]]></guid>
+			<comments>http://steamcommunity.com//discussions/</comments>
+			<pubDate>Wed, 24 May 2017 15:35:00 -0700</pubDate>
+			<author>Valve</author>
+			<category>Valve news update</category>
+			<dc:subject>Valve news update</dc:subject>
+			<dc:creator>Valve</dc:creator>
+			<dc:date>2017-05-24T15:35:00-0700</dc:date>
+						<content:encoded><![CDATA[* Updated cursor images to better support high resolution displays.<br>* Improved the accuracy of the preview of wards blocking spawn boxes.<br>* Fixed the caption on Io's first talent.<br>* Fixed the interaction of Rubick's Spell Steal and Io's Spirits.<br>* Fixed a bug with Monkey King's Primal Spring and Ironwood Branches.]]></content:encoded>
+					</item>
+					<item rdf:about="http://store.steampowered.com/news/29627/">
+			<title><![CDATA[Now Available on Steam - Black Desert Online, 40% off!]]></title>
+			<link><![CDATA[http://store.steampowered.com/news/29627/]]></link>
+			<guid isPermaLink="true"><![CDATA[http://store.steampowered.com/news/29627/]]></guid>
+			<comments>http://steamcommunity.com//discussions/</comments>
+			<pubDate>Wed, 24 May 2017 12:20:00 -0700</pubDate>
+			<author>Valve</author>
+			<category>Valve news update</category>
+			<dc:subject>Valve news update</dc:subject>
+			<dc:creator>Valve</dc:creator>
+			<dc:date>2017-05-24T12:20:00-0700</dc:date>
+						<content:encoded><![CDATA[<a href='http://store.steampowered.com/app/582660/'>Black Desert Online</a> is Now Available on Steam and is 40% off!*<br><br>Black Desert Online is a sandbox, living-world MMORPG. Experience fast-paced, action-packed combat, hunt monsters and huge bosses, fight with friends in a guild to siege nodes and region castles, train your life skills such as fishing, trading, crafting, cooking, and much more!<br><br>*Offer ends May 31 at 10AM Pacific Time<br><a href="http://store.steampowered.com/app/582660/"><img src="https://steamcdn-a.akamaihd.net/steam/apps/582660/capsule_467x181.jpg" style=" float: left; margin-right: 12px; height: 181px; width: 467px;"></a>]]></content:encoded>
+					</item>
+					<item rdf:about="http://store.steampowered.com/news/29634/">
+			<title><![CDATA[Now Free to Play on Steam - Awesomenauts]]></title>
+			<link><![CDATA[http://store.steampowered.com/news/29634/]]></link>
+			<guid isPermaLink="true"><![CDATA[http://store.steampowered.com/news/29634/]]></guid>
+			<comments>http://steamcommunity.com//discussions/</comments>
+			<pubDate>Wed, 24 May 2017 11:57:00 -0700</pubDate>
+			<author>Valve</author>
+			<category>Valve news update</category>
+			<dc:subject>Valve news update</dc:subject>
+			<dc:creator>Valve</dc:creator>
+			<dc:date>2017-05-24T11:57:00-0700</dc:date>
+						<content:encoded><![CDATA[<a href='http://store.steampowered.com/app/204300/'>Awesomenauts</a> is Now Free to Play on Steam!<br><br>Conflict spans the stars as huge robot armies are locked in an enduring battle.  Head out to the battlefields with your friends in this 3-on-3 action platformer. Best of all: it's completely free to play!<br><br><a href="http://store.steampowered.com/app/204300/"><img src="https://steamcdn-a.akamaihd.net/steam/apps/204300/capsule_467x181.jpg" style=" float: left; margin-right: 12px; height: 181px; width: 467px;"></a>]]></content:encoded>
+					</item>
+					<item rdf:about="http://store.steampowered.com/news/29630/">
+			<title><![CDATA[Now Available on Steam - Cosmic Trip, 15% off!]]></title>
+			<link><![CDATA[http://store.steampowered.com/news/29630/]]></link>
+			<guid isPermaLink="true"><![CDATA[http://store.steampowered.com/news/29630/]]></guid>
+			<comments>http://steamcommunity.com//discussions/</comments>
+			<pubDate>Wed, 24 May 2017 10:01:31 -0700</pubDate>
+			<author>Valve</author>
+			<category>Valve news update</category>
+			<dc:subject>Valve news update</dc:subject>
+			<dc:creator>Valve</dc:creator>
+			<dc:date>2017-05-24T10:01:31-0700</dc:date>
+						<content:encoded><![CDATA[<a href='http://store.steampowered.com/app/427240/'>Cosmic Trip</a> is Now Available on Steam and is 15% off!*<br><br>Built exclusively for VR, Cosmic Trip is an award-winning real-time strategy game for the HTC Vive and Oculus Rift. Experience what itâ€&trade;s like to command an army of badass robots and fight against hostile enemies on beautiful alien planets.<br><br>*Offer ends May 31 at 10AM Pacific Time<br><a href="http://store.steampowered.com/app/427240/"><img src="https://steamcdn-a.akamaihd.net/steam/apps/427240/capsule_467x181.jpg" style=" float: left; margin-right: 12px; height: 181px; width: 467px;"></a>]]></content:encoded>
+					</item>
+					<item rdf:about="http://store.steampowered.com/news/29572/">
+			<title><![CDATA[Daily Deal - Risk of Rain, 75% Off]]></title>
+			<link><![CDATA[http://store.steampowered.com/news/29572/]]></link>
+			<guid isPermaLink="true"><![CDATA[http://store.steampowered.com/news/29572/]]></guid>
+			<comments>http://steamcommunity.com//discussions/</comments>
+			<pubDate>Wed, 24 May 2017 10:00:00 -0700</pubDate>
+			<author>Valve</author>
+			<category>Valve news update</category>
+			<dc:subject>Valve news update</dc:subject>
+			<dc:creator>Valve</dc:creator>
+			<dc:date>2017-05-24T10:00:00-0700</dc:date>
+						<content:encoded><![CDATA[Today's Deal: Save 75% on <a href='http://store.steampowered.com/app/248820/'>Risk of Rain</a>!*<br><br>Look for the deals each day on the front page of Steam.  Or follow us on <a href='http://twitter.com/steam_games'>twitter</a> or <a href='http://www.facebook.com/Steam'>Facebook</a> for instant notifications wherever you are!<br><br>*Offer ends Friday at 10AM Pacific Time<br><a href="http://store.steampowered.com/app/248820/"><img src="https://steamcdn-a.akamaihd.net/steam/apps/248820/capsule_467x181.jpg" style=" float: left; margin-right: 12px; height: 181px; width: 467px;"></a>]]></content:encoded>
+					</item>
+					<item rdf:about="http://store.steampowered.com/news/29621/">
+			<title><![CDATA[Now Available on Steam - Dead Realm]]></title>
+			<link><![CDATA[http://store.steampowered.com/news/29621/]]></link>
+			<guid isPermaLink="true"><![CDATA[http://store.steampowered.com/news/29621/]]></guid>
+			<comments>http://steamcommunity.com//discussions/</comments>
+			<pubDate>Tue, 23 May 2017 16:59:52 -0700</pubDate>
+			<author>Valve</author>
+			<category>Valve news update</category>
+			<dc:subject>Valve news update</dc:subject>
+			<dc:creator>Valve</dc:creator>
+			<dc:date>2017-05-23T16:59:52-0700</dc:date>
+						<content:encoded><![CDATA[<a href='http://store.steampowered.com/app/352460/'>Dead Realm</a> is Now Available on Steam!<br><br>Ghosts prey on the living inside the haunted mansion of a long dead electricity tycoon. Dead Realm is a creepy, multiplayer action game with beautiful, immersive environments. You can play as either a Ghost or a Human character and work with your friends to run, hide, surviveâ€¦ or die.<br><a href="http://store.steampowered.com/app/352460/"><img src="https://steamcdn-a.akamaihd.net/steam/apps/352460/capsule_467x181.jpg" style=" float: left; margin-right: 12px; height: 181px; width: 467px;"></a>]]></content:encoded>
+					</item>
+					<item rdf:about="http://store.steampowered.com/news/29482/">
+			<title><![CDATA[Midweek Madness - Hacknet, 66% Off]]></title>
+			<link><![CDATA[http://store.steampowered.com/news/29482/]]></link>
+			<guid isPermaLink="true"><![CDATA[http://store.steampowered.com/news/29482/]]></guid>
+			<comments>http://steamcommunity.com//discussions/</comments>
+			<pubDate>Tue, 23 May 2017 10:10:00 -0700</pubDate>
+			<author>Valve</author>
+			<category>Valve news update</category>
+			<dc:subject>Valve news update</dc:subject>
+			<dc:creator>Valve</dc:creator>
+			<dc:date>2017-05-23T10:10:00-0700</dc:date>
+						<content:encoded><![CDATA[Save 66% on <a href='http://store.steampowered.com/app/365450/'>Hacknet</a> during this week's Midweek Madness*!<br><br>*Offer ends Friday at 10AM Pacific Time<br><a href="http://store.steampowered.com/app/365450/"><img src="https://steamcdn-a.akamaihd.net/steam/apps/365450/capsule_467x181.jpg" style=" float: left; margin-right: 12px; height: 181px; width: 467px;"></a>]]></content:encoded>
+					</item>
+					<item rdf:about="http://store.steampowered.com/news/29607/">
+			<title><![CDATA[Midweek Madness - Shadow Tactics: Blades of the Shogun, 33% Off]]></title>
+			<link><![CDATA[http://store.steampowered.com/news/29607/]]></link>
+			<guid isPermaLink="true"><![CDATA[http://store.steampowered.com/news/29607/]]></guid>
+			<comments>http://steamcommunity.com//discussions/</comments>
+			<pubDate>Tue, 23 May 2017 10:05:00 -0700</pubDate>
+			<author>Valve</author>
+			<category>Valve news update</category>
+			<dc:subject>Valve news update</dc:subject>
+			<dc:creator>Valve</dc:creator>
+			<dc:date>2017-05-23T10:05:00-0700</dc:date>
+						<content:encoded><![CDATA[Save 33% on <a href='http://store.steampowered.com/app/418240/'>Shadow Tactics: Blades of the Shogun</a> during this week's Midweek Madness*!<br><br>Shadow Tactics is a hardcore tactical stealth game set in Japan around the Edo period.<br><br>Take control of a team of deadly specialists and sneak in the shadows between dozens of enemies. Choose your approach when infiltrating mighty castles, snowy mountain monasteries or hidden forest camps. Set traps, poison your opponents or completely avoid enemy contact.<br><br>*Offer ends Friday at 10AM Pacific Time<br><br><a href="http://store.steampowered.com/app/418240/"><img src="https://steamcdn-a.akamaihd.net/steam/apps/418240/capsule_467x181.jpg" style=" float: left; margin-right: 12px; height: 181px; width: 467px;"></a>]]></content:encoded>
+					</item>
+					<item rdf:about="http://store.steampowered.com/news/29605/">
+			<title><![CDATA[Grand Theft Auto V - On Sale Now, 40% off]]></title>
+			<link><![CDATA[http://store.steampowered.com/news/29605/]]></link>
+			<guid isPermaLink="true"><![CDATA[http://store.steampowered.com/news/29605/]]></guid>
+			<comments>http://steamcommunity.com//discussions/</comments>
+			<pubDate>Tue, 23 May 2017 10:05:00 -0700</pubDate>
+			<author>Valve</author>
+			<category>Valve news update</category>
+			<dc:subject>Valve news update</dc:subject>
+			<dc:creator>Valve</dc:creator>
+			<dc:date>2017-05-23T10:05:00-0700</dc:date>
+						<content:encoded><![CDATA[<a href='http://store.steampowered.com/app/271590/'>Grand Theft Auto V</a> is on sale now!*<br><br>*Offer ends Tuesday, May 30th at 10AM Pacific Time<br><br><a href="http://store.steampowered.com/app/271590/"><img src="https://steamcdn-a.akamaihd.net/steam/apps/271590/capsule_467x181.jpg" style=" float: left; margin-right: 12px; height: 181px; width: 467px;"></a>]]></content:encoded>
+					</item>
+					<item rdf:about="http://store.steampowered.com/news/29571/">
+			<title><![CDATA[Daily Deal - Overcooked, 50% Off]]></title>
+			<link><![CDATA[http://store.steampowered.com/news/29571/]]></link>
+			<guid isPermaLink="true"><![CDATA[http://store.steampowered.com/news/29571/]]></guid>
+			<comments>http://steamcommunity.com//discussions/</comments>
+			<pubDate>Tue, 23 May 2017 10:00:00 -0700</pubDate>
+			<author>Valve</author>
+			<category>Valve news update</category>
+			<dc:subject>Valve news update</dc:subject>
+			<dc:creator>Valve</dc:creator>
+			<dc:date>2017-05-23T10:00:00-0700</dc:date>
+						<content:encoded><![CDATA[Today's Deal: Save 50% on <a href='http://store.steampowered.com/app/448510/'>Overcooked</a>!*<br><br>Look for the deals each day on the front page of Steam.  Or follow us on <a href='http://twitter.com/steam_games'>twitter</a> or <a href='http://www.facebook.com/Steam'>Facebook</a> for instant notifications wherever you are!<br><br>*Offer ends Thursday at 10AM Pacific Time<br><a href="http://store.steampowered.com/app/448510/"><img src="https://steamcdn-a.akamaihd.net/steam/apps/448510/capsule_467x181.jpg" style=" float: left; margin-right: 12px; height: 181px; width: 467px;"></a>]]></content:encoded>
+					</item>
+					<item rdf:about="http://store.steampowered.com/news/29609/">
+			<title><![CDATA[Now Available on Steam - Steel Division: Normandy 44]]></title>
+			<link><![CDATA[http://store.steampowered.com/news/29609/]]></link>
+			<guid isPermaLink="true"><![CDATA[http://store.steampowered.com/news/29609/]]></guid>
+			<comments>http://steamcommunity.com//discussions/</comments>
+			<pubDate>Tue, 23 May 2017 09:59:38 -0700</pubDate>
+			<author>Valve</author>
+			<category>Valve news update</category>
+			<dc:subject>Valve news update</dc:subject>
+			<dc:creator>Valve</dc:creator>
+			<dc:date>2017-05-23T09:59:38-0700</dc:date>
+						<content:encoded><![CDATA[<a href='http://store.steampowered.com/app/572410/'>Steel Division: Normandy 44</a> is Now Available on Steam!<br><br><strong>Steel Division: Normandy</strong> is a tactical real-time strategy (RTS) game that pits players against AI enemies in a single-player campaign -- or against several opponents in massive 10-on-10 multiplayer battles.<br><a href="http://store.steampowered.com/app/572410/"><img src="https://steamcdn-a.akamaihd.net/steam/apps/572410/capsule_467x181.jpg" style=" float: left; margin-right: 12px; height: 181px; width: 467px;"></a>]]></content:encoded>
+					</item>
+					<item rdf:about="http://store.steampowered.com/news/29606/">
+			<title><![CDATA[Now Available on Steam - Killers and Thieves, 10% off!]]></title>
+			<link><![CDATA[http://store.steampowered.com/news/29606/]]></link>
+			<guid isPermaLink="true"><![CDATA[http://store.steampowered.com/news/29606/]]></guid>
+			<comments>http://steamcommunity.com//discussions/</comments>
+			<pubDate>Tue, 23 May 2017 09:19:21 -0700</pubDate>
+			<author>Valve</author>
+			<category>Valve news update</category>
+			<dc:subject>Valve news update</dc:subject>
+			<dc:creator>Valve</dc:creator>
+			<dc:date>2017-05-23T09:19:21-0700</dc:date>
+						<content:encoded><![CDATA[<a href='http://store.steampowered.com/app/382330/'>Killers and Thieves</a> is Now Available on Steam and is 10% off!*<br><br>Become the leader of a medieval thieve's guild in Killers and Thieves from the co-creator of the Banner Saga series. Train a team, steal loot and master heists throughout a sprawling city to take your revenge.<br><br>*Offer ends May 30 at 10AM Pacific Time<br><a href="http://store.steampowered.com/app/382330/"><img src="https://steamcdn-a.akamaihd.net/steam/apps/382330/capsule_467x181.jpg" style=" float: left; margin-right: 12px; height: 181px; width: 467px;"></a>]]></content:encoded>
+					</item>
+					<item rdf:about="http://store.steampowered.com/news/29588/">
+			<title><![CDATA[Giveaway - Starpoint Gemini 2]]></title>
+			<link><![CDATA[http://store.steampowered.com/news/29588/]]></link>
+			<guid isPermaLink="true"><![CDATA[http://store.steampowered.com/news/29588/]]></guid>
+			<comments>http://steamcommunity.com//discussions/</comments>
+			<pubDate>Mon, 22 May 2017 10:19:00 -0700</pubDate>
+			<author>Valve</author>
+			<category>Valve news update</category>
+			<dc:subject>Valve news update</dc:subject>
+			<dc:creator>Valve</dc:creator>
+			<dc:date>2017-05-22T10:19:00-0700</dc:date>
+						<content:encoded><![CDATA[Get <a href="http://store.steampowered.com/app/236150/">Starpoint Gemini 2</a> for FREE starting now until May 24th at 10AM Pacific Time! Once you add the game it will remain in your account after the free period, so don't miss out! <br><br>Captain your own space ship and roam the galaxy in 3D in this tactical space simulator with tons of RPG depth ! Space has never looked so inviting - but images can betray...It has been two years since the end of the second Gemini war, the situation in the wartorn system is further from resolution than ever.<br><br><a href="http://store.steampowered.com/app/236150/"><img src="https://steamcdn-a.akamaihd.net/steam/apps/236150/header.jpg" style=" float: left; margin-right: 12px; height: 215px; width: 460px;"></a>]]></content:encoded>
+					</item>
+					<item rdf:about="http://store.steampowered.com/news/29570/">
+			<title><![CDATA[Daily Deal - Satellite Reign, 85% Off]]></title>
+			<link><![CDATA[http://store.steampowered.com/news/29570/]]></link>
+			<guid isPermaLink="true"><![CDATA[http://store.steampowered.com/news/29570/]]></guid>
+			<comments>http://steamcommunity.com//discussions/</comments>
+			<pubDate>Mon, 22 May 2017 10:00:00 -0700</pubDate>
+			<author>Valve</author>
+			<category>Valve news update</category>
+			<dc:subject>Valve news update</dc:subject>
+			<dc:creator>Valve</dc:creator>
+			<dc:date>2017-05-22T10:00:00-0700</dc:date>
+						<content:encoded><![CDATA[Today's Deal: Save 85% on <a href='http://store.steampowered.com/app/268870/'>Satellite Reign</a>!*<br><br>Look for the deals each day on the front page of Steam.  Or follow us on <a href='http://twitter.com/steam_games'>twitter</a> or <a href='http://www.facebook.com/Steam'>Facebook</a> for instant notifications wherever you are!<br><br>*Offer ends Wednesday at 10AM Pacific Time<br><a href="http://store.steampowered.com/app/268870/"><img src="https://steamcdn-a.akamaihd.net/steam/apps/268870/capsule_467x181.jpg" style=" float: left; margin-right: 12px; height: 181px; width: 467px;"></a>]]></content:encoded>
+					</item>
+	</rdf:RDF>

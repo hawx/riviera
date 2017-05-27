@@ -1,4 +1,4 @@
-package feed
+package common
 
 type Extension struct {
 	Name      string
