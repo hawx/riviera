@@ -28,7 +28,6 @@ import (
 	"net/http"
 	"time"
 
-	xmlx "github.com/jteeuwen/go-pkg-xmlx"
 	"hawx.me/code/riviera/feed/atom"
 	"hawx.me/code/riviera/feed/data"
 	"hawx.me/code/riviera/feed/rdf"
@@ -85,7 +84,7 @@ func New(cachetimeout time.Duration, ih ItemHandler, database Database) *Feed {
 //
 // The client parameter allows the use of arbitrary network connections, for
 // example the Google App Engine "URL Fetch" service.
-func (f *Feed) Fetch(uri string, client *http.Client, charset xmlx.CharsetFunc) (int, error) {
+func (f *Feed) Fetch(uri string, client *http.Client, charset func(charset string, input io.Reader) (io.Reader, error)) (int, error) {
 	if !f.CanUpdate() {
 		return -1, nil
 	}
@@ -124,26 +123,22 @@ var parsers = []data.Parser{
 	rdf.Parser{},
 }
 
-func Parse(r io.Reader, charset xmlx.CharsetFunc) (chs []*data.Channel, err error) {
-
+func Parse(r io.Reader, charset func(charset string, input io.Reader) (io.Reader, error)) (chs []*data.Channel, err error) {
 	data, _ := ioutil.ReadAll(r)
-
-	doc := xmlx.New()
-
-	if err = doc.LoadStream(bytes.NewReader(data), charset); err != nil {
-		return
-	}
+	br := bytes.NewReader(data)
 
 	for _, parser := range parsers {
-		if parser.CanRead(bytes.NewReader(data), charset) {
-			return parser.Read(bytes.NewReader(data), charset)
+		if parser.CanRead(br, charset) {
+			br.Seek(0, io.SeekStart)
+			return parser.Read(br, charset)
 		}
+		br.Seek(0, io.SeekStart)
 	}
 
 	return nil, errors.New("Unsupported feed")
 }
 
-func (f *Feed) load(r io.Reader, charset xmlx.CharsetFunc) (err error) {
+func (f *Feed) load(r io.Reader, charset func(charset string, input io.Reader) (io.Reader, error)) (err error) {
 	f.channels, err = Parse(r, charset)
 	if err != nil || len(f.channels) == 0 {
 		return
