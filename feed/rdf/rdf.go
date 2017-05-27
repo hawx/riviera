@@ -1,6 +1,12 @@
+// Package rdf provides a parser for RDF Site Summary (RSS) 1.0
+//
+// See http://web.resource.org/rss/1.0/spec for the specification.
+//
+// It also supports three modules:
+// - Dublin Core: http://web.resource.org/rss/1.0/modules/dc/
+// - Syndication: http://web.resource.org/rss/1.0/modules/syndication/
+// - Content: http://web.resource.org/rss/1.0/modules/content/
 package rdf
-
-// http://web.resource.org/rss/1.0/spec
 
 import (
 	"encoding/xml"

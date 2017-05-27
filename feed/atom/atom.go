@@ -1,3 +1,6 @@
+// Package atom provides a parser for Atom feeds
+//
+// Commentary taken from https://tools.ietf.org/html/rfc4287
 package atom
 
 import (
@@ -136,8 +139,6 @@ func (Parser) Read(r io.Reader, charset func(charset string, input io.Reader) (i
 	foundChannels = append(foundChannels, ch)
 	return
 }
-
-// Commentary taken from https://tools.ietf.org/html/rfc4287
 
 // The "atom:feed" element is the document (i.e., top-level) element of an Atom
 // Feed Document, acting as a container for metadata and data associated with

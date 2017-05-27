@@ -1,3 +1,6 @@
+// Package rss provides a parser for RSS v2.0 feeds
+//
+// Commentary taken from http://www.rssboard.org/rss-specification
 package rss
 
 import (
@@ -201,8 +204,6 @@ func (Parser) Read(r io.Reader, charset func(charset string, input io.Reader) (i
 
 	return
 }
-
-// Commentary taken from http://www.rssboard.org/rss-specification
 
 // At the top level, a RSS document is a <rss> element, with a mandatory
 // attribute called version, that specifies the version of RSS that the document
