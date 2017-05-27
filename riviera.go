@@ -67,8 +67,6 @@ var (
 
 	port   = flag.String("port", "8080", "")
 	socket = flag.String("socket", "", "")
-
-	help = flag.Bool("help", false, "")
 )
 
 // DefaultCallback is the name of the callback to use in the jsonp response.
@@ -142,9 +140,10 @@ func (h *riverHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+	flag.Usage = func() { printHelp() }
 	flag.Parse()
 
-	if *help || flag.NArg() == 0 {
+	if flag.NArg() == 0 {
 		printHelp()
 		return
 	}
