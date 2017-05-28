@@ -21,6 +21,7 @@ import (
 
 	"hawx.me/code/riviera/feed/atom"
 	"hawx.me/code/riviera/feed/common"
+	"hawx.me/code/riviera/feed/jsonfeed"
 	"hawx.me/code/riviera/feed/rdf"
 	"hawx.me/code/riviera/feed/rss"
 )
@@ -127,6 +128,7 @@ var parsers = []common.Parser{
 	atom.Parser{},
 	rss.Parser{},
 	rdf.Parser{},
+	jsonfeed.Parser{},
 }
 
 func Parse(r io.Reader, charset func(charset string, input io.Reader) (io.Reader, error)) (chs []*common.Channel, err error) {
