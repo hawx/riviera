@@ -226,6 +226,26 @@ func TestDefaultMapping(t *testing.T) {
 				},
 			},
 		},
+
+		// Thumbnail
+		{
+			"thumbnail",
+			&common.Item{
+				PubDate: "Mon, 02 Jan 2006 20:04:19 UTC",
+				Id:      "5",
+				Thumbnail: &common.Image{
+					Url: "http://example.com/thumb",
+				},
+			},
+			&models.Item{
+				PubDate: models.RssTime{time.Date(2006, 1, 2, 20, 4, 19, 0, time.UTC)},
+				Id:      "5",
+				Thumbnail: &models.Thumbnail{
+					Url: "http://example.com/thumb",
+				},
+				Enclosures: []models.Enclosure{},
+			},
+		},
 	}
 
 	assert := assert.New(t)

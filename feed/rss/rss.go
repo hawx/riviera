@@ -197,6 +197,19 @@ func (Parser) Read(r io.Reader, charset func(charset string, input io.Reader) (i
 			}
 		}
 
+		if item.MediaThumbnail != nil {
+			i.Thumbnail = &common.Image{
+				Url: item.MediaThumbnail.URL,
+			}
+
+			if item.MediaThumbnail.Width != nil {
+				i.Thumbnail.Width = *item.MediaThumbnail.Width
+			}
+			if item.MediaThumbnail.Height != nil {
+				i.Thumbnail.Height = *item.MediaThumbnail.Height
+			}
+		}
+
 		ch.Items = append(ch.Items, i)
 	}
 
@@ -293,6 +306,13 @@ type rssItem struct {
 	Guid        *rssGuid       `xml:"guid"`
 	PubDate     string         `xml:"pubDate"`
 	Source      *rssSource     `xml:"source"`
+
+	MediaThumbnail *struct {
+		URL    string  `xml:"url,attr"`
+		Width  *int    `xml:"width,attr"`
+		Height *int    `xml:"height,attr"`
+		Time   *string `xml:"time,attr"`
+	} `xml:"http://search.yahoo.com/mrss/ thumbnail"`
 }
 
 type rssCategory struct {

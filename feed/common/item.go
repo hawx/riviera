@@ -18,6 +18,7 @@ type Item struct {
 	Comments    string
 	Description string
 	Enclosures  []Enclosure
+	Thumbnail   *Image
 	Extensions  map[string]map[string][]Extension
 	Guid        *Guid
 	Links       []Link

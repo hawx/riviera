@@ -71,6 +71,12 @@ func DefaultMapping(item *common.Item) *models.Item {
 		})
 	}
 
+	if item.Thumbnail != nil {
+		i.Thumbnail = &models.Thumbnail{
+			Url: item.Thumbnail.Url,
+		}
+	}
+
 	return i
 }
 
