@@ -33,11 +33,13 @@ func TestSimple(t *testing.T) {
 			assert.Equal("https://example.org/second-item", channel.Items[0].Links[0].Href)
 			assert.Equal("alternate", channel.Items[0].Links[0].Rel)
 			assert.Equal("This is a second item.", channel.Items[0].Content.Text)
+			assert.Equal("https://example.com/image.jpg", channel.Items[0].Thumbnail.Url)
 
 			assert.Equal("1", channel.Items[1].Guid.Guid)
 			assert.Equal("https://example.org/initial-post", channel.Items[1].Links[0].Href)
 			assert.Equal("alternate", channel.Items[1].Links[0].Rel)
 			assert.Equal("<p>Hello, world!</p>", channel.Items[1].Content.Text)
+			assert.Nil(channel.Items[1].Thumbnail)
 
 			if assert.Len(channel.Items[1].Categories, 2) {
 				assert.Equal("test", channel.Items[1].Categories[0].Text)

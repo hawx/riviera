@@ -103,6 +103,12 @@ func (Parser) Read(r io.Reader, charset func(charset string, input io.Reader) (i
 			})
 		}
 
+		if item.Image != "" {
+			i.Thumbnail = &common.Image{
+				Url: item.Image,
+			}
+		}
+
 		ch.Items = append(ch.Items, i)
 	}
 

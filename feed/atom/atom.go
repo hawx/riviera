@@ -133,6 +133,19 @@ func (Parser) Read(r io.Reader, charset func(charset string, input io.Reader) (i
 			}
 		}
 
+		if entry.MediaThumbnail != nil {
+			i.Thumbnail = &common.Image{
+				Url: entry.MediaThumbnail.URL,
+			}
+
+			if entry.MediaThumbnail.Width != nil {
+				i.Thumbnail.Width = *entry.MediaThumbnail.Width
+			}
+			if entry.MediaThumbnail.Height != nil {
+				i.Thumbnail.Height = *entry.MediaThumbnail.Height
+			}
+		}
+
 		ch.Items = append(ch.Items, i)
 	}
 
@@ -288,6 +301,30 @@ type atomEntry struct {
 
 	// atom:entry elements MUST contain exactly one atom:updated element.
 	Updated string `xml:"http://www.w3.org/2005/Atom updated"`
+
+	// http://www.rssboard.org/media-rss#media-thumbnails
+	//
+	// Allows particular images to be used as representative images for the media
+	// object. If multiple thumbnails are included, and time coding is not at
+	// play, it is assumed that the images are in order of importance. It has one
+	// required attribute and three optional attributes.
+	MediaThumbnail *struct {
+		// url specifies the url of the thumbnail. It is a required attribute.
+		URL string `xml:"url,attr"`
+
+		// height specifies the height of the thumbnail. It is an optional attribute.
+		Height *int `xml:"height,attr"`
+
+		// width specifies the width of the thumbnail. It is an optional attribute.
+		Width *int `xml:"width,attr"`
+
+		// time specifies the time offset in relation to the media object. Typically
+		// this is used when creating multiple keyframes within a single video. The
+		// format for this attribute should be in the DSM-CC's Normal Play Time
+		// (NTP) as used in RTSP [RFC 2326 3.6 Normal Play Time]. It is an optional
+		// attribute.
+		Time *string `xml:"time,attr"`
+	} `xml:"http://search.yahoo.com/mrss/ thumbnail"`
 }
 
 type atomContributor struct {

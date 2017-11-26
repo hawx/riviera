@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<rss xmlns:media="http://search.yahoo.com/mrss/" version="2.0">
+  <channel>
+    <title>Media Extensions Testcase</title>
+    <link>https://example.com/media-extensions</link>
+    <pubDate>Mon, 06 Nov 2017 11:12:45 +0900</pubDate>
+    <item>
+      <title>1</title>
+      <link>http://example.com/media-extesions/1/</link>
+      <description>Blah</description>
+      <pubDate>Mon, 06 Nov 2017 11:12:45 +0900</pubDate>
+      <media:thumbnail url="http://example.com/images/1.jpg" />
+    </item>
+    <item>
+      <title>2</title>
+      <link>http://example.com/media-extensions/2/</link>
+      <description>Blah 2</description>
+      <pubDate>Mon, 06 Nov 2017 11:12:45 +0900</pubDate>
+      <media:thumbnail url="http://example.com/images/2.jpg" width="100" height="123" />
+    </item>
+  </channel>
+</rss>

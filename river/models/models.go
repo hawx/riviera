@@ -53,12 +53,22 @@ type Item struct {
 	// Enclosure is exactly as in RSS 2.0, with three sub-elements, url, type and
 	// length.
 	Enclosures []Enclosure `json:"enclosure,omitempty"`
+
+	// Thumbnail has three sub-elements, url that points to the full image, and
+	// width and height which give the size of the thumbnail.
+	Thumbnail *Thumbnail `json:"thumbnail,omitempty"`
 }
 
 type Enclosure struct {
 	Url    string `json:"url"`
 	Type   string `json:"type"`
 	Length int64  `json:"length"`
+}
+
+type Thumbnail struct {
+	Url    string `json:"url"`
+	Height *int   `json:"height,omitempty"`
+	Width  *int   `json:"width,omitempty"`
 }
 
 type Metadata struct {
