@@ -75,6 +75,14 @@ func DefaultMapping(item *common.Item) *models.Item {
 		i.Thumbnail = &models.Thumbnail{
 			Url: item.Thumbnail.Url,
 		}
+
+		if item.Thumbnail.Height > 0 {
+			i.Thumbnail.Height = &item.Thumbnail.Height
+		}
+
+		if item.Thumbnail.Width > 0 {
+			i.Thumbnail.Width = &item.Thumbnail.Width
+		}
 	}
 
 	return i

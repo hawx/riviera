@@ -10,6 +10,9 @@ import (
 )
 
 func TestDefaultMapping(t *testing.T) {
+	fifty := 50
+	oneHundred := 100
+
 	testcases := []struct {
 		name       string
 		feedItem   *common.Item
@@ -242,6 +245,28 @@ func TestDefaultMapping(t *testing.T) {
 				Id:      "5",
 				Thumbnail: &models.Thumbnail{
 					Url: "http://example.com/thumb",
+				},
+				Enclosures: []models.Enclosure{},
+			},
+		},
+		{
+			"thumbnail with size",
+			&common.Item{
+				PubDate: "Mon, 02 Jan 2006 20:04:19 UTC",
+				Id:      "5",
+				Thumbnail: &common.Image{
+					Url:    "http://example.com/thumb",
+					Height: 50,
+					Width:  100,
+				},
+			},
+			&models.Item{
+				PubDate: models.RssTime{time.Date(2006, 1, 2, 20, 4, 19, 0, time.UTC)},
+				Id:      "5",
+				Thumbnail: &models.Thumbnail{
+					Url:    "http://example.com/thumb",
+					Height: &fifty,
+					Width:  &oneHundred,
 				},
 				Enclosures: []models.Enclosure{},
 			},
