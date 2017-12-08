@@ -1,4 +1,4 @@
-package river
+package mapping
 
 import (
 	"testing"

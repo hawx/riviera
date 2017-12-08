@@ -1,4 +1,4 @@
-package river
+package events
 
 import "time"
 
@@ -9,15 +9,15 @@ type Event struct {
 	Code int       `json:"code"`
 }
 
-type events struct {
+type Events struct {
 	evs []Event
 	cur int
 	ln  int
 	cp  int
 }
 
-func newEvents(size int) *events {
-	return &events{
+func New(size int) *Events {
+	return &Events{
 		evs: make([]Event, size),
 		cur: -1,
 		ln:  0,
@@ -25,7 +25,7 @@ func newEvents(size int) *events {
 	}
 }
 
-func (e *events) Prepend(ev Event) {
+func (e *Events) Prepend(ev Event) {
 	e.cur = (e.cur + 1) % e.cp
 	if e.ln < e.cp {
 		e.ln++
@@ -34,7 +34,7 @@ func (e *events) Prepend(ev Event) {
 	e.evs[e.cp-e.cur-1] = ev
 }
 
-func (e *events) List() []Event {
+func (e *Events) List() []Event {
 	if e.ln < e.cp {
 		return e.evs[e.cp-e.ln:]
 	}

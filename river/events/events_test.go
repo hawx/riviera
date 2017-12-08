@@ -1,4 +1,4 @@
-package river
+package events
 
 import (
 	"testing"

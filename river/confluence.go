@@ -4,8 +4,10 @@ import (
 	"net/http"
 	"sync"
 
+	"hawx.me/code/riviera/river/events"
 	"hawx.me/code/riviera/river/internal/persistence"
 	"hawx.me/code/riviera/river/riverjs"
+	"hawx.me/code/riviera/river/tributary"
 )
 
 // confluence manages a list of streams and aggregates the latest updates into a
@@ -13,19 +15,19 @@ import (
 type confluence struct {
 	store   persistence.River
 	mu      sync.Mutex
-	streams map[string]Tributary
+	streams map[string]tributary.Tributary
 	feeds   chan riverjs.Feed
-	events  chan Event
-	evs     *events
+	events  chan events.Event
+	evs     *events.Events
 	quit    chan struct{}
 }
 
-func newConfluence(store persistence.River, evs *events) *confluence {
+func newConfluence(store persistence.River, evs *events.Events) *confluence {
 	c := &confluence{
 		store:   store,
-		streams: map[string]Tributary{},
+		streams: map[string]tributary.Tributary{},
 		feeds:   make(chan riverjs.Feed),
-		events:  make(chan Event),
+		events:  make(chan events.Event),
 		evs:     evs,
 		quit:    make(chan struct{}),
 	}
@@ -38,11 +40,11 @@ func (c *confluence) Latest() []riverjs.Feed {
 	return c.store.Latest()
 }
 
-func (c *confluence) Log() []Event {
+func (c *confluence) Log() []events.Event {
 	return c.evs.List()
 }
 
-func (c *confluence) Add(stream Tributary) {
+func (c *confluence) Add(stream tributary.Tributary) {
 	name := stream.Name()
 	c.mu.Lock()
 

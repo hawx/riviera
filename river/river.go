@@ -9,8 +9,11 @@ import (
 	"time"
 
 	"hawx.me/code/riviera/river/data"
+	"hawx.me/code/riviera/river/events"
 	"hawx.me/code/riviera/river/internal/persistence"
+	"hawx.me/code/riviera/river/mapping"
 	"hawx.me/code/riviera/river/riverjs"
+	"hawx.me/code/riviera/river/tributary"
 )
 
 const docsPath = "http://scripting.com/stories/2010/12/06/innovationRiverOfNewsInJso.html"
@@ -21,7 +24,7 @@ type River interface {
 	WriteTo(w io.Writer) error
 
 	// Log returns a list of fetch events.
-	Log() []Event
+	Log() []events.Event
 
 	// Add subscribes the river to the feed at uri.
 	Add(uri string)
@@ -36,7 +39,7 @@ type River interface {
 type Options struct {
 	// Mapping is the function used to convert a feed item to an item in the
 	// river.
-	Mapping Mapping
+	Mapping mapping.Mapping
 
 	// CutOff is the duration after which items are not shown in the river. This
 	// is given as a negative time and is calculated from the time the feed was
@@ -52,7 +55,7 @@ type Options struct {
 }
 
 var DefaultOptions = Options{
-	Mapping:   DefaultMapping,
+	Mapping:   mapping.DefaultMapping,
 	CutOff:    -24 * time.Hour,
 	Refresh:   15 * time.Minute,
 	LogLength: 0,
@@ -64,7 +67,7 @@ type river struct {
 	confluence   *confluence
 	store        data.Database
 	cacheTimeout time.Duration
-	mapping      Mapping
+	mapping      mapping.Mapping
 }
 
 // New creates an empty river.
@@ -82,7 +85,7 @@ func New(store data.Database, options Options) River {
 	rp, _ := persistence.NewRiver(store, options.CutOff)
 
 	return &river{
-		confluence:   newConfluence(rp, newEvents(options.LogLength)),
+		confluence:   newConfluence(rp, events.New(options.LogLength)),
 		store:        store,
 		cacheTimeout: options.Refresh,
 		mapping:      options.Mapping,
@@ -110,7 +113,7 @@ func (r *river) WriteTo(w io.Writer) error {
 func (r *river) Add(uri string) {
 	b, _ := persistence.NewBucket(r.store, uri)
 
-	tributary := newTributary(b, uri, r.cacheTimeout, r.mapping)
+	tributary := tributary.New(b, uri, r.cacheTimeout, r.mapping)
 	r.confluence.Add(tributary)
 
 	tributary.Start()
@@ -120,7 +123,7 @@ func (r *river) Remove(uri string) {
 	r.confluence.Remove(uri)
 }
 
-func (r *river) Log() []Event {
+func (r *river) Log() []events.Event {
 	return r.confluence.Log()
 }
 

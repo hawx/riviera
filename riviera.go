@@ -17,6 +17,7 @@ import (
 	"hawx.me/code/riviera/river/data"
 	"hawx.me/code/riviera/river/data/boltdata"
 	"hawx.me/code/riviera/river/data/memdata"
+	"hawx.me/code/riviera/river/mapping"
 	"hawx.me/code/riviera/subscriptions"
 	"hawx.me/code/riviera/subscriptions/opml"
 	"hawx.me/code/serve"
@@ -187,7 +188,7 @@ func main() {
 	}
 
 	feeds := river.New(store, river.Options{
-		Mapping:   river.DefaultMapping,
+		Mapping:   mapping.DefaultMapping,
 		CutOff:    duration,
 		Refresh:   cacheTimeout,
 		LogLength: 500,
