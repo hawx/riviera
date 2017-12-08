@@ -10,7 +10,7 @@ import (
 
 	"hawx.me/code/riviera/river/data"
 	"hawx.me/code/riviera/river/internal/persistence"
-	"hawx.me/code/riviera/river/models"
+	"hawx.me/code/riviera/river/riverjs"
 )
 
 const docsPath = "http://scripting.com/stories/2010/12/06/innovationRiverOfNewsInJso.html"
@@ -90,18 +90,18 @@ func New(store data.Database, options Options) River {
 }
 
 func (r *river) WriteTo(w io.Writer) error {
-	updatedFeeds := models.Feeds{r.confluence.Latest()}
+	updatedFeeds := riverjs.Feeds{r.confluence.Latest()}
 	now := time.Now()
 
-	metadata := models.Metadata{
+	metadata := riverjs.Metadata{
 		Docs:      docsPath,
-		WhenGMT:   models.RssTime{now.UTC()},
-		WhenLocal: models.RssTime{now},
+		WhenGMT:   riverjs.RssTime{now.UTC()},
+		WhenLocal: riverjs.RssTime{now},
 		Version:   "3",
 		Secs:      0,
 	}
 
-	return json.NewEncoder(w).Encode(models.River{
+	return json.NewEncoder(w).Encode(riverjs.River{
 		Metadata:     metadata,
 		UpdatedFeeds: updatedFeeds,
 	})

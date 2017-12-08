@@ -10,7 +10,7 @@ import (
 	"hawx.me/code/riviera/feed"
 	"hawx.me/code/riviera/feed/common"
 	"hawx.me/code/riviera/river/internal/persistence"
-	"hawx.me/code/riviera/river/models"
+	"hawx.me/code/riviera/river/riverjs"
 )
 
 type Tributary interface {
@@ -19,7 +19,7 @@ type Tributary interface {
 
 	// Feeds sets a channel that is used to send out the latest updates to the
 	// tributary.
-	Feeds(chan<- models.Feed)
+	Feeds(chan<- riverjs.Feed)
 
 	// Events sets a channel that is used to send out events for the tributary.
 	Events(chan<- Event)
@@ -36,7 +36,7 @@ type tributary struct {
 	feed    *feed.Feed
 	client  *http.Client
 	mapping Mapping
-	feeds   chan<- models.Feed
+	feeds   chan<- riverjs.Feed
 	events  chan<- Event
 	quit    chan struct{}
 }
@@ -60,7 +60,7 @@ func (t *tributary) Name() string {
 	return t.uri.String()
 }
 
-func (t *tributary) Feeds(feeds chan<- models.Feed) {
+func (t *tributary) Feeds(feeds chan<- riverjs.Feed) {
 	t.feeds = feeds
 }
 
@@ -150,7 +150,7 @@ func maybeResolvedLink(root *url.URL, other string) string {
 }
 
 func (t *tributary) itemHandler(feed *feed.Feed, ch *common.Channel, newitems []*common.Item) {
-	items := []models.Item{}
+	items := []riverjs.Item{}
 	for _, item := range newitems {
 		converted := t.mapping(item)
 
@@ -181,12 +181,12 @@ func (t *tributary) itemHandler(feed *feed.Feed, ch *common.Channel, newitems []
 		}
 	}
 
-	t.feeds <- models.Feed{
+	t.feeds <- riverjs.Feed{
 		FeedUrl:         feedUrl,
 		WebsiteUrl:      websiteUrl,
 		FeedTitle:       ch.Title,
 		FeedDescription: ch.Description,
-		WhenLastUpdate:  models.RssTime{time.Now()},
+		WhenLastUpdate:  riverjs.RssTime{time.Now()},
 		Items:           items,
 	}
 }
