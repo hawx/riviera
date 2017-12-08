@@ -2,6 +2,7 @@ package river
 
 import "time"
 
+// An Event keeps track of the results of fetching a feed.
 type Event struct {
 	At   time.Time `json:"at"`
 	Uri  string    `json:"uri"`
