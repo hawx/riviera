@@ -51,8 +51,6 @@ func (Parser) CanRead(r io.Reader, charset func(charset string, input io.Reader)
 			return false
 		}
 	}
-
-	return false
 }
 
 func (Parser) Read(r io.Reader, charset func(charset string, input io.Reader) (io.Reader, error)) (foundChannels []*common.Channel, err error) {

@@ -43,8 +43,6 @@ func (Parser) CanRead(r io.Reader, charset func(charset string, input io.Reader)
 			return t.Name.Space == "http://www.w3.org/1999/02/22-rdf-syntax-ns#" && t.Name.Local == "RDF"
 		}
 	}
-
-	return false
 }
 
 func (Parser) Read(r io.Reader, charset func(string, io.Reader) (io.Reader, error)) (foundChannels []*common.Channel, err error) {
