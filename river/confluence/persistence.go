@@ -1,8 +1,6 @@
 package confluence
 
 import (
-	"log"
-
 	"hawx.me/code/riviera/river/data"
 	"hawx.me/code/riviera/river/riverjs"
 
@@ -10,33 +8,28 @@ import (
 	"time"
 )
 
+type Database interface {
+	Add(feed riverjs.Feed)
+	Truncate(cutoff time.Duration)
+	Latest(cutoff time.Duration) []riverjs.Feed
+}
+
 // A confluenceDatabase contains persisted feed data, specifically each "block"
 // of updates for a feed. This allows the river to be recreated from past data,
 // to be displayed on startup.
 type confluenceDatabase struct {
 	data.Bucket
-	cutoff time.Duration
 }
 
 var riverBucketName = []byte("river")
 
-func newConfluenceDatabase(database data.Database, cutoff time.Duration) (*confluenceDatabase, error) {
+func newConfluenceDatabase(database data.Database) (Database, error) {
 	b, err := database.Bucket(riverBucketName)
 	if err != nil {
 		return nil, err
 	}
 
-	riv := &confluenceDatabase{b, cutoff}
-
-	go func() {
-		for _ = range time.Tick(cutoff) {
-			log.Println("truncating feed data")
-			riv.truncate()
-			log.Println("done truncating")
-		}
-	}()
-
-	return riv, nil
+	return &confluenceDatabase{b}, nil
 }
 
 func (d *confluenceDatabase) Add(feed riverjs.Feed) {
@@ -48,9 +41,9 @@ func (d *confluenceDatabase) Add(feed riverjs.Feed) {
 	})
 }
 
-func (d *confluenceDatabase) truncate() {
+func (d *confluenceDatabase) Truncate(cutoff time.Duration) {
 	d.Update(func(tx data.Tx) error {
-		max := time.Now().UTC().Add(d.cutoff).Format(time.RFC3339)
+		max := time.Now().UTC().Add(cutoff).Format(time.RFC3339)
 
 		for _, k := range tx.KeysBefore([]byte(max)) {
 			tx.Delete(k)
@@ -60,11 +53,11 @@ func (d *confluenceDatabase) truncate() {
 	})
 }
 
-func (d *confluenceDatabase) Latest() []riverjs.Feed {
+func (d *confluenceDatabase) Latest(cutoff time.Duration) []riverjs.Feed {
 	feeds := []riverjs.Feed{}
 
 	d.View(func(tx data.ReadTx) error {
-		min := time.Now().UTC().Add(d.cutoff).Format(time.RFC3339)
+		min := time.Now().UTC().Add(cutoff).Format(time.RFC3339)
 
 		for _, v := range tx.After([]byte(min)) {
 			var feed riverjs.Feed

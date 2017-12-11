@@ -1,6 +1,7 @@
 package confluence
 
 import (
+	"log"
 	"net/http"
 	"sync"
 	"time"
@@ -33,7 +34,8 @@ type Confluence interface {
 }
 
 type confluence struct {
-	store   *confluenceDatabase
+	store   Database
+	cutoff  time.Duration
 	mu      sync.Mutex
 	streams map[string]tributary.Tributary
 	feeds   chan riverjs.Feed
@@ -48,11 +50,21 @@ type confluence struct {
 // is 2 hours old may be returned by Latest, but an item that is 5 minutes old
 // must be returned by Latest). The event log size is set by logLength.
 func New(store data.Database, cutoff time.Duration, logLength int) Confluence {
-	database, _ := newConfluenceDatabase(store, cutoff)
+	database, _ := newConfluenceDatabase(store)
+
+	go func() {
+		for _ = range time.Tick(cutoff) {
+			log.Println("truncating feed data")
+			database.Truncate(cutoff)
+			log.Println("done truncating")
+		}
+	}()
+
 	evs := events.New(logLength)
 
 	c := &confluence{
 		store:   database,
+		cutoff:  cutoff,
 		streams: map[string]tributary.Tributary{},
 		feeds:   make(chan riverjs.Feed),
 		events:  make(chan events.Event),
@@ -65,7 +77,7 @@ func New(store data.Database, cutoff time.Duration, logLength int) Confluence {
 }
 
 func (c *confluence) Latest() []riverjs.Feed {
-	return c.store.Latest()
+	return c.store.Latest(c.cutoff)
 }
 
 func (c *confluence) Log() []events.Event {

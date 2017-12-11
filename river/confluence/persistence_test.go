@@ -15,7 +15,7 @@ func TestPersistedRiver(t *testing.T) {
 	assert := assert.New(t)
 	db := memdata.Open()
 
-	riv, err := newConfluenceDatabase(db, -time.Minute)
+	riv, err := newConfluenceDatabase(db)
 	assert.Nil(err)
 
 	now := time.Now().Round(time.Second)
@@ -34,7 +34,7 @@ func TestPersistedRiver(t *testing.T) {
 	oldfeed := riverjs.Feed{FeedTitle: "out", FeedUrl: "out", WhenLastUpdate: riverjs.RssTime{time.Now().Add(-2 * time.Minute)}}
 	riv.Add(oldfeed)
 
-	latest := riv.Latest()
+	latest := riv.Latest(-time.Minute)
 	if assert.Len(latest, len(feeds)) {
 		// ordered by date, then reverse alphabetically on FeedUrl
 		assert.Equal(feeds[1], latest[0])
@@ -44,10 +44,12 @@ func TestPersistedRiver(t *testing.T) {
 		assert.Equal(feeds[3], latest[4])
 	}
 
-	riv.truncate()
+	riv.Truncate(-time.Minute)
+
+	bucket, _ := riv.(data.Bucket)
 
 	// make sure old feed has been deleted
-	riv.View(func(tx data.ReadTx) error {
+	bucket.View(func(tx data.ReadTx) error {
 		for _, v := range tx.All() {
 			var feed riverjs.Feed
 			json.Unmarshal(v, &feed)
