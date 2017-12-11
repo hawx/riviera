@@ -7,7 +7,7 @@ import (
 )
 
 func TestEvents(t *testing.T) {
-	evs := newEvents(3)
+	evs := New(3)
 
 	ev := []Event{
 		{Uri: "1"},

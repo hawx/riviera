@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"hawx.me/code/riviera/river/data"
 	"hawx.me/code/riviera/river/data/memdata"
-	"hawx.me/code/riviera/river/models"
+	"hawx.me/code/riviera/river/riverjs"
 )
 
 func TestRiver(t *testing.T) {
@@ -19,19 +19,19 @@ func TestRiver(t *testing.T) {
 	assert.Nil(err)
 
 	now := time.Now().Round(time.Second)
-	feeds := []models.Feed{
-		{FeedTitle: "cool", FeedUrl: "http://cool", WhenLastUpdate: models.RssTime{now}},
-		{FeedTitle: "what", FeedUrl: "http://what", WhenLastUpdate: models.RssTime{now}},
-		{FeedTitle: "hey", FeedUrl: "http://hey", WhenLastUpdate: models.RssTime{now}},
-		{FeedTitle: "hey2", FeedUrl: "http://hey", WhenLastUpdate: models.RssTime{now.Add(-10 * time.Second)}},
-		{FeedTitle: "hey", FeedUrl: "http://hey", WhenLastUpdate: models.RssTime{now.Add(-2 * time.Second)}},
+	feeds := []riverjs.Feed{
+		{FeedTitle: "cool", FeedUrl: "http://cool", WhenLastUpdate: riverjs.RssTime{now}},
+		{FeedTitle: "what", FeedUrl: "http://what", WhenLastUpdate: riverjs.RssTime{now}},
+		{FeedTitle: "hey", FeedUrl: "http://hey", WhenLastUpdate: riverjs.RssTime{now}},
+		{FeedTitle: "hey2", FeedUrl: "http://hey", WhenLastUpdate: riverjs.RssTime{now.Add(-10 * time.Second)}},
+		{FeedTitle: "hey", FeedUrl: "http://hey", WhenLastUpdate: riverjs.RssTime{now.Add(-2 * time.Second)}},
 	}
 	for _, feed := range feeds {
 		riv.Add(feed)
 	}
 
 	// old feed, ignored
-	oldfeed := models.Feed{FeedTitle: "out", FeedUrl: "out", WhenLastUpdate: models.RssTime{time.Now().Add(-2 * time.Minute)}}
+	oldfeed := riverjs.Feed{FeedTitle: "out", FeedUrl: "out", WhenLastUpdate: riverjs.RssTime{time.Now().Add(-2 * time.Minute)}}
 	riv.Add(oldfeed)
 
 	latest := riv.Latest()
@@ -50,7 +50,7 @@ func TestRiver(t *testing.T) {
 	// make sure old feed has been deleted
 	intriv.View(func(tx data.ReadTx) error {
 		for _, v := range tx.All() {
-			var feed models.Feed
+			var feed riverjs.Feed
 			json.Unmarshal(v, &feed)
 			assert.NotEqual(oldfeed.FeedTitle, feed.FeedTitle)
 		}

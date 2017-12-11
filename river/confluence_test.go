@@ -6,28 +6,29 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"hawx.me/code/riviera/river/data/memdata"
+	"hawx.me/code/riviera/river/events"
 	"hawx.me/code/riviera/river/internal/persistence"
-	"hawx.me/code/riviera/river/models"
+	"hawx.me/code/riviera/river/riverjs"
 )
 
 func TestConfluence(t *testing.T) {
 	db := memdata.Open()
 	river, _ := persistence.NewRiver(db, -time.Minute)
 
-	c := newConfluence(river, newEvents(3))
+	c := newConfluence(river, events.New(3))
 
 	assert.Empty(t, c.Latest())
 }
 
 type dummyTrib struct {
 	name    string
-	feed    models.Feed
+	feed    riverjs.Feed
 	stopped bool
-	feeds   chan<- models.Feed
-	events  chan<- Event
+	feeds   chan<- riverjs.Feed
+	events  chan<- events.Event
 }
 
-func newDummyTrib(feed models.Feed, name string) *dummyTrib {
+func newDummyTrib(feed riverjs.Feed, name string) *dummyTrib {
 	return &dummyTrib{
 		name:    name,
 		feed:    feed,
@@ -41,11 +42,11 @@ func (d *dummyTrib) push() {
 	d.feeds <- d.feed
 }
 
-func (d *dummyTrib) Feeds(feeds chan<- models.Feed) {
+func (d *dummyTrib) Feeds(feeds chan<- riverjs.Feed) {
 	d.feeds = feeds
 }
 
-func (d *dummyTrib) Events(events chan<- Event) {
+func (d *dummyTrib) Events(events chan<- events.Event) {
 	d.events = events
 }
 
@@ -63,17 +64,17 @@ func TestConfluenceWithTributary(t *testing.T) {
 	db := memdata.Open()
 	river, _ := persistence.NewRiver(db, -time.Minute)
 
-	c := newConfluence(river, newEvents(3))
+	c := newConfluence(river, events.New(3))
 
 	now := time.Now().Local().Round(time.Second)
 
-	feed := models.Feed{
+	feed := riverjs.Feed{
 		FeedTitle:      "hey",
-		WhenLastUpdate: models.RssTime{now.Add(-time.Second)},
+		WhenLastUpdate: riverjs.RssTime{now.Add(-time.Second)},
 	}
-	feed2 := models.Feed{
+	feed2 := riverjs.Feed{
 		FeedTitle:      "cool",
-		WhenLastUpdate: models.RssTime{now.Add(-5 * time.Second)},
+		WhenLastUpdate: riverjs.RssTime{now.Add(-5 * time.Second)},
 	}
 
 	trib := newDummyTrib(feed, "dummy1")
@@ -81,29 +82,29 @@ func TestConfluenceWithTributary(t *testing.T) {
 
 	c.Add(trib)
 	trib.Start()
-	assert.Equal(t, []models.Feed{feed}, c.Latest())
+	assert.Equal(t, []riverjs.Feed{feed}, c.Latest())
 
 	c.Add(trib2)
 	trib2.Start()
-	assert.Equal(t, []models.Feed{feed, feed2}, c.Latest())
+	assert.Equal(t, []riverjs.Feed{feed, feed2}, c.Latest())
 
 	c.Remove(trib.Name())
 	assert.True(t, trib.stopped)
 
 	c.Add(trib)
 	trib.Start()
-	assert.Equal(t, []models.Feed{feed, feed2}, c.Latest())
+	assert.Equal(t, []riverjs.Feed{feed, feed2}, c.Latest())
 }
 
 func TestConfluenceWithTributaryWhenTooOld(t *testing.T) {
 	db := memdata.Open()
 	river, _ := persistence.NewRiver(db, -time.Minute)
 
-	c := newConfluence(river, newEvents(3))
+	c := newConfluence(river, events.New(3))
 
-	feed := models.Feed{
+	feed := riverjs.Feed{
 		FeedTitle:      "hey",
-		WhenLastUpdate: models.RssTime{time.Now().Add(-5 * time.Minute)},
+		WhenLastUpdate: riverjs.RssTime{time.Now().Add(-5 * time.Minute)},
 	}
 
 	trib := newDummyTrib(feed, "dummy3")

@@ -9,7 +9,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"hawx.me/code/riviera/river/data/memdata"
 	"hawx.me/code/riviera/river/internal/persistence"
-	"hawx.me/code/riviera/river/models"
+	"hawx.me/code/riviera/river/mapping"
+	"hawx.me/code/riviera/river/riverjs"
 )
 
 func TestTributary(t *testing.T) {
@@ -37,29 +38,29 @@ func TestTributary(t *testing.T) {
 	db := memdata.Open()
 	bucket, _ := persistence.NewBucket(db, "-")
 
-	tributary := newTributary(bucket, s.URL, time.Minute, DefaultMapping)
+	tributary := New(bucket, s.URL, time.Minute, mapping.DefaultMapping)
 	tributary.Start()
 
-	expected := models.Feed{
+	expected := riverjs.Feed{
 		FeedUrl:         s.URL,
 		WebsiteUrl:      "http://boingboing.net",
 		FeedTitle:       "Boing Boing",
 		FeedDescription: "Brain candy for Happy Mutants",
-		WhenLastUpdate:  models.RssTime{time.Now()},
-		Items: []models.Item{{
+		WhenLastUpdate:  riverjs.RssTime{time.Now()},
+		Items: []riverjs.Item{{
 			Title:      "Save Noisebridge!",
 			Link:       "http://feedproxy.google.com/~r/boingboing/iBag/~3/EKKb-61Ismc/story01.htm",
 			PermaLink:  "http://feedproxy.google.com/~r/boingboing/iBag/~3/EKKb-61Ismc/story01.htm",
 			Id:         "http://boingboing.net/?p=221544",
-			PubDate:    models.RssTime{time.Date(2013, 03, 27, 12, 40, 18, 0, time.UTC)},
+			PubDate:    riverjs.RssTime{time.Date(2013, 03, 27, 12, 40, 18, 0, time.UTC)},
 			Body:       "A reader writes, \"Noisebridge, San Francisco's Hackerspace, is having some hard times, so we're throwing an epic benefit and party this Saturday, to include eclectic performers, interactive art, a raffle and more! For more details, if any BBers want to put on demos or ideas shar…",
-			Enclosures: []models.Enclosure{},
+			Enclosures: []riverjs.Enclosure{},
 		}},
 	}
 
 	assert := assert.New(t)
 
-	feeds := make(chan models.Feed)
+	feeds := make(chan riverjs.Feed)
 	tributary.Feeds(feeds)
 
 	select {
@@ -110,29 +111,29 @@ good engineering culture— is our obsession with aggressively measuring everyth
 	db := memdata.Open()
 	bucket, _ := persistence.NewBucket(db, "-")
 
-	tributary := newTributary(bucket, s.URL, time.Minute, DefaultMapping)
+	tributary := New(bucket, s.URL, time.Minute, mapping.DefaultMapping)
 	tributary.Start()
 
-	expected := models.Feed{
+	expected := riverjs.Feed{
 		FeedUrl:         s.URL + "/atom.xml",
 		WebsiteUrl:      s.URL,
 		FeedTitle:       "GitHub Engineering",
 		FeedDescription: "",
-		WhenLastUpdate:  models.RssTime{time.Now()},
-		Items: []models.Item{{
+		WhenLastUpdate:  riverjs.RssTime{time.Now()},
+		Items: []riverjs.Item{{
 			Title:      "Brubeck, a statsd-compatible metrics aggregator",
 			Link:       s.URL + "/brubeck/",
 			PermaLink:  s.URL + "/brubeck/",
 			Id:         "/brubeck",
-			PubDate:    models.RssTime{time.Date(2015, 06, 15, 0, 0, 0, 0, time.FixedZone("", 0))},
+			PubDate:    riverjs.RssTime{time.Date(2015, 06, 15, 0, 0, 0, 0, time.FixedZone("", 0))},
 			Body:       "One of the key points of GitHub's engineering culture —and I believe, of any good engineering culture— is our obsession with aggressively measuring everything.\n",
-			Enclosures: []models.Enclosure{},
+			Enclosures: []riverjs.Enclosure{},
 		}},
 	}
 
 	assert := assert.New(t)
 
-	feeds := make(chan models.Feed)
+	feeds := make(chan riverjs.Feed)
 	tributary.Feeds(feeds)
 
 	select {
@@ -151,7 +152,7 @@ good engineering culture— is our obsession with aggressively measuring everyth
 	}
 }
 
-func assertItemEqual(t *testing.T, a, b models.Item) {
+func assertItemEqual(t *testing.T, a, b riverjs.Item) {
 	assert.Equal(t, a.Body, b.Body)
 	assert.Equal(t, a.PermaLink, b.PermaLink)
 	assert.WithinDuration(t, a.PubDate.Time, b.PubDate.Time, time.Second)
