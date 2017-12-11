@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	"github.com/boltdb/bolt"
+	"hawx.me/code/riviera/feed"
 	"hawx.me/code/riviera/river/confluence"
 	"hawx.me/code/riviera/river/data"
 )
@@ -26,6 +27,10 @@ func Open(path string) (data.Database, error) {
 
 func (d *database) Confluence() (confluence.Database, error) {
 	return newConfluenceDatabase(d.db)
+}
+
+func (d *database) Feed(name string) (feed.Database, error) {
+	return newFeedDatabase(d.db, name)
 }
 
 func (d *database) Bucket(name []byte) (data.Bucket, error) {
