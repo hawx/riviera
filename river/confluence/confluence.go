@@ -1,18 +1,28 @@
-package river
+package confluence
 
 import (
 	"net/http"
 	"sync"
+	"time"
 
+	"hawx.me/code/riviera/river/data"
 	"hawx.me/code/riviera/river/events"
 	"hawx.me/code/riviera/river/riverjs"
 	"hawx.me/code/riviera/river/tributary"
 )
 
+type Confluence interface {
+	Latest() []riverjs.Feed
+	Log() []events.Event
+	Add(stream tributary.Tributary)
+	Remove(uri string) bool
+	Close() error
+}
+
 // confluence manages a list of streams and aggregates the latest updates into a
 // single (truncated) list.
 type confluence struct {
-	store   PersistedRiver
+	store   *confluenceDatabase
 	mu      sync.Mutex
 	streams map[string]tributary.Tributary
 	feeds   chan riverjs.Feed
@@ -21,9 +31,11 @@ type confluence struct {
 	quit    chan struct{}
 }
 
-func newConfluence(store PersistedRiver, evs *events.Events) *confluence {
+func New(store data.Database, cutoff time.Duration, evs *events.Events) Confluence {
+	database, _ := newConfluenceDatabase(store, cutoff)
+
 	c := &confluence{
-		store:   store,
+		store:   database,
 		streams: map[string]tributary.Tributary{},
 		feeds:   make(chan riverjs.Feed),
 		events:  make(chan events.Event),

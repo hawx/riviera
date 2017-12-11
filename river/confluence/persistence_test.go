@@ -1,4 +1,4 @@
-package river
+package confluence
 
 import (
 	"encoding/json"
@@ -15,7 +15,7 @@ func TestPersistedRiver(t *testing.T) {
 	assert := assert.New(t)
 	db := memdata.Open()
 
-	riv, err := NewPersistedRiver(db, -time.Minute)
+	riv, err := newConfluenceDatabase(db, -time.Minute)
 	assert.Nil(err)
 
 	now := time.Now().Round(time.Second)
@@ -44,11 +44,10 @@ func TestPersistedRiver(t *testing.T) {
 		assert.Equal(feeds[3], latest[4])
 	}
 
-	intriv, _ := riv.(*persistedRiver)
-	intriv.truncate()
+	riv.truncate()
 
 	// make sure old feed has been deleted
-	intriv.View(func(tx data.ReadTx) error {
+	riv.View(func(tx data.ReadTx) error {
 		for _, v := range tx.All() {
 			var feed riverjs.Feed
 			json.Unmarshal(v, &feed)

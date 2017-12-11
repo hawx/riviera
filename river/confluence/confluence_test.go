@@ -1,4 +1,4 @@
-package river
+package confluence
 
 import (
 	"testing"
@@ -12,9 +12,7 @@ import (
 
 func TestConfluence(t *testing.T) {
 	db := memdata.Open()
-	river, _ := NewPersistedRiver(db, -time.Minute)
-
-	c := newConfluence(river, events.New(3))
+	c := New(db, -time.Minute, events.New(3))
 
 	assert.Empty(t, c.Latest())
 }
@@ -61,9 +59,7 @@ func (d *dummyTrib) Stop() {
 
 func TestConfluenceWithTributary(t *testing.T) {
 	db := memdata.Open()
-	river, _ := NewPersistedRiver(db, -time.Minute)
-
-	c := newConfluence(river, events.New(3))
+	c := New(db, -time.Minute, events.New(3))
 
 	now := time.Now().Local().Round(time.Second)
 
@@ -97,9 +93,7 @@ func TestConfluenceWithTributary(t *testing.T) {
 
 func TestConfluenceWithTributaryWhenTooOld(t *testing.T) {
 	db := memdata.Open()
-	river, _ := NewPersistedRiver(db, -time.Minute)
-
-	c := newConfluence(river, events.New(3))
+	c := New(db, -time.Minute, events.New(3))
 
 	feed := riverjs.Feed{
 		FeedTitle:      "hey",

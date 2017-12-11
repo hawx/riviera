@@ -8,6 +8,7 @@ import (
 	"io"
 	"time"
 
+	"hawx.me/code/riviera/river/confluence"
 	"hawx.me/code/riviera/river/data"
 	"hawx.me/code/riviera/river/events"
 	"hawx.me/code/riviera/river/mapping"
@@ -38,7 +39,7 @@ type River interface {
 // river acts as the top-level factory. It manages the creation of the initial
 // confluence and creating new tributaries to add to it.
 type river struct {
-	confluence   *confluence
+	confluence   confluence.Confluence
 	store        data.Database
 	cacheTimeout time.Duration
 	mapping      mapping.Mapping
@@ -56,10 +57,8 @@ func New(store data.Database, options Options) River {
 		options.Refresh = DefaultOptions.Refresh
 	}
 
-	rp, _ := NewPersistedRiver(store, options.CutOff)
-
 	return &river{
-		confluence:   newConfluence(rp, events.New(options.LogLength)),
+		confluence:   confluence.New(store, options.CutOff, events.New(options.LogLength)),
 		store:        store,
 		cacheTimeout: options.Refresh,
 		mapping:      options.Mapping,
