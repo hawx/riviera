@@ -58,7 +58,7 @@ func New(store data.Database, options Options) River {
 	}
 
 	return &river{
-		confluence:   confluence.New(store, options.CutOff, events.New(options.LogLength)),
+		confluence:   confluence.New(store, options.CutOff, options.LogLength),
 		store:        store,
 		cacheTimeout: options.Refresh,
 		mapping:      options.Mapping,

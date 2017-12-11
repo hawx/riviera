@@ -11,16 +11,27 @@ import (
 	"hawx.me/code/riviera/river/tributary"
 )
 
+// A Confluence manages a list of Tributaries and aggregates the latest updates
+// into a single (truncated) list.
 type Confluence interface {
+	// Latest returns the newest items from all managed Tributaries.
 	Latest() []riverjs.Feed
+
+	// Log returns the events that have been triggered by the Tributaries.
 	Log() []events.Event
+
+	// Add causes the Confluence to aggregate a new Tributary. If a Tributary with
+	// the same name is already managed by the Confluence no action will be taken.
 	Add(stream tributary.Tributary)
+
+	// Remove will stop the named Tributary and remove it from the list of those
+	// managed by the Confluence.
 	Remove(uri string) bool
+
+	// Close stops the Confluence and all managed Tributaries.
 	Close() error
 }
 
-// confluence manages a list of streams and aggregates the latest updates into a
-// single (truncated) list.
 type confluence struct {
 	store   *confluenceDatabase
 	mu      sync.Mutex
@@ -31,8 +42,14 @@ type confluence struct {
 	quit    chan struct{}
 }
 
-func New(store data.Database, cutoff time.Duration, evs *events.Events) Confluence {
+// New creates a new Confluence writing to the store. The cutoff specifies the
+// minimum duration an item should be returned by Latest for, but is not
+// guaranteed to be followed exactly (e.g. with a cutoff of 1 hour an item which
+// is 2 hours old may be returned by Latest, but an item that is 5 minutes old
+// must be returned by Latest). The event log size is set by logLength.
+func New(store data.Database, cutoff time.Duration, logLength int) Confluence {
 	database, _ := newConfluenceDatabase(store, cutoff)
+	evs := events.New(logLength)
 
 	c := &confluence{
 		store:   database,

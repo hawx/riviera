@@ -10,9 +10,9 @@ import (
 	"time"
 )
 
-// A confluenceDatabase contains persisted feed data, specifically each "block" of updates
-// for a feed. This allows the river to be recreated from past data, to be
-// displayed on startup.
+// A confluenceDatabase contains persisted feed data, specifically each "block"
+// of updates for a feed. This allows the river to be recreated from past data,
+// to be displayed on startup.
 type confluenceDatabase struct {
 	data.Bucket
 	cutoff time.Duration
