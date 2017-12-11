@@ -1,4 +1,4 @@
-package persistence
+package river
 
 import (
 	"encoding/json"
@@ -11,11 +11,11 @@ import (
 	"hawx.me/code/riviera/river/riverjs"
 )
 
-func TestRiver(t *testing.T) {
+func TestPersistedRiver(t *testing.T) {
 	assert := assert.New(t)
 	db := memdata.Open()
 
-	riv, err := NewRiver(db, -time.Minute)
+	riv, err := NewPersistedRiver(db, -time.Minute)
 	assert.Nil(err)
 
 	now := time.Now().Round(time.Second)
@@ -44,7 +44,7 @@ func TestRiver(t *testing.T) {
 		assert.Equal(feeds[3], latest[4])
 	}
 
-	intriv, _ := riv.(*river)
+	intriv, _ := riv.(*persistedRiver)
 	intriv.truncate()
 
 	// make sure old feed has been deleted

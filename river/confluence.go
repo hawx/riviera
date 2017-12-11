@@ -5,7 +5,6 @@ import (
 	"sync"
 
 	"hawx.me/code/riviera/river/events"
-	"hawx.me/code/riviera/river/internal/persistence"
 	"hawx.me/code/riviera/river/riverjs"
 	"hawx.me/code/riviera/river/tributary"
 )
@@ -13,7 +12,7 @@ import (
 // confluence manages a list of streams and aggregates the latest updates into a
 // single (truncated) list.
 type confluence struct {
-	store   persistence.River
+	store   PersistedRiver
 	mu      sync.Mutex
 	streams map[string]tributary.Tributary
 	feeds   chan riverjs.Feed
@@ -22,7 +21,7 @@ type confluence struct {
 	quit    chan struct{}
 }
 
-func newConfluence(store persistence.River, evs *events.Events) *confluence {
+func newConfluence(store PersistedRiver, evs *events.Events) *confluence {
 	c := &confluence{
 		store:   store,
 		streams: map[string]tributary.Tributary{},

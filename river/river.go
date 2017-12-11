@@ -10,7 +10,6 @@ import (
 
 	"hawx.me/code/riviera/river/data"
 	"hawx.me/code/riviera/river/events"
-	"hawx.me/code/riviera/river/internal/persistence"
 	"hawx.me/code/riviera/river/mapping"
 	"hawx.me/code/riviera/river/riverjs"
 	"hawx.me/code/riviera/river/tributary"
@@ -57,7 +56,7 @@ func New(store data.Database, options Options) River {
 		options.Refresh = DefaultOptions.Refresh
 	}
 
-	rp, _ := persistence.NewRiver(store, options.CutOff)
+	rp, _ := NewPersistedRiver(store, options.CutOff)
 
 	return &river{
 		confluence:   newConfluence(rp, events.New(options.LogLength)),

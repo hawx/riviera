@@ -7,13 +7,12 @@ import (
 	"github.com/stretchr/testify/assert"
 	"hawx.me/code/riviera/river/data/memdata"
 	"hawx.me/code/riviera/river/events"
-	"hawx.me/code/riviera/river/internal/persistence"
 	"hawx.me/code/riviera/river/riverjs"
 )
 
 func TestConfluence(t *testing.T) {
 	db := memdata.Open()
-	river, _ := persistence.NewRiver(db, -time.Minute)
+	river, _ := NewPersistedRiver(db, -time.Minute)
 
 	c := newConfluence(river, events.New(3))
 
@@ -62,7 +61,7 @@ func (d *dummyTrib) Stop() {
 
 func TestConfluenceWithTributary(t *testing.T) {
 	db := memdata.Open()
-	river, _ := persistence.NewRiver(db, -time.Minute)
+	river, _ := NewPersistedRiver(db, -time.Minute)
 
 	c := newConfluence(river, events.New(3))
 
@@ -98,7 +97,7 @@ func TestConfluenceWithTributary(t *testing.T) {
 
 func TestConfluenceWithTributaryWhenTooOld(t *testing.T) {
 	db := memdata.Open()
-	river, _ := persistence.NewRiver(db, -time.Minute)
+	river, _ := NewPersistedRiver(db, -time.Minute)
 
 	c := newConfluence(river, events.New(3))
 

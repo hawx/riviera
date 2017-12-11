@@ -1,4 +1,4 @@
-package persistence
+package river
 
 import (
 	"log"
@@ -13,25 +13,25 @@ import (
 // A River contains persisted feed data, specifically each "block" of updates
 // for a feed. This allows the river to be recreated from past data, to be
 // displayed on startup.
-type River interface {
+type PersistedRiver interface {
 	Add(riverjs.Feed)
 	Latest() []riverjs.Feed
 }
 
-type river struct {
+type persistedRiver struct {
 	data.Bucket
 	cutoff time.Duration
 }
 
 var riverBucketName = []byte("river")
 
-func NewRiver(database data.Database, cutoff time.Duration) (River, error) {
+func NewPersistedRiver(database data.Database, cutoff time.Duration) (PersistedRiver, error) {
 	b, err := database.Bucket(riverBucketName)
 	if err != nil {
 		return nil, err
 	}
 
-	riv := &river{b, cutoff}
+	riv := &persistedRiver{b, cutoff}
 
 	go func() {
 		for _ = range time.Tick(cutoff) {
@@ -44,7 +44,7 @@ func NewRiver(database data.Database, cutoff time.Duration) (River, error) {
 	return riv, nil
 }
 
-func (d *river) Add(feed riverjs.Feed) {
+func (d *persistedRiver) Add(feed riverjs.Feed) {
 	d.Update(func(tx data.Tx) error {
 		key := feed.WhenLastUpdate.UTC().Format(time.RFC3339) + " " + feed.FeedUrl
 		value, _ := json.Marshal(feed)
@@ -53,7 +53,7 @@ func (d *river) Add(feed riverjs.Feed) {
 	})
 }
 
-func (d *river) truncate() {
+func (d *persistedRiver) truncate() {
 	d.Update(func(tx data.Tx) error {
 		max := time.Now().UTC().Add(d.cutoff).Format(time.RFC3339)
 
@@ -65,7 +65,7 @@ func (d *river) truncate() {
 	})
 }
 
-func (d *river) Latest() []riverjs.Feed {
+func (d *persistedRiver) Latest() []riverjs.Feed {
 	feeds := []riverjs.Feed{}
 
 	d.View(func(tx data.ReadTx) error {
