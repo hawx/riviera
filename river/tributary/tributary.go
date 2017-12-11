@@ -45,7 +45,7 @@ type tributary struct {
 
 func New(store data.Database, uri string, cacheTimeout time.Duration, mapping mapping.Mapping) *tributary {
 	parsedUri, _ := url.Parse(uri)
-	bucket, _ := NewBucket(store, uri)
+	feedDatabase, _ := newFeedDatabase(store, uri)
 
 	p := &tributary{
 		uri:     parsedUri,
@@ -53,7 +53,7 @@ func New(store data.Database, uri string, cacheTimeout time.Duration, mapping ma
 		quit:    make(chan struct{}),
 	}
 
-	p.feed = feed.New(cacheTimeout, p.itemHandler, bucket)
+	p.feed = feed.New(cacheTimeout, p.itemHandler, feedDatabase)
 	p.client = &http.Client{Timeout: time.Minute, Transport: &statusTransport{http.DefaultTransport.(*http.Transport), p}}
 
 	return p
