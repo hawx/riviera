@@ -1,4 +1,4 @@
-package persistence
+package tributary
 
 import (
 	"hawx.me/code/riviera/feed"

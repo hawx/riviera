@@ -86,9 +86,7 @@ func (r *river) WriteTo(w io.Writer) error {
 }
 
 func (r *river) Add(uri string) {
-	b, _ := persistence.NewBucket(r.store, uri)
-
-	tributary := tributary.New(b, uri, r.cacheTimeout, r.mapping)
+	tributary := tributary.New(r.store, uri, r.cacheTimeout, r.mapping)
 	r.confluence.Add(tributary)
 
 	tributary.Start()

@@ -8,7 +8,6 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"hawx.me/code/riviera/river/data/memdata"
-	"hawx.me/code/riviera/river/internal/persistence"
 	"hawx.me/code/riviera/river/mapping"
 	"hawx.me/code/riviera/river/riverjs"
 )
@@ -36,9 +35,7 @@ func TestTributary(t *testing.T) {
 	defer s.Close()
 
 	db := memdata.Open()
-	bucket, _ := persistence.NewBucket(db, "-")
-
-	tributary := New(bucket, s.URL, time.Minute, mapping.DefaultMapping)
+	tributary := New(db, s.URL, time.Minute, mapping.DefaultMapping)
 	tributary.Start()
 
 	expected := riverjs.Feed{
@@ -109,9 +106,7 @@ good engineering culture— is our obsession with aggressively measuring everyth
 	defer s.Close()
 
 	db := memdata.Open()
-	bucket, _ := persistence.NewBucket(db, "-")
-
-	tributary := New(bucket, s.URL, time.Minute, mapping.DefaultMapping)
+	tributary := New(db, s.URL, time.Minute, mapping.DefaultMapping)
 	tributary.Start()
 
 	expected := riverjs.Feed{
