@@ -24,7 +24,7 @@ func DefaultMapping(item *common.Item) *riverjs.Item {
 
 	i := &riverjs.Item{
 		Body:       stripAndCrop(item.Description),
-		PubDate:    riverjs.RssTime{pubDate},
+		PubDate:    riverjs.Time(pubDate),
 		Title:      html.UnescapeString(item.Title),
 		Id:         item.Key(),
 		Comments:   item.Comments,

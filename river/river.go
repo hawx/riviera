@@ -67,13 +67,15 @@ func New(store data.Database, options Options) River {
 }
 
 func (r *river) WriteTo(w io.Writer) error {
-	updatedFeeds := riverjs.Feeds{r.confluence.Latest()}
-	now := time.Now()
+	updatedFeeds := riverjs.Feeds{
+		UpdatedFeeds: r.confluence.Latest(),
+	}
 
+	now := time.Now()
 	metadata := riverjs.Metadata{
 		Docs:      docsPath,
-		WhenGMT:   riverjs.RssTime{now.UTC()},
-		WhenLocal: riverjs.RssTime{now},
+		WhenGMT:   riverjs.Time(now.UTC()),
+		WhenLocal: riverjs.Time(now),
 		Version:   "3",
 		Secs:      0,
 	}

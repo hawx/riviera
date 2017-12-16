@@ -30,5 +30,5 @@ func TestRiver(t *testing.T) {
 	assert.Equal("3", v.Metadata.Version)
 	assert.Equal(float64(0), v.Metadata.Secs)
 
-	assert.Equal(riverjs.Feeds{[]riverjs.Feed{}}, v.UpdatedFeeds)
+	assert.Equal(riverjs.Feeds{UpdatedFeeds: []riverjs.Feed{}}, v.UpdatedFeeds)
 }

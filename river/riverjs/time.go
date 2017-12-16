@@ -2,6 +2,10 @@ package riverjs
 
 import "time"
 
+func Time(t time.Time) RssTime {
+	return RssTime{t}
+}
+
 // RssTime wraps a time.Time object so that when serialised and unserialised it
 // uses the RFC1123Z format.
 type RssTime struct {

@@ -66,11 +66,11 @@ func TestConfluenceWithTributary(t *testing.T) {
 
 	feed := riverjs.Feed{
 		FeedTitle:      "hey",
-		WhenLastUpdate: riverjs.RssTime{now.Add(-time.Second)},
+		WhenLastUpdate: riverjs.Time(now.Add(-time.Second)),
 	}
 	feed2 := riverjs.Feed{
 		FeedTitle:      "cool",
-		WhenLastUpdate: riverjs.RssTime{now.Add(-5 * time.Second)},
+		WhenLastUpdate: riverjs.Time(now.Add(-5 * time.Second)),
 	}
 
 	trib := newDummyTrib(feed, "dummy1")
@@ -98,7 +98,7 @@ func TestConfluenceWithTributaryWhenTooOld(t *testing.T) {
 
 	feed := riverjs.Feed{
 		FeedTitle:      "hey",
-		WhenLastUpdate: riverjs.RssTime{time.Now().Add(-5 * time.Minute)},
+		WhenLastUpdate: riverjs.Time(time.Now().Add(-5 * time.Minute)),
 	}
 
 	trib := newDummyTrib(feed, "dummy3")

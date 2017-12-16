@@ -18,18 +18,18 @@ func TestPersistedRiver(t *testing.T) {
 
 	now := time.Now().Round(time.Second)
 	feeds := []riverjs.Feed{
-		{FeedTitle: "cool", FeedUrl: "http://cool", WhenLastUpdate: riverjs.RssTime{now}},
-		{FeedTitle: "what", FeedUrl: "http://what", WhenLastUpdate: riverjs.RssTime{now}},
-		{FeedTitle: "hey", FeedUrl: "http://hey", WhenLastUpdate: riverjs.RssTime{now}},
-		{FeedTitle: "hey2", FeedUrl: "http://hey", WhenLastUpdate: riverjs.RssTime{now.Add(-10 * time.Second)}},
-		{FeedTitle: "hey", FeedUrl: "http://hey", WhenLastUpdate: riverjs.RssTime{now.Add(-2 * time.Second)}},
+		{FeedTitle: "cool", FeedUrl: "http://cool", WhenLastUpdate: riverjs.Time(now)},
+		{FeedTitle: "what", FeedUrl: "http://what", WhenLastUpdate: riverjs.Time(now)},
+		{FeedTitle: "hey", FeedUrl: "http://hey", WhenLastUpdate: riverjs.Time(now)},
+		{FeedTitle: "hey2", FeedUrl: "http://hey", WhenLastUpdate: riverjs.Time(now.Add(-10 * time.Second))},
+		{FeedTitle: "hey", FeedUrl: "http://hey", WhenLastUpdate: riverjs.Time(now.Add(-2 * time.Second))},
 	}
 	for _, feed := range feeds {
 		riv.Add(feed)
 	}
 
 	// old feed, ignored
-	oldfeed := riverjs.Feed{FeedTitle: "out", FeedUrl: "out", WhenLastUpdate: riverjs.RssTime{time.Now().Add(-2 * time.Minute)}}
+	oldfeed := riverjs.Feed{FeedTitle: "out", FeedUrl: "out", WhenLastUpdate: riverjs.Time(time.Now().Add(-2 * time.Minute))}
 	riv.Add(oldfeed)
 
 	latest := riv.Latest(-time.Minute)

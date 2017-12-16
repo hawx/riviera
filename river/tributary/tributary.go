@@ -187,7 +187,7 @@ func (t *tributary) itemHandler(feed *feed.Feed, ch *common.Channel, newitems []
 		WebsiteUrl:      websiteUrl,
 		FeedTitle:       ch.Title,
 		FeedDescription: ch.Description,
-		WhenLastUpdate:  riverjs.RssTime{time.Now()},
+		WhenLastUpdate:  riverjs.Time(time.Now()),
 		Items:           items,
 	}
 }
