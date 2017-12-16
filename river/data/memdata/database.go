@@ -6,6 +6,7 @@ import (
 	"sync"
 
 	"hawx.me/code/riviera/feed"
+	"hawx.me/code/riviera/river/confluence"
 	"hawx.me/code/riviera/river/data"
 )
 
@@ -17,6 +18,10 @@ type database struct {
 // Open a new in memory database.
 func Open() data.Database {
 	return &database{buckets: map[string]data.Bucket{}}
+}
+
+func (*database) Confluence() (confluence.Database, error) {
+	return newConfluenceDatabase()
 }
 
 func (*database) Feed(name string) (feed.Database, error) {

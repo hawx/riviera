@@ -6,7 +6,6 @@ import (
 	"sync"
 	"time"
 
-	"hawx.me/code/riviera/river/data"
 	"hawx.me/code/riviera/river/events"
 	"hawx.me/code/riviera/river/riverjs"
 	"hawx.me/code/riviera/river/tributary"
@@ -49,13 +48,11 @@ type confluence struct {
 // guaranteed to be followed exactly (e.g. with a cutoff of 1 hour an item which
 // is 2 hours old may be returned by Latest, but an item that is 5 minutes old
 // must be returned by Latest). The event log size is set by logLength.
-func New(store data.Database, cutoff time.Duration, logLength int) Confluence {
-	database, _ := newConfluenceDatabase(store)
-
+func New(store Database, cutoff time.Duration, logLength int) Confluence {
 	go func() {
 		for _ = range time.Tick(cutoff) {
 			log.Println("truncating feed data")
-			database.Truncate(cutoff)
+			store.Truncate(cutoff)
 			log.Println("done truncating")
 		}
 	}()
@@ -63,7 +60,7 @@ func New(store data.Database, cutoff time.Duration, logLength int) Confluence {
 	evs := events.New(logLength)
 
 	c := &confluence{
-		store:   database,
+		store:   store,
 		cutoff:  cutoff,
 		streams: map[string]tributary.Tributary{},
 		feeds:   make(chan riverjs.Feed),

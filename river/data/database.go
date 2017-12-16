@@ -2,8 +2,17 @@
 // key-value database arranged into buckets.
 package data
 
+import (
+	"hawx.me/code/riviera/feed"
+	"hawx.me/code/riviera/river/confluence"
+)
+
 // Database is a key-value store with data arranged in buckets.
 type Database interface {
+	Feed(name string) (feed.Database, error)
+
+	Confluence() (confluence.Database, error)
+
 	// Bucket returns a namespaced bucket for storing key-value data.
 	Bucket(name []byte) (Bucket, error)
 

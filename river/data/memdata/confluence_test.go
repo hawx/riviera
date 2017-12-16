@@ -1,21 +1,19 @@
-package confluence
+package memdata
 
 import (
-	"encoding/json"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/assert"
-	"hawx.me/code/riviera/river/data"
-	"hawx.me/code/riviera/river/data/memdata"
 	"hawx.me/code/riviera/river/riverjs"
 )
 
 func TestPersistedRiver(t *testing.T) {
 	assert := assert.New(t)
-	db := memdata.Open()
 
-	riv, err := newConfluenceDatabase(db)
+	db := Open()
+
+	riv, err := db.Confluence()
 	assert.Nil(err)
 
 	now := time.Now().Round(time.Second)
@@ -46,15 +44,5 @@ func TestPersistedRiver(t *testing.T) {
 
 	riv.Truncate(-time.Minute)
 
-	bucket, _ := riv.(data.Bucket)
-
-	// make sure old feed has been deleted
-	bucket.View(func(tx data.ReadTx) error {
-		for _, v := range tx.All() {
-			var feed riverjs.Feed
-			json.Unmarshal(v, &feed)
-			assert.NotEqual(oldfeed.FeedTitle, feed.FeedTitle)
-		}
-		return nil
-	})
+	assert.Len(riv.(*confluenceDatabase).feeds, len(feeds))
 }

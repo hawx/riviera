@@ -1,4 +1,4 @@
-package tributary
+package tributary_test
 
 import (
 	"net/http"
@@ -10,6 +10,7 @@ import (
 	"hawx.me/code/riviera/river/data/memdata"
 	"hawx.me/code/riviera/river/mapping"
 	"hawx.me/code/riviera/river/riverjs"
+	"hawx.me/code/riviera/river/tributary"
 )
 
 func TestTributary(t *testing.T) {
@@ -34,8 +35,8 @@ func TestTributary(t *testing.T) {
 	}))
 	defer s.Close()
 
-	db := memdata.Open()
-	tributary := New(db, s.URL, time.Minute, mapping.DefaultMapping)
+	db, _ := memdata.Open().Feed(s.URL)
+	tributary := tributary.New(db, s.URL, time.Minute, mapping.DefaultMapping)
 	tributary.Start()
 
 	expected := riverjs.Feed{
@@ -105,8 +106,8 @@ good engineering culture— is our obsession with aggressively measuring everyth
 	}))
 	defer s.Close()
 
-	db := memdata.Open()
-	tributary := New(db, s.URL, time.Minute, mapping.DefaultMapping)
+	db, _ := memdata.Open().Feed(s.URL)
+	tributary := tributary.New(db, s.URL, time.Minute, mapping.DefaultMapping)
 	tributary.Start()
 
 	expected := riverjs.Feed{

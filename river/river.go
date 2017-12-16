@@ -57,8 +57,9 @@ func New(store data.Database, options Options) River {
 		options.Refresh = DefaultOptions.Refresh
 	}
 
+	confluenceStore, _ := store.Confluence()
 	return &river{
-		confluence:   confluence.New(store, options.CutOff, options.LogLength),
+		confluence:   confluence.New(confluenceStore, options.CutOff, options.LogLength),
 		store:        store,
 		cacheTimeout: options.Refresh,
 		mapping:      options.Mapping,
@@ -84,7 +85,8 @@ func (r *river) WriteTo(w io.Writer) error {
 }
 
 func (r *river) Add(uri string) {
-	tributary := tributary.New(r.store, uri, r.cacheTimeout, r.mapping)
+	feedStore, _ := r.store.Feed(uri)
+	tributary := tributary.New(feedStore, uri, r.cacheTimeout, r.mapping)
 	r.confluence.Add(tributary)
 
 	tributary.Start()

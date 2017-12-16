@@ -9,7 +9,6 @@ import (
 	"golang.org/x/net/html/charset"
 	"hawx.me/code/riviera/feed"
 	"hawx.me/code/riviera/feed/common"
-	"hawx.me/code/riviera/river/data"
 	"hawx.me/code/riviera/river/events"
 	"hawx.me/code/riviera/river/mapping"
 	"hawx.me/code/riviera/river/riverjs"
@@ -43,9 +42,8 @@ type tributary struct {
 	quit    chan struct{}
 }
 
-func New(store data.Database, uri string, cacheTimeout time.Duration, mapping mapping.Mapping) *tributary {
+func New(store feed.Database, uri string, cacheTimeout time.Duration, mapping mapping.Mapping) *tributary {
 	parsedUri, _ := url.Parse(uri)
-	feedDatabase, _ := newFeedDatabase(store, uri)
 
 	p := &tributary{
 		uri:     parsedUri,
@@ -53,7 +51,7 @@ func New(store data.Database, uri string, cacheTimeout time.Duration, mapping ma
 		quit:    make(chan struct{}),
 	}
 
-	p.feed = feed.New(cacheTimeout, p.itemHandler, feedDatabase)
+	p.feed = feed.New(cacheTimeout, p.itemHandler, store)
 	p.client = &http.Client{Timeout: time.Minute, Transport: &statusTransport{http.DefaultTransport.(*http.Transport), p}}
 
 	return p
