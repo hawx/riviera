@@ -105,7 +105,7 @@ loop:
 
 		case event := <-c.events:
 			if event.Code == http.StatusGone {
-				c.Remove(event.Uri)
+				c.Remove(event.URI)
 			}
 			c.evs.Prepend(event)
 

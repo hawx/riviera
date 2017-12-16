@@ -18,9 +18,10 @@ import (
 
 const docsPath = "http://scripting.com/stories/2010/12/06/innovationRiverOfNewsInJso.html"
 
+// A River aggregates feeds that it is subscribed to, and writes them in riverjs format.
 type River interface {
 	// WriteTo writes the river to w in json format. It does not write the json in
-	// a callback function.
+	// a javascript callback function.
 	WriteTo(w io.Writer) error
 
 	// Log returns a list of fetch events.

@@ -197,7 +197,7 @@ func main() {
 
 	subs := subscriptions.FromOpml(outline)
 	for _, sub := range subs.List() {
-		feeds.Add(sub.Uri)
+		feeds.Add(sub.URI)
 	}
 
 	watcher, err := watchFile(opmlPath, func() {

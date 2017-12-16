@@ -6,6 +6,7 @@ import (
 	"hawx.me/code/riviera/river/mapping"
 )
 
+// Options change the behaviour of River.
 type Options struct {
 	// Mapping is the function used to convert a feed item to an item in the
 	// river.
@@ -24,6 +25,7 @@ type Options struct {
 	LogLength int
 }
 
+// DefaultOptions are some sensible options to start out with.
 var DefaultOptions = Options{
 	Mapping:   mapping.DefaultMapping,
 	CutOff:    -24 * time.Hour,

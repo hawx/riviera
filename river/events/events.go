@@ -5,10 +5,11 @@ import "time"
 // An Event keeps track of the results of fetching a feed.
 type Event struct {
 	At   time.Time `json:"at"`
-	Uri  string    `json:"uri"`
+	URI  string    `json:"uri"`
 	Code int       `json:"code"`
 }
 
+// Events is a list of Event objects.
 type Events struct {
 	evs []Event
 	cur int
@@ -16,6 +17,7 @@ type Events struct {
 	cp  int
 }
 
+// New returns an empty list of Events with a maximum size.
 func New(size int) *Events {
 	return &Events{
 		evs: make([]Event, size),

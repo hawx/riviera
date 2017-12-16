@@ -10,11 +10,11 @@ func TestEvents(t *testing.T) {
 	evs := New(3)
 
 	ev := []Event{
-		{Uri: "1"},
-		{Uri: "2"},
-		{Uri: "3"},
-		{Uri: "4"},
-		{Uri: "5"},
+		{URI: "1"},
+		{URI: "2"},
+		{URI: "3"},
+		{URI: "4"},
+		{URI: "5"},
 	}
 
 	assert.Equal(t, []Event{}, evs.List())

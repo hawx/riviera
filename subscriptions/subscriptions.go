@@ -17,11 +17,11 @@ type List interface {
 
 // Subscription represents the metadata for a single feed.
 type Subscription struct {
-	// Uri the subscription was created with, never changed!
-	Uri string `json:"uri"`
+	// URI the subscription was created with, never changed!
+	URI string `json:"uri"`
 
-	FeedUrl         string `json:"feedUrl"`
-	WebsiteUrl      string `json:"websiteUrl"`
+	FeedURL         string `json:"feedUrl"`
+	WebsiteURL      string `json:"websiteUrl"`
 	FeedTitle       string `json:"feedTitle"`
 	FeedDescription string `json:"feedDescription"`
 }
@@ -60,14 +60,14 @@ func (s *Subscriptions) List() []Subscription {
 // Add a new feed url to the list.
 func (s *Subscriptions) Add(uri string) {
 	s.mu.Lock()
-	s.m[uri] = Subscription{Uri: uri}
+	s.m[uri] = Subscription{URI: uri}
 	s.mu.Unlock()
 }
 
 // Refresh the data for a particular Subscription.
 func (s *Subscriptions) Refresh(sub Subscription) {
 	s.mu.Lock()
-	s.m[sub.Uri] = sub
+	s.m[sub.URI] = sub
 	s.mu.Unlock()
 }
 
@@ -88,9 +88,9 @@ func FromOpml(doc opml.Opml) *Subscriptions {
 
 		s.Refresh(Subscription{
 			FeedTitle:       e.Text,
-			FeedUrl:         e.XmlUrl,
-			Uri:             e.XmlUrl,
-			WebsiteUrl:      e.HtmlUrl,
+			FeedURL:         e.XMLURL,
+			URI:             e.XMLURL,
+			WebsiteURL:      e.HTMLURL,
 			FeedDescription: e.Description,
 		})
 	}
@@ -109,9 +109,9 @@ func AsOpml(s List) opml.Opml {
 		l.Body.Outline = append(l.Body.Outline, opml.Outline{
 			Type:        "rss",
 			Text:        e.FeedTitle,
-			XmlUrl:      e.Uri,
+			XMLURL:      e.URI,
 			Description: e.FeedDescription,
-			HtmlUrl:     e.WebsiteUrl,
+			HTMLURL:     e.WebsiteURL,
 			Title:       e.FeedTitle,
 		})
 	}
@@ -128,7 +128,7 @@ const (
 
 type Change struct {
 	Type ChangeType
-	Uri  string
+	URI  string
 }
 
 // Diff finds the difference between two subscription lists.
@@ -137,14 +137,14 @@ func Diff(a, b *Subscriptions) (added, removed []string) {
 	b.mu.RLock()
 
 	for _, s := range a.m {
-		if _, ok := b.m[s.Uri]; !ok {
-			removed = append(removed, s.Uri)
+		if _, ok := b.m[s.URI]; !ok {
+			removed = append(removed, s.URI)
 		}
 	}
 
 	for _, s := range b.m {
-		if _, ok := a.m[s.Uri]; !ok {
-			added = append(added, s.Uri)
+		if _, ok := a.m[s.URI]; !ok {
+			added = append(added, s.URI)
 		}
 	}
 

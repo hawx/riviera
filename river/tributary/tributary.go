@@ -131,7 +131,7 @@ func (t *tributary) fetch() {
 	code, err := t.feed.Fetch(t.uri.String(), t.client, charset.NewReaderLabel)
 	t.events <- events.Event{
 		At:   time.Now().UTC(),
-		Uri:  t.Name(),
+		URI:  t.Name(),
 		Code: code,
 	}
 
