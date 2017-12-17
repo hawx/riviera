@@ -2,13 +2,11 @@
 package main
 
 import (
-	"encoding/json"
 	"flag"
 	"fmt"
 	"io"
 	"log"
 	"net/http"
-	"strings"
 	"sync"
 	"time"
 
@@ -70,9 +68,6 @@ var (
 	socket = flag.String("socket", "", "")
 )
 
-// DefaultCallback is the name of the callback to use in the jsonp response.
-const DefaultCallback = "onGetRiverStream"
-
 func loadDatastore() (data.Database, error) {
 	if *boltdbPath != "" {
 		return boltdata.Open(*boltdbPath)
@@ -103,41 +98,6 @@ func watchFile(path string, f func()) (io.Closer, error) {
 	}()
 
 	return watcher, watcher.Add(path)
-}
-
-type riverHandler struct {
-	river.River
-}
-
-func newRiverHandler(feeds river.River) http.Handler {
-	return &riverHandler{feeds}
-}
-
-func (h *riverHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	if strings.ToUpper(r.Method) != "GET" {
-		w.Header().Set("Accept", "GET")
-		w.WriteHeader(http.StatusMethodNotAllowed)
-		return
-	}
-
-	switch r.URL.Path {
-	case "/":
-		w.Header().Set("Content-Type", "application/javascript")
-		fmt.Fprintf(w, "%s(", DefaultCallback)
-		if err := h.WriteTo(w); err != nil {
-			log.Println("/:", err)
-		}
-		fmt.Fprintf(w, ")")
-
-	case "/log":
-		w.Header().Set("Content-Type", "application/json")
-		if err := json.NewEncoder(w).Encode(h.Log()); err != nil {
-			log.Println("/log:", err)
-		}
-
-	default:
-		http.NotFound(w, r)
-	}
 }
 
 func main() {
@@ -223,7 +183,7 @@ func main() {
 	}
 	defer waitFor("watcher", watcher.Close)
 
-	http.Handle("/river/", http.StripPrefix("/river", newRiverHandler(feeds)))
+	http.Handle("/river/", http.StripPrefix("/river", river.Handler(feeds)))
 
 	serve.Serve(*port, *socket, http.DefaultServeMux)
 	wg.Wait()
