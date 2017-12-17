@@ -28,8 +28,8 @@ Riviera expects a list of feeds to subscribe to be passed. This is given in
 By default an in-memory database is used, it is more useful to use the
 `--boltdb` option to create/open a database on disk.
 
-The riverjs document is served at `/river`, a set of metadata listing the feeds
-subscribed to and recent fetcher activity is served at `/river/meta`.
+The riverjs document is served at `/river` and a log of recent fetcher activity
+is served at `/river/log`.
 
 See `riviera --help` for a full list of options.
 
