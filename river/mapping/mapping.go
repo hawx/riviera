@@ -1,3 +1,4 @@
+// Package mapping converts a feed item into a riverjs item.
 package mapping
 
 import (

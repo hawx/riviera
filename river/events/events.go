@@ -1,3 +1,4 @@
+// Package events keeps track of the results of fetching feeds.
 package events
 
 import "time"

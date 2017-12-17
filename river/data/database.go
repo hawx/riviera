@@ -1,5 +1,5 @@
-// Package data provides an interface for saving and retrieving data from a
-// key-value database arranged into buckets.
+// Package data provides the ability to rebuild previous feeds and remove
+// duplicate items.
 package data
 
 import (

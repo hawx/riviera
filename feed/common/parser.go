@@ -1,4 +1,4 @@
-// Package common contains structs for a unified feed format
+// Package common contains structs for a unified feed format.
 package common
 
 import "io"

@@ -1,3 +1,4 @@
+// Package tributary fetches a single feed.
 package tributary
 
 import (

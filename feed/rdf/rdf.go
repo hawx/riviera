@@ -1,4 +1,4 @@
-// Package rdf provides a parser for RDF Site Summary (RSS) 1.0
+// Package rdf provides a parser for RDF Site Summary (RSS) 1.0.
 //
 // See http://web.resource.org/rss/1.0/spec for the specification.
 //

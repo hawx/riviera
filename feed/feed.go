@@ -1,17 +1,5 @@
-// Package feed provides an RSS and Atom feed fetcher
-//
-// Feeds are parsed into a common/hybrid object tree. Because of this not all
-// fields will be filled when requesting either an RSS or Atom feed. As many
-// shared fields as possible are used but some of them simply do not occur in
-// either the RSS or Atom spec.
-//
-// The package allows us to maintain cache timeout management. This prevents
-// querying the servers for feed updates too often. Apart from setting a cache
-// timeout manually, the package also optionally adheres to the TTL, SkipDays
-// and SkipHours values specified in RSS feeds.
-
 // Package feed provides a feed fetcher capable of reading multiple formats into
-// a common structureo
+// a common structure.
 package feed
 
 import (

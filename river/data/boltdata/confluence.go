@@ -2,20 +2,14 @@ package boltdata
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
+	"time"
 
 	"github.com/boltdb/bolt"
+	"hawx.me/code/riviera/river/confluence"
 	"hawx.me/code/riviera/river/riverjs"
-
-	"encoding/json"
-	"time"
 )
-
-type Database interface {
-	Add(feed riverjs.Feed)
-	Truncate(cutoff time.Duration)
-	Latest(cutoff time.Duration) []riverjs.Feed
-}
 
 // A confluenceDatabase contains persisted feed data, specifically each "block"
 // of updates for a feed. This allows the river to be recreated from past data,
@@ -26,7 +20,7 @@ type confluenceDatabase struct {
 
 var riverBucketName = []byte("river")
 
-func newConfluenceDatabase(db *bolt.DB) (Database, error) {
+func newConfluenceDatabase(db *bolt.DB) (confluence.Database, error) {
 	err := db.Update(func(tx *bolt.Tx) error {
 		_, err := tx.CreateBucketIfNotExists(riverBucketName)
 		return err

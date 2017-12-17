@@ -1,3 +1,4 @@
+// Package confluence manages a list of subscribed feeds.
 package confluence
 
 import (

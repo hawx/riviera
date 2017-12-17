@@ -1,4 +1,4 @@
-// Package rss provides a parser for RSS v2.0 feeds
+// Package rss provides a parser for RSS v2.0 feeds.
 //
 // Commentary taken from http://www.rssboard.org/rss-specification
 package rss
