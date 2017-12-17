@@ -1,4 +1,4 @@
-// Package rss provides a parser for RSS v2.0 feeds
+// Package rss provides a parser for RSS v2.0 feeds.
 //
 // Commentary taken from http://www.rssboard.org/rss-specification
 package rss
@@ -51,8 +51,6 @@ func (Parser) CanRead(r io.Reader, charset func(charset string, input io.Reader)
 			return false
 		}
 	}
-
-	return false
 }
 
 func (Parser) Read(r io.Reader, charset func(charset string, input io.Reader) (io.Reader, error)) (foundChannels []*common.Channel, err error) {

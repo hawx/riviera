@@ -1,4 +1,4 @@
-package river
+package mapping
 
 import (
 	"testing"
@@ -6,7 +6,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"hawx.me/code/riviera/feed/common"
-	"hawx.me/code/riviera/river/models"
+	"hawx.me/code/riviera/river/riverjs"
 )
 
 func TestDefaultMapping(t *testing.T) {
@@ -16,7 +16,7 @@ func TestDefaultMapping(t *testing.T) {
 	testcases := []struct {
 		name       string
 		feedItem   *common.Item
-		modelsItem *models.Item
+		modelsItem *riverjs.Item
 	}{
 		{
 			"standard",
@@ -30,15 +30,15 @@ func TestDefaultMapping(t *testing.T) {
 				Description: "this is tha content",
 				PubDate:     "Mon, 02 Jan 2006 20:04:19 UTC",
 			},
-			&models.Item{
+			&riverjs.Item{
 				PermaLink:  "http://example.org/this",
 				Link:       "http://example.org/this",
 				Body:       "this is tha content",
-				PubDate:    models.RssTime{time.Date(2006, 1, 2, 20, 4, 19, 0, time.UTC)},
+				PubDate:    riverjs.Time(time.Date(2006, 1, 2, 20, 4, 19, 0, time.UTC)),
 				Title:      "cool feed thang",
 				Id:         "cool feed thangMon, 02 Jan 2006 20:04:19 UTC",
 				Comments:   "",
-				Enclosures: []models.Enclosure{},
+				Enclosures: []riverjs.Enclosure{},
 			},
 		},
 
@@ -50,12 +50,12 @@ func TestDefaultMapping(t *testing.T) {
 				Description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec a diam lectus. Sed sit amet ipsum mauris. Maecenas congue ligula ac quam viverra nec consectetur ante hendrerit. Donec et mollis dolor. Praesent et diam eget libero egestas mattis sit amet vitae augue. Nam tincidunt congue enim, ut porta lorem lacinia consectetur. Donec ut libero sed arcu vehicula ultricies a non tortor. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean ut gravida lorem. Ut turpis felis, pulvinar a semper sed, adipiscing id dolor. Pellentesque auctor nisi id magna consequat sagittis. Curabitur dapibus enim sit amet elit pharetra tincidunt feugiat nisl imperdiet. Ut convallis libero in urna ultrices accumsan. Donec sed odio eros. Donec viverra mi quis quam pulvinar at malesuada arcu rhoncus. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. In rutrum accumsan ultricies. Mauris vitae nisi at sem facilisis semper ac in est.",
 				PubDate:     "Mon, 02 Jan 2006 20:04:19 UTC",
 			},
-			&models.Item{
+			&riverjs.Item{
 				Body:       "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec a diam lectus. Sed sit amet ipsum mauris. Maecenas congue ligula ac quam viverra nec consectetur ante hendrerit. Donec et mollis dolor. Praesent et diam eget libero egestas mattis sit amet vitae augue. Nam tincidunt…",
-				PubDate:    models.RssTime{time.Date(2006, 1, 2, 20, 4, 19, 0, time.UTC)},
+				PubDate:    riverjs.Time(time.Date(2006, 1, 2, 20, 4, 19, 0, time.UTC)),
 				Title:      "cool feed thang",
 				Id:         "cool feed thangMon, 02 Jan 2006 20:04:19 UTC",
-				Enclosures: []models.Enclosure{},
+				Enclosures: []riverjs.Enclosure{},
 			},
 		},
 		{
@@ -65,11 +65,11 @@ func TestDefaultMapping(t *testing.T) {
 				PubDate:     "Mon, 02 Jan 2006 20:04:19 UTC",
 				Id:          "5",
 			},
-			&models.Item{
+			&riverjs.Item{
 				Body:       "'",
-				PubDate:    models.RssTime{time.Date(2006, 1, 2, 20, 4, 19, 0, time.UTC)},
+				PubDate:    riverjs.Time(time.Date(2006, 1, 2, 20, 4, 19, 0, time.UTC)),
 				Id:         "5",
-				Enclosures: []models.Enclosure{},
+				Enclosures: []riverjs.Enclosure{},
 			},
 		},
 
@@ -81,11 +81,11 @@ func TestDefaultMapping(t *testing.T) {
 				PubDate: "Mon, 02 Jan 2006 20:04:19 UTC",
 				Id:      "5",
 			},
-			&models.Item{
+			&riverjs.Item{
 				Title:      `“The purpose of the IoT is to give humans superpowers”`,
-				PubDate:    models.RssTime{time.Date(2006, 1, 2, 20, 4, 19, 0, time.UTC)},
+				PubDate:    riverjs.Time(time.Date(2006, 1, 2, 20, 4, 19, 0, time.UTC)),
 				Id:         "5",
-				Enclosures: []models.Enclosure{},
+				Enclosures: []riverjs.Enclosure{},
 			},
 		},
 
@@ -96,10 +96,10 @@ func TestDefaultMapping(t *testing.T) {
 				PubDate: "Mon, 02 Jan 2006 20:04:19 UTC",
 				Id:      "-",
 			},
-			&models.Item{
-				PubDate:    models.RssTime{time.Date(2006, 1, 2, 20, 4, 19, 0, time.UTC)},
+			&riverjs.Item{
+				PubDate:    riverjs.Time(time.Date(2006, 1, 2, 20, 4, 19, 0, time.UTC)),
 				Id:         "-",
-				Enclosures: []models.Enclosure{},
+				Enclosures: []riverjs.Enclosure{},
 			},
 		},
 		{
@@ -108,10 +108,10 @@ func TestDefaultMapping(t *testing.T) {
 				PubDate: "2006-01-02T20:04:19+00:00",
 				Id:      "-",
 			},
-			&models.Item{
-				PubDate:    models.RssTime{time.Date(2006, 1, 2, 20, 4, 19, 0, time.Local)},
+			&riverjs.Item{
+				PubDate:    riverjs.Time(time.Date(2006, 1, 2, 20, 4, 19, 0, time.Local)),
 				Id:         "-",
-				Enclosures: []models.Enclosure{},
+				Enclosures: []riverjs.Enclosure{},
 			},
 		},
 
@@ -122,10 +122,10 @@ func TestDefaultMapping(t *testing.T) {
 				PubDate: "Mon, 02 Jan 2006 20:04:19 UTC",
 				Id:      "5",
 			},
-			&models.Item{
-				PubDate:    models.RssTime{time.Date(2006, 1, 2, 20, 4, 19, 0, time.UTC)},
+			&riverjs.Item{
+				PubDate:    riverjs.Time(time.Date(2006, 1, 2, 20, 4, 19, 0, time.UTC)),
 				Id:         "5",
-				Enclosures: []models.Enclosure{},
+				Enclosures: []riverjs.Enclosure{},
 			},
 		},
 		{
@@ -134,10 +134,10 @@ func TestDefaultMapping(t *testing.T) {
 				PubDate: "Mon, 02 Jan 2006 20:04:19 UTC",
 				Guid:    &common.Guid{Guid: "200823-4545345-435543-45"},
 			},
-			&models.Item{
-				PubDate:    models.RssTime{time.Date(2006, 1, 2, 20, 4, 19, 0, time.UTC)},
+			&riverjs.Item{
+				PubDate:    riverjs.Time(time.Date(2006, 1, 2, 20, 4, 19, 0, time.UTC)),
 				Id:         "200823-4545345-435543-45",
-				Enclosures: []models.Enclosure{},
+				Enclosures: []riverjs.Enclosure{},
 			},
 		},
 		{
@@ -146,11 +146,11 @@ func TestDefaultMapping(t *testing.T) {
 				PubDate: "Mon, 02 Jan 2006 20:04:19 UTC",
 				Title:   "hey",
 			},
-			&models.Item{
+			&riverjs.Item{
 				Title:      "hey",
-				PubDate:    models.RssTime{time.Date(2006, 1, 2, 20, 4, 19, 0, time.UTC)},
+				PubDate:    riverjs.Time(time.Date(2006, 1, 2, 20, 4, 19, 0, time.UTC)),
 				Id:         "heyMon, 02 Jan 2006 20:04:19 UTC",
-				Enclosures: []models.Enclosure{},
+				Enclosures: []riverjs.Enclosure{},
 			},
 		},
 
@@ -161,12 +161,12 @@ func TestDefaultMapping(t *testing.T) {
 				PubDate: "Mon, 02 Jan 2006 20:04:19 UTC",
 				Guid:    &common.Guid{Guid: "5", IsPermaLink: true},
 			},
-			&models.Item{
+			&riverjs.Item{
 				Link:       "5",
 				PermaLink:  "5",
-				PubDate:    models.RssTime{time.Date(2006, 1, 2, 20, 4, 19, 0, time.UTC)},
+				PubDate:    riverjs.Time(time.Date(2006, 1, 2, 20, 4, 19, 0, time.UTC)),
 				Id:         "5",
-				Enclosures: []models.Enclosure{},
+				Enclosures: []riverjs.Enclosure{},
 			},
 		},
 		{
@@ -179,12 +179,12 @@ func TestDefaultMapping(t *testing.T) {
 					{Href: "ignored"},
 				},
 			},
-			&models.Item{
+			&riverjs.Item{
 				Link:       "cool",
 				PermaLink:  "cool",
-				PubDate:    models.RssTime{time.Date(2006, 1, 2, 20, 4, 19, 0, time.UTC)},
+				PubDate:    riverjs.Time(time.Date(2006, 1, 2, 20, 4, 19, 0, time.UTC)),
 				Id:         "5",
-				Enclosures: []models.Enclosure{},
+				Enclosures: []riverjs.Enclosure{},
 			},
 		},
 		{
@@ -197,12 +197,12 @@ func TestDefaultMapping(t *testing.T) {
 					{Href: "alt", Rel: "alternate"},
 				},
 			},
-			&models.Item{
+			&riverjs.Item{
 				Link:       "alt",
 				PermaLink:  "alt",
-				PubDate:    models.RssTime{time.Date(2006, 1, 2, 20, 4, 19, 0, time.UTC)},
+				PubDate:    riverjs.Time(time.Date(2006, 1, 2, 20, 4, 19, 0, time.UTC)),
 				Id:         "5",
-				Enclosures: []models.Enclosure{},
+				Enclosures: []riverjs.Enclosure{},
 			},
 		},
 
@@ -218,12 +218,12 @@ func TestDefaultMapping(t *testing.T) {
 					{Href: "otherthing", Type: "media/what", Rel: "enclosure"},
 				},
 			},
-			&models.Item{
+			&riverjs.Item{
 				Link:      "what",
 				PermaLink: "what",
-				PubDate:   models.RssTime{time.Date(2006, 1, 2, 20, 4, 19, 0, time.UTC)},
+				PubDate:   riverjs.Time(time.Date(2006, 1, 2, 20, 4, 19, 0, time.UTC)),
 				Id:        "5",
-				Enclosures: []models.Enclosure{
+				Enclosures: []riverjs.Enclosure{
 					{Url: "thing", Type: "media/what"},
 					{Url: "otherthing", Type: "media/what"},
 				},
@@ -240,13 +240,13 @@ func TestDefaultMapping(t *testing.T) {
 					Url: "http://example.com/thumb",
 				},
 			},
-			&models.Item{
-				PubDate: models.RssTime{time.Date(2006, 1, 2, 20, 4, 19, 0, time.UTC)},
+			&riverjs.Item{
+				PubDate: riverjs.Time(time.Date(2006, 1, 2, 20, 4, 19, 0, time.UTC)),
 				Id:      "5",
-				Thumbnail: &models.Thumbnail{
+				Thumbnail: &riverjs.Thumbnail{
 					Url: "http://example.com/thumb",
 				},
-				Enclosures: []models.Enclosure{},
+				Enclosures: []riverjs.Enclosure{},
 			},
 		},
 		{
@@ -260,15 +260,15 @@ func TestDefaultMapping(t *testing.T) {
 					Width:  100,
 				},
 			},
-			&models.Item{
-				PubDate: models.RssTime{time.Date(2006, 1, 2, 20, 4, 19, 0, time.UTC)},
+			&riverjs.Item{
+				PubDate: riverjs.Time(time.Date(2006, 1, 2, 20, 4, 19, 0, time.UTC)),
 				Id:      "5",
-				Thumbnail: &models.Thumbnail{
+				Thumbnail: &riverjs.Thumbnail{
 					Url:    "http://example.com/thumb",
 					Height: &fifty,
 					Width:  &oneHundred,
 				},
-				Enclosures: []models.Enclosure{},
+				Enclosures: []riverjs.Enclosure{},
 			},
 		},
 	}

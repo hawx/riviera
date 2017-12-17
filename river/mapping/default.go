@@ -1,4 +1,4 @@
-package river
+package mapping
 
 import (
 	"html"
@@ -8,31 +8,27 @@ import (
 
 	"github.com/kennygrant/sanitize"
 	"hawx.me/code/riviera/feed/common"
-	"hawx.me/code/riviera/river/models"
+	"hawx.me/code/riviera/river/riverjs"
 )
-
-// A Mapping takes an item from a feed and returns an item for the river, if nil
-// is returned the item will not be added to the river.
-type Mapping func(*common.Item) *models.Item
 
 // DefaultMapping will always return an item. It: attempts to parse the PubDate,
 // otherwise uses the current time; truncates the description to 280 characters;
 // finds the correct Link and PermaLink; copies any Enclosures; and fills out
 // the other properties by copying the correct values.
-func DefaultMapping(item *common.Item) *models.Item {
+func DefaultMapping(item *common.Item) *riverjs.Item {
 	pubDate, err := item.ParsedPubDate()
 	if err != nil {
 		log.Println("DefaultMapping/time:", err)
 		pubDate = time.Now()
 	}
 
-	i := &models.Item{
+	i := &riverjs.Item{
 		Body:       stripAndCrop(item.Description),
-		PubDate:    models.RssTime{pubDate},
+		PubDate:    riverjs.Time(pubDate),
 		Title:      html.UnescapeString(item.Title),
 		Id:         item.Key(),
 		Comments:   item.Comments,
-		Enclosures: []models.Enclosure{},
+		Enclosures: []riverjs.Enclosure{},
 	}
 
 	if item.Guid != nil && item.Guid.IsPermaLink {
@@ -51,7 +47,7 @@ func DefaultMapping(item *common.Item) *models.Item {
 			}
 
 			if link.Rel == "enclosure" {
-				i.Enclosures = append(i.Enclosures, models.Enclosure{
+				i.Enclosures = append(i.Enclosures, riverjs.Enclosure{
 					Url:  link.Href,
 					Type: link.Type,
 				})
@@ -64,7 +60,7 @@ func DefaultMapping(item *common.Item) *models.Item {
 	}
 
 	for _, enclosure := range item.Enclosures {
-		i.Enclosures = append(i.Enclosures, models.Enclosure{
+		i.Enclosures = append(i.Enclosures, riverjs.Enclosure{
 			Url:    enclosure.Url,
 			Type:   enclosure.Type,
 			Length: enclosure.Length,
@@ -72,7 +68,7 @@ func DefaultMapping(item *common.Item) *models.Item {
 	}
 
 	if item.Thumbnail != nil {
-		i.Thumbnail = &models.Thumbnail{
+		i.Thumbnail = &riverjs.Thumbnail{
 			Url: item.Thumbnail.Url,
 		}
 

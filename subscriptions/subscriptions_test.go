@@ -18,27 +18,27 @@ func TestSubscriptions(t *testing.T) {
 	subs.Add("http://example.com/feed2")
 
 	assert.Equal(t, []Subscription{
-		{Uri: "http://example.com/feed"},
-		{Uri: "http://example.com/feed2"},
-		{Uri: "http://example.org/xml"},
+		{URI: "http://example.com/feed"},
+		{URI: "http://example.com/feed2"},
+		{URI: "http://example.org/xml"},
 	}, subs.List())
 
 	// Refresh feed
 	subs.Refresh(Subscription{
-		Uri:       "http://example.com/feed",
+		URI:       "http://example.com/feed",
 		FeedTitle: "what",
 	})
 	assert.Equal(t, []Subscription{
-		{Uri: "http://example.com/feed", FeedTitle: "what"},
-		{Uri: "http://example.com/feed2"},
-		{Uri: "http://example.org/xml"},
+		{URI: "http://example.com/feed", FeedTitle: "what"},
+		{URI: "http://example.com/feed2"},
+		{URI: "http://example.org/xml"},
 	}, subs.List())
 
 	// Remove feed
 	subs.Remove("http://example.com/feed")
 	assert.Equal(t, []Subscription{
-		{Uri: "http://example.com/feed2"},
-		{Uri: "http://example.org/xml"},
+		{URI: "http://example.com/feed2"},
+		{URI: "http://example.org/xml"},
 	}, subs.List())
 }
 
@@ -63,19 +63,19 @@ func TestFromOpml(t *testing.T) {
 			{ // ignored as type not "rss"
 				Type:   "whu",
 				Text:   "hey",
-				XmlUrl: "what",
+				XMLURL: "what",
 			},
 			{
 				Type:   "rss",
 				Text:   "hey2",
-				XmlUrl: "what2",
+				XMLURL: "what2",
 			},
 			{
 				Type:        "rss",
 				Text:        "cool",
-				XmlUrl:      "yes",
+				XMLURL:      "yes",
 				Description: "this desc",
-				HtmlUrl:     "htmls",
+				HTMLURL:     "htmls",
 				Language:    "en",
 				Title:       "titl",
 			},
@@ -85,7 +85,7 @@ func TestFromOpml(t *testing.T) {
 	subs := FromOpml(doc)
 
 	assert.Equal(t, []Subscription{
-		{Uri: "what2", FeedTitle: "hey2", FeedUrl: "what2"},
-		{Uri: "yes", FeedTitle: "cool", FeedUrl: "yes", WebsiteUrl: "htmls", FeedDescription: "this desc"},
+		{URI: "what2", FeedTitle: "hey2", FeedURL: "what2"},
+		{URI: "yes", FeedTitle: "cool", FeedURL: "yes", WebsiteURL: "htmls", FeedDescription: "this desc"},
 	}, subs.List())
 }

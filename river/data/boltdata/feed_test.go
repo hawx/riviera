@@ -1,24 +1,31 @@
-package persistence
+package boltdata
 
 import (
+	"io/ioutil"
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"hawx.me/code/riviera/river/data/memdata"
 )
 
 func TestBucket(t *testing.T) {
-	assert := assert.New(t)
-	db := memdata.Open()
+	dir, _ := ioutil.TempDir("", "riviera-bolt-test")
+	defer os.RemoveAll(dir)
 
-	bucket, err := NewBucket(db, "test")
+	assert := assert.New(t)
+
+	path := "/test.db"
+	db, err := Open(dir + path)
+	assert.Nil(err)
+
+	bucket, err := db.(*database).Feed("test")
 	assert.Nil(err)
 
 	const key = "1"
 	assert.False(bucket.Contains(key))
 	assert.True(bucket.Contains(key))
 
-	bucket2, err := NewBucket(db, "test2")
+	bucket2, err := db.(*database).Feed("test2")
 	assert.Nil(err)
 
 	assert.False(bucket2.Contains(key))

@@ -89,51 +89,6 @@ func Test_NewItem(t *testing.T) {
 	}
 }
 
-func Test_AtomAuthor(t *testing.T) {
-	file, err := os.Open("testdata/idownload.atom")
-	if err != nil {
-		t.Errorf("unable to load file")
-	}
-	defer file.Close()
-
-	itemCh := make(chan *common.Item, 1)
-	feed := New(1, func(f *Feed, ch *common.Channel, newitems []*common.Item) {
-		itemCh <- newitems[0]
-	}, NewDatabase())
-	err = feed.load(file, nil)
-
-	select {
-	case item := <-itemCh:
-		expected := "Cody Lee"
-		if item.Author.Name != expected {
-			t.Errorf("Expected author to be %s but found %s", expected, item.Author.Name)
-		}
-	case <-time.After(time.Second):
-		t.Fatal("timeout")
-	}
-}
-
-func Test_RssAuthor(t *testing.T) {
-	file, _ := os.Open("testdata/boing.rss")
-	defer file.Close()
-
-	itemCh := make(chan *common.Item, 1)
-	feed := New(1, func(f *Feed, ch *common.Channel, newitems []*common.Item) {
-		itemCh <- newitems[0]
-	}, NewDatabase())
-	feed.load(file, nil)
-
-	select {
-	case item := <-itemCh:
-		expected := "Cory Doctorow"
-		if item.Author.Name != expected {
-			t.Errorf("Expected author to be %s but found %s", expected, item.Author.Name)
-		}
-	case <-time.After(time.Second):
-		t.Fatal("timeout")
-	}
-}
-
 // func Test_ItemExtensions(t *testing.T) {
 // 	file, _ := os.Open("testdata/extension.rss")
 // 	defer file.Close()

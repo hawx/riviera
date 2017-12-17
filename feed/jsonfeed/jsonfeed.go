@@ -1,4 +1,4 @@
-// Package jsonfeed provides a parser for the jsonfeed format
+// Package jsonfeed provides a parser for the jsonfeed format.
 //
 // See https://jsonfeed.org/version/1
 package jsonfeed

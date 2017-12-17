@@ -7,6 +7,26 @@ import (
 	"hawx.me/code/assert"
 )
 
+func TestAuthor(t *testing.T) {
+	assert := assert.New(t)
+
+	file, _ := os.Open("../testdata/idownload.atom")
+	defer file.Close()
+
+	channels, err := new(Parser).Read(file, nil)
+	assert.Nil(err)
+
+	if assert.Len(channels, 1) {
+		channel := channels[0]
+
+		if assert.Len(channel.Items, 20) {
+			item := channel.Items[0]
+
+			assert.Equal("Cody Lee", item.Author.Name)
+		}
+	}
+}
+
 func TestMediaExtensions(t *testing.T) {
 	assert := assert.New(t)
 

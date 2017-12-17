@@ -1,14 +1,5 @@
-// Package feed provides an RSS and Atom feed fetcher
-//
-// Feeds are parsed into a common/hybrid object tree. Because of this not all
-// fields will be filled when requesting either an RSS or Atom feed. As many
-// shared fields as possible are used but some of them simply do not occur in
-// either the RSS or Atom spec.
-//
-// The package allows us to maintain cache timeout management. This prevents
-// querying the servers for feed updates too often. Apart from setting a cache
-// timeout manually, the package also optionally adheres to the TTL, SkipDays
-// and SkipHours values specified in RSS feeds.
+// Package feed provides a feed fetcher capable of reading multiple formats into
+// a common structure.
 package feed
 
 import (
@@ -69,14 +60,16 @@ func New(cachetimeout time.Duration, ih ItemHandler, database Database) *Feed {
 
 // Fetch retrieves the feed's latest content if necessary.
 //
-// The charset parameter overrides the xml decoder's CharsetReader.
-// This allows us to specify a custom character encoding conversion
-// routine when dealing with non-utf8 input. Supply 'nil' to use the
-// default from Go's xml package.
+// The charset parameter overrides the xml decoder's CharsetReader. This allows
+// us to specify a custom character encoding conversion routine when dealing
+// with non-utf8 input. Supply 'nil' to use the default from Go's xml package.
 //
 // The client parameter allows the use of arbitrary network connections, for
 // example the Google App Engine "URL Fetch" service.
-func (f *Feed) Fetch(uri string, client *http.Client, charset func(charset string, input io.Reader) (io.Reader, error)) (int, error) {
+//
+// If the feed is unable to update (see CanUpdate) then no request will be made,
+// instead the result will be (status=-1, err=nil).
+func (f *Feed) Fetch(uri string, client *http.Client, charset func(charset string, input io.Reader) (io.Reader, error)) (status int, err error) {
 	if !f.CanUpdate() {
 		return -1, nil
 	}
@@ -110,7 +103,7 @@ func (f *Feed) Fetch(uri string, client *http.Client, charset func(charset strin
 }
 
 func (f *Feed) load(r io.Reader, charset func(charset string, input io.Reader) (io.Reader, error)) (err error) {
-	f.channels, err = Parse(r, charset)
+	f.channels, err = parse(r, charset)
 	if err != nil || len(f.channels) == 0 {
 		return
 	}
@@ -131,7 +124,7 @@ var parsers = []common.Parser{
 	jsonfeed.Parser{},
 }
 
-func Parse(r io.Reader, charset func(charset string, input io.Reader) (io.Reader, error)) (chs []*common.Channel, err error) {
+func parse(r io.Reader, charset func(charset string, input io.Reader) (io.Reader, error)) (chs []*common.Channel, err error) {
 	data, _ := ioutil.ReadAll(r)
 	br := bytes.NewReader(data)
 
@@ -198,8 +191,7 @@ func (f *Feed) CanUpdate() bool {
 	return true
 }
 
-// Returns the number of seconds needed to elapse
-// before the feed should update.
+// Returns the number of seconds needed to elapse before the feed should update.
 func (f *Feed) DurationTillUpdate() time.Duration {
 	return f.cacheTimeout - time.Now().UTC().Sub(f.lastupdate)
 }

@@ -36,7 +36,7 @@ type Outline struct {
 
 	Type   string `xml:"type,attr,omitempty"`
 	Text   string `xml:"text,attr,omitempty"`
-	XmlUrl string `xml:"xmlUrl,attr,omitempty"`
+	XMLURL string `xml:"xmlUrl,attr,omitempty"`
 
 	// Optional attributes: description, htmlUrl, language, title. These
 	// attributes are useful when presenting a list of subscriptions to a user,
@@ -47,7 +47,7 @@ type Outline struct {
 	Description string `xml:"description,attr,omitempty"`
 
 	// htmlUrl is the top-level link element.
-	HtmlUrl string `xml:"htmlUrl,attr,omitempty"`
+	HTMLURL string `xml:"htmlUrl,attr,omitempty"`
 
 	// language is the value of the top-level language element.
 	Language string `xml:"language,attr,omitempty"`

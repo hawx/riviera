@@ -1,11 +1,11 @@
-// Package rdf provides a parser for RDF Site Summary (RSS) 1.0
+// Package rdf provides a parser for RDF Site Summary (RSS) 1.0.
 //
 // See http://web.resource.org/rss/1.0/spec for the specification.
 //
 // It also supports three modules:
-// - Dublin Core: http://web.resource.org/rss/1.0/modules/dc/
-// - Syndication: http://web.resource.org/rss/1.0/modules/syndication/
-// - Content: http://web.resource.org/rss/1.0/modules/content/
+//   - Dublin Core: http://web.resource.org/rss/1.0/modules/dc/
+//   - Syndication: http://web.resource.org/rss/1.0/modules/syndication/
+//   - Content: http://web.resource.org/rss/1.0/modules/content/
 package rdf
 
 import (
@@ -43,8 +43,6 @@ func (Parser) CanRead(r io.Reader, charset func(charset string, input io.Reader)
 			return t.Name.Space == "http://www.w3.org/1999/02/22-rdf-syntax-ns#" && t.Name.Local == "RDF"
 		}
 	}
-
-	return false
 }
 
 func (Parser) Read(r io.Reader, charset func(string, io.Reader) (io.Reader, error)) (foundChannels []*common.Channel, err error) {

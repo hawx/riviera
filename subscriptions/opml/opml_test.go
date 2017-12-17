@@ -48,8 +48,8 @@ func TestReadSubscriptions(t *testing.T) {
 		},
 		Body: Body{
 			Outline: []Outline{
-				{Type: "rss", Text: "CNET News.com", XmlUrl: "http://news.com.com/2547-1_3-0-5.xml", Description: "Tech news and business reports by CNET News.com. Focused on information technology, core topics include computers, hardware, software, networking, and Internet media.", HtmlUrl: "http://news.com.com/", Language: "unknown", Title: "CNET News.com"},
-				{Type: "rss", Text: "washingtonpost.com - Politics", XmlUrl: "http://www.washingtonpost.com/wp-srv/politics/rssheadlines.xml", Description: "Politics", HtmlUrl: "http://www.washingtonpost.com/wp-dyn/politics?nav=rss_politics", Language: "unknown", Title: "washingtonpost.com - Politics"},
+				{Type: "rss", Text: "CNET News.com", XMLURL: "http://news.com.com/2547-1_3-0-5.xml", Description: "Tech news and business reports by CNET News.com. Focused on information technology, core topics include computers, hardware, software, networking, and Internet media.", HTMLURL: "http://news.com.com/", Language: "unknown", Title: "CNET News.com"},
+				{Type: "rss", Text: "washingtonpost.com - Politics", XMLURL: "http://www.washingtonpost.com/wp-srv/politics/rssheadlines.xml", Description: "Politics", HTMLURL: "http://www.washingtonpost.com/wp-dyn/politics?nav=rss_politics", Language: "unknown", Title: "washingtonpost.com - Politics"},
 			},
 		},
 	}, doc)
@@ -63,8 +63,8 @@ func TestWrite(t *testing.T) {
 		},
 		Body: Body{
 			Outline: []Outline{
-				{Type: "rss", Text: "CNET News.com", XmlUrl: "http://news.com.com/2547-1_3-0-5.xml", Description: "Tech news and business reports by CNET News.com. Focused on information technology, core topics include computers, hardware, software, networking, and Internet media.", HtmlUrl: "http://news.com.com/", Language: "unknown", Title: "CNET News.com"},
-				{Type: "rss", Text: "washingtonpost.com - Politics", XmlUrl: "http://www.washingtonpost.com/wp-srv/politics/rssheadlines.xml", Description: "Politics", HtmlUrl: "http://www.washingtonpost.com/wp-dyn/politics?nav=rss_politics", Language: "unknown", Title: "washingtonpost.com - Politics"},
+				{Type: "rss", Text: "CNET News.com", XMLURL: "http://news.com.com/2547-1_3-0-5.xml", Description: "Tech news and business reports by CNET News.com. Focused on information technology, core topics include computers, hardware, software, networking, and Internet media.", HTMLURL: "http://news.com.com/", Language: "unknown", Title: "CNET News.com"},
+				{Type: "rss", Text: "washingtonpost.com - Politics", XMLURL: "http://www.washingtonpost.com/wp-srv/politics/rssheadlines.xml", Description: "Politics", HTMLURL: "http://www.washingtonpost.com/wp-dyn/politics?nav=rss_politics", Language: "unknown", Title: "washingtonpost.com - Politics"},
 			},
 		},
 	}

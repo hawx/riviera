@@ -8,7 +8,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"hawx.me/code/riviera/river/data/memdata"
-	"hawx.me/code/riviera/river/models"
+	"hawx.me/code/riviera/river/riverjs"
 )
 
 func TestRiver(t *testing.T) {
@@ -19,7 +19,7 @@ func TestRiver(t *testing.T) {
 	var buf bytes.Buffer
 	r.WriteTo(&buf)
 
-	var v models.River
+	var v riverjs.River
 	json.Unmarshal(buf.Bytes(), &v)
 
 	assert := assert.New(t)
@@ -30,5 +30,5 @@ func TestRiver(t *testing.T) {
 	assert.Equal("3", v.Metadata.Version)
 	assert.Equal(float64(0), v.Metadata.Secs)
 
-	assert.Equal(models.Feeds{[]models.Feed{}}, v.UpdatedFeeds)
+	assert.Equal(riverjs.Feeds{UpdatedFeeds: []riverjs.Feed{}}, v.UpdatedFeeds)
 }

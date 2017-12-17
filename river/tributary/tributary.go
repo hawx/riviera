@@ -1,4 +1,5 @@
-package river
+// Package tributary fetches a single feed.
+package tributary
 
 import (
 	"log"
@@ -9,8 +10,9 @@ import (
 	"golang.org/x/net/html/charset"
 	"hawx.me/code/riviera/feed"
 	"hawx.me/code/riviera/feed/common"
-	"hawx.me/code/riviera/river/internal/persistence"
-	"hawx.me/code/riviera/river/models"
+	"hawx.me/code/riviera/river/events"
+	"hawx.me/code/riviera/river/mapping"
+	"hawx.me/code/riviera/river/riverjs"
 )
 
 type Tributary interface {
@@ -19,10 +21,10 @@ type Tributary interface {
 
 	// Feeds sets a channel that is used to send out the latest updates to the
 	// tributary.
-	Feeds(chan<- models.Feed)
+	Feeds(chan<- riverjs.Feed)
 
 	// Events sets a channel that is used to send out events for the tributary.
-	Events(chan<- Event)
+	Events(chan<- events.Event)
 
 	// Start polling for updates.
 	Start()
@@ -35,13 +37,13 @@ type tributary struct {
 	uri     *url.URL
 	feed    *feed.Feed
 	client  *http.Client
-	mapping Mapping
-	feeds   chan<- models.Feed
-	events  chan<- Event
+	mapping mapping.Mapping
+	feeds   chan<- riverjs.Feed
+	events  chan<- events.Event
 	quit    chan struct{}
 }
 
-func newTributary(store persistence.Bucket, uri string, cacheTimeout time.Duration, mapping Mapping) *tributary {
+func New(store feed.Database, uri string, cacheTimeout time.Duration, mapping mapping.Mapping) *tributary {
 	parsedUri, _ := url.Parse(uri)
 
 	p := &tributary{
@@ -60,11 +62,11 @@ func (t *tributary) Name() string {
 	return t.uri.String()
 }
 
-func (t *tributary) Feeds(feeds chan<- models.Feed) {
+func (t *tributary) Feeds(feeds chan<- riverjs.Feed) {
 	t.feeds = feeds
 }
 
-func (t *tributary) Events(events chan<- Event) {
+func (t *tributary) Events(events chan<- events.Event) {
 	t.events = events
 }
 
@@ -128,9 +130,9 @@ func (t *statusTransport) RoundTrip(req *http.Request) (resp *http.Response, err
 // fetch retrieves the feed for the tributary.
 func (t *tributary) fetch() {
 	code, err := t.feed.Fetch(t.uri.String(), t.client, charset.NewReaderLabel)
-	t.events <- Event{
+	t.events <- events.Event{
 		At:   time.Now().UTC(),
-		Uri:  t.Name(),
+		URI:  t.Name(),
 		Code: code,
 	}
 
@@ -150,7 +152,7 @@ func maybeResolvedLink(root *url.URL, other string) string {
 }
 
 func (t *tributary) itemHandler(feed *feed.Feed, ch *common.Channel, newitems []*common.Item) {
-	items := []models.Item{}
+	items := []riverjs.Item{}
 	for _, item := range newitems {
 		converted := t.mapping(item)
 
@@ -181,12 +183,12 @@ func (t *tributary) itemHandler(feed *feed.Feed, ch *common.Channel, newitems []
 		}
 	}
 
-	t.feeds <- models.Feed{
+	t.feeds <- riverjs.Feed{
 		FeedUrl:         feedUrl,
 		WebsiteUrl:      websiteUrl,
 		FeedTitle:       ch.Title,
 		FeedDescription: ch.Description,
-		WhenLastUpdate:  models.RssTime{time.Now()},
+		WhenLastUpdate:  riverjs.Time(time.Now()),
 		Items:           items,
 	}
 }

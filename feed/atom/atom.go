@@ -1,4 +1,4 @@
-// Package atom provides a parser for Atom feeds
+// Package atom provides a parser for Atom feeds.
 //
 // Commentary taken from https://tools.ietf.org/html/rfc4287
 package atom

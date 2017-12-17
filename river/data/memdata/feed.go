@@ -1,25 +1,24 @@
-package feed
+package memdata
 
-import "sync"
+import (
+	"sync"
 
-// A Database allows the Feed to keep track of items it has already seen before.
-type Database interface {
-	Contains(string) bool
-}
+	"hawx.me/code/riviera/feed"
+)
 
-type database struct {
+type feedDatabase struct {
 	known map[string]struct{}
 	sync.RWMutex
 }
 
 // NewDatabase returns an empty in-memory database for item keys.
-func NewDatabase() Database {
-	return &database{known: map[string]struct{}{}}
+func newFeedDatabase() (feed.Database, error) {
+	return &feedDatabase{known: map[string]struct{}{}}, nil
 }
 
 // Contains checks the database for the Key of a feed item and returns true if
 // the item has been seen before.
-func (d *database) Contains(key string) bool {
+func (d *feedDatabase) Contains(key string) bool {
 	d.RLock()
 	_, ok := d.known[key]
 	d.RUnlock()
