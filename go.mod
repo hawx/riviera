@@ -11,5 +11,5 @@ require (
 	golang.org/x/text v0.3.0 // indirect
 	gopkg.in/fsnotify.v1 v1.4.7
 	hawx.me/code/assert v0.0.0-20150803185601-4570da094475
-	hawx.me/code/serve v0.0.0-20151208092840-f3356a42ab53
+	hawx.me/code/serve v0.0.0-20190207181551-eb94630184cf
 )
