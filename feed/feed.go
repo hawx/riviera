@@ -103,7 +103,7 @@ func (f *Feed) Fetch(uri string, client *http.Client, charset func(charset strin
 }
 
 func (f *Feed) load(r io.Reader, charset func(charset string, input io.Reader) (io.Reader, error)) (err error) {
-	f.channels, err = parse(r, charset)
+	f.channels, err = Parse(r, charset)
 	if err != nil || len(f.channels) == 0 {
 		return
 	}
@@ -124,7 +124,7 @@ var parsers = []common.Parser{
 	jsonfeed.Parser{},
 }
 
-func parse(r io.Reader, charset func(charset string, input io.Reader) (io.Reader, error)) (chs []*common.Channel, err error) {
+func Parse(r io.Reader, charset func(charset string, input io.Reader) (io.Reader, error)) (chs []*common.Channel, err error) {
 	data, _ := ioutil.ReadAll(r)
 	br := bytes.NewReader(data)
 
