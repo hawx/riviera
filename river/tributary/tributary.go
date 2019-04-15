@@ -15,6 +15,7 @@ import (
 	"hawx.me/code/riviera/river/riverjs"
 )
 
+// A Tributary reports changes in a feed to the channels it is given.
 type Tributary interface {
 	// Name returns a unique name to refer to the tributary.
 	Name() string
@@ -43,11 +44,12 @@ type tributary struct {
 	quit    chan struct{}
 }
 
-func New(store feed.Database, uri string, cacheTimeout time.Duration, mapping mapping.Mapping) *tributary {
-	parsedUri, _ := url.Parse(uri)
+// New returns a tributary watching the feed at the URI given.
+func New(store feed.Database, uri string, cacheTimeout time.Duration, mapping mapping.Mapping) Tributary {
+	parsedURI, _ := url.Parse(uri)
 
 	p := &tributary{
-		uri:     parsedUri,
+		uri:     parsedURI,
 		mapping: mapping,
 		quit:    make(chan struct{}),
 	}
@@ -114,14 +116,14 @@ func (t *statusTransport) RoundTrip(req *http.Request) (resp *http.Response, err
 	if resp.StatusCode == http.StatusMovedPermanently {
 		newLoc := resp.Header.Get("Location")
 
-		newUrl, errp := url.Parse(newLoc)
+		newURL, errp := url.Parse(newLoc)
 		if errp != nil {
 			log.Printf("%s moved to %s, error: %s\n", t.trib.uri, newLoc, errp)
 			return
 		}
 
 		log.Printf("%s moved to %s\n", t.trib.uri, newLoc)
-		t.trib.uri = newUrl
+		t.trib.uri = newURL
 	}
 
 	return
@@ -169,23 +171,23 @@ func (t *tributary) itemHandler(feed *feed.Feed, ch *common.Channel, newitems []
 		return
 	}
 
-	feedUrl := t.uri.String()
-	websiteUrl := ""
+	feedURL := t.uri.String()
+	websiteURL := ""
 	for _, link := range ch.Links {
-		if feedUrl != "" && websiteUrl != "" {
+		if feedURL != "" && websiteURL != "" {
 			break
 		}
 
 		if link.Rel == "self" {
-			feedUrl = maybeResolvedLink(t.uri, link.Href)
+			feedURL = maybeResolvedLink(t.uri, link.Href)
 		} else {
-			websiteUrl = maybeResolvedLink(t.uri, link.Href)
+			websiteURL = maybeResolvedLink(t.uri, link.Href)
 		}
 	}
 
 	t.feeds <- riverjs.Feed{
-		FeedUrl:         feedUrl,
-		WebsiteUrl:      websiteUrl,
+		FeedURL:         feedURL,
+		WebsiteURL:      websiteURL,
 		FeedTitle:       ch.Title,
 		FeedDescription: ch.Description,
 		WhenLastUpdate:  riverjs.Time(time.Now()),

@@ -12,9 +12,10 @@ Build & run with:
 
 import (
 	"fmt"
-	rss "github.com/riviera/feed"
 	"os"
 	"time"
+
+	rss "github.com/riviera/feed"
 )
 
 func main() {
@@ -38,9 +39,9 @@ func PollFeed(uri string, timeout int) {
 }
 
 func chanHandler(feed *rss.Feed, newchannels []*rss.Channel) {
-	fmt.Printf("%d new channel(s) in %s\n", len(newchannels), feed.Url)
+	fmt.Printf("%d new channel(s) in %s\n", len(newchannels), feed.URL)
 }
 
 func itemHandler(feed *rss.Feed, ch *rss.Channel, newitems []*rss.Item) {
-	fmt.Printf("%d new item(s) in %s\n", len(newitems), feed.Url)
+	fmt.Printf("%d new item(s) in %s\n", len(newitems), feed.URL)
 }

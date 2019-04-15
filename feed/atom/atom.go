@@ -10,8 +10,11 @@ import (
 	"hawx.me/code/riviera/feed/common"
 )
 
+// Parser is capable of reading Atom feeds.
 type Parser struct{}
 
+// CanRead returns true if the reader provides data that is XML and contains the
+// expected namespace for an Atom feed.
 func (Parser) CanRead(r io.Reader, charset func(charset string, input io.Reader) (io.Reader, error)) bool {
 	decoder := xml.NewDecoder(r)
 	decoder.CharsetReader = charset
@@ -45,7 +48,7 @@ func (Parser) Read(r io.Reader, charset func(charset string, input io.Reader) (i
 	ch := &common.Channel{
 		Title:         feed.Title.Text,
 		LastBuildDate: feed.Updated,
-		Id:            feed.ID,
+		ID:            feed.ID,
 		Rights:        feed.Rights,
 	}
 
@@ -67,7 +70,7 @@ func (Parser) Read(r io.Reader, charset func(charset string, input io.Reader) (i
 
 	if feed.Generator != nil {
 		ch.Generator = common.Generator{
-			Uri:     feed.Generator.URI,
+			URI:     feed.Generator.URI,
 			Version: feed.Generator.Version,
 			Text:    feed.Generator.Text,
 		}
@@ -76,7 +79,7 @@ func (Parser) Read(r io.Reader, charset func(charset string, input io.Reader) (i
 	if len(feed.Authors) > 0 {
 		ch.Author = common.Author{
 			Name:  feed.Authors[0].Name,
-			Uri:   feed.Authors[0].URI,
+			URI:   feed.Authors[0].URI,
 			Email: feed.Authors[0].Email,
 		}
 	}
@@ -84,7 +87,7 @@ func (Parser) Read(r io.Reader, charset func(charset string, input io.Reader) (i
 	for _, entry := range feed.Entries {
 		i := &common.Item{
 			Title:       entry.Title,
-			Id:          entry.ID,
+			ID:          entry.ID,
 			PubDate:     entry.Updated,
 			Description: entry.Summary,
 		}
@@ -92,7 +95,7 @@ func (Parser) Read(r io.Reader, charset func(charset string, input io.Reader) (i
 		for _, link := range entry.Links {
 			if link.Rel == "enclosure" {
 				i.Enclosures = append(i.Enclosures, common.Enclosure{
-					Url:  link.Href,
+					URL:  link.Href,
 					Type: link.Type,
 				})
 			} else {
@@ -128,14 +131,14 @@ func (Parser) Read(r io.Reader, charset func(charset string, input io.Reader) (i
 		if len(entry.Authors) > 0 {
 			i.Author = common.Author{
 				Name:  entry.Authors[0].Name,
-				Uri:   entry.Authors[0].URI,
+				URI:   entry.Authors[0].URI,
 				Email: entry.Authors[0].Email,
 			}
 		}
 
 		if entry.MediaThumbnail != nil {
 			i.Thumbnail = &common.Image{
-				Url: entry.MediaThumbnail.URL,
+				URL: entry.MediaThumbnail.URL,
 			}
 
 			if entry.MediaThumbnail.Width != nil {

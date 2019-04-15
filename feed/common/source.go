@@ -1,6 +1,6 @@
 package common
 
 type Source struct {
-	Url  string
+	URL  string
 	Text string
 }

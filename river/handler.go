@@ -35,7 +35,7 @@ func (h riverHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	case "/":
 		w.Header().Set("Content-Type", "application/javascript")
 		fmt.Fprintf(w, "%s(", DefaultCallback)
-		if err := h.WriteTo(w); err != nil {
+		if err := h.Encode(w); err != nil {
 			log.Println("/:", err)
 		}
 		fmt.Fprintf(w, ")")

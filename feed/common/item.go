@@ -6,8 +6,8 @@ import (
 	"time"
 )
 
-type Guid struct {
-	Guid        string
+type GUID struct {
+	GUID        string
 	IsPermaLink bool
 }
 
@@ -20,7 +20,7 @@ type Item struct {
 	Enclosures  []Enclosure
 	Thumbnail   *Image
 	Extensions  map[string]map[string][]Extension
-	Guid        *Guid
+	GUID        *GUID
 	Links       []Link
 	PubDate     string
 	Source      *Source
@@ -30,7 +30,7 @@ type Item struct {
 	Content      *Content
 	Contributors []string
 	Generator    *Generator
-	Id           string
+	ID           string
 }
 
 func (i *Item) ParsedPubDate() (time.Time, error) {
@@ -39,15 +39,17 @@ func (i *Item) ParsedPubDate() (time.Time, error) {
 
 func (i *Item) Key() string {
 	switch {
-	case i.Guid != nil && len(i.Guid.Guid) != 0:
-		return i.Guid.Guid
-	case len(i.Id) != 0:
-		return i.Id
+	case i.GUID != nil && len(i.GUID.GUID) != 0:
+		return i.GUID.GUID
+	case len(i.ID) != 0:
+		return i.ID
 	case len(i.Title) > 0 && len(i.PubDate) > 0:
 		return i.Title + i.PubDate
 	default:
 		h := md5.New()
-		io.WriteString(h, i.Description)
+		if _, err := io.WriteString(h, i.Description); err != nil {
+			panic(err)
+		}
 		return string(h.Sum(nil))
 	}
 }

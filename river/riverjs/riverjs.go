@@ -15,12 +15,12 @@ type Feeds struct {
 // Each of these elements are mandatory, if there is no value for one it must be
 // included with an empty string as its value.
 //
-// The elements all come from the top level of a feed, except for FeedUrl which
+// The elements all come from the top level of a feed, except for FeedURL which
 // is the address of the feed itself, and WhenLastUpdate which is the time when
 // the new items from the feed were read by the aggregator.
 type Feed struct {
-	FeedUrl         string  `json:"feedUrl"`
-	WebsiteUrl      string  `json:"websiteUrl"`
+	FeedURL         string  `json:"feedUrl"`
+	WebsiteURL      string  `json:"websiteUrl"`
 	FeedTitle       string  `json:"feedTitle"`
 	FeedDescription string  `json:"feedDescription"`
 	WhenLastUpdate  RssTime `json:"whenLastUpdate"`
@@ -40,9 +40,9 @@ type Item struct {
 	Title     string  `json:"title"`
 	Link      string  `json:"link"`
 
-	// Id is a number assigned to the item by the aggregator. Usuaully it is
+	// ID is a number assigned to the item by the aggregator. Usuaully it is
 	// incremented by one for each item, but that's not guaranteed.
-	Id string `json:"id"`
+	ID string `json:"id"`
 
 	// Comments points to a page of comments related to the item (it's exactly as
 	// in RSS 2.0).
@@ -58,13 +58,13 @@ type Item struct {
 }
 
 type Enclosure struct {
-	Url    string `json:"url"`
+	URL    string `json:"url"`
 	Type   string `json:"type"`
 	Length int64  `json:"length"`
 }
 
 type Thumbnail struct {
-	Url    string `json:"url"`
+	URL    string `json:"url"`
 	Height *int   `json:"height,omitempty"`
 	Width  *int   `json:"width,omitempty"`
 }

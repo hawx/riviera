@@ -2,10 +2,6 @@
 //
 // See http://web.resource.org/rss/1.0/spec for the specification.
 //
-// It also supports three modules:
-//   - Dublin Core: http://web.resource.org/rss/1.0/modules/dc/
-//   - Syndication: http://web.resource.org/rss/1.0/modules/syndication/
-//   - Content: http://web.resource.org/rss/1.0/modules/content/
 package rdf
 
 import (
@@ -26,8 +22,16 @@ var days = map[string]int{
 	"Sunday":    7,
 }
 
+// Parser is capable of reading RDF Site Summary (RSS) 1.0 feeds.
+//
+// It also supports three modules:
+//   - Dublin Core: http://web.resource.org/rss/1.0/modules/dc/
+//   - Syndication: http://web.resource.org/rss/1.0/modules/syndication/
+//   - Content: http://web.resource.org/rss/1.0/modules/content/
 type Parser struct{}
 
+// CanRead returns true if the reader provides data that is XML and contains the
+// expected namespace for an RDF Site Summary feed.
 func (Parser) CanRead(r io.Reader, charset func(charset string, input io.Reader) (io.Reader, error)) bool {
 	decoder := xml.NewDecoder(r)
 	decoder.CharsetReader = charset
@@ -65,7 +69,7 @@ func (Parser) Read(r io.Reader, charset func(string, io.Reader) (io.Reader, erro
 	if feed.Image != nil {
 		ch.Image = common.Image{
 			Title: feed.Image.Title,
-			Url:   feed.Image.URL,
+			URL:   feed.Image.URL,
 			Link:  feed.Image.Link,
 		}
 	}

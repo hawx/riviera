@@ -1,7 +1,7 @@
 package common
 
 type Enclosure struct {
-	Url    string
+	URL    string
 	Length int64
 	Type   string
 }

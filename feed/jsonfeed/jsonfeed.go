@@ -10,8 +10,11 @@ import (
 	"hawx.me/code/riviera/feed/common"
 )
 
+// Parser is capable of reading jsonfeed feeds.
 type Parser struct{}
 
+// CanRead returns true if the reader provides data that is JSON and contains
+// the understood jsonfeed version of https://jsonfeed.org/version/1.
 func (Parser) CanRead(r io.Reader, charset func(charset string, input io.Reader) (io.Reader, error)) bool {
 	var feedVersion struct {
 		Version string `json:"version"`
@@ -37,7 +40,7 @@ func (Parser) Read(r io.Reader, charset func(charset string, input io.Reader) (i
 	if feed.Author != nil {
 		ch.Author = common.Author{
 			Name: feed.Author.Name,
-			Uri:  feed.Author.URL,
+			URI:  feed.Author.URL,
 		}
 	}
 
@@ -57,7 +60,7 @@ func (Parser) Read(r io.Reader, charset func(charset string, input io.Reader) (i
 	for _, item := range feed.Items {
 		i := &common.Item{
 			Title:   item.Title,
-			Guid:    &common.Guid{Guid: item.ID},
+			GUID:    &common.GUID{GUID: item.ID},
 			PubDate: item.DatePublished,
 		}
 
@@ -77,7 +80,7 @@ func (Parser) Read(r io.Reader, charset func(charset string, input io.Reader) (i
 		if item.Author != nil {
 			i.Author = common.Author{
 				Name: item.Author.Name,
-				Uri:  item.Author.URL,
+				URI:  item.Author.URL,
 			}
 		}
 
@@ -91,7 +94,7 @@ func (Parser) Read(r io.Reader, charset func(charset string, input io.Reader) (i
 
 		for _, attachment := range item.Attachments {
 			i.Enclosures = append(i.Enclosures, common.Enclosure{
-				Url:    attachment.URL,
+				URL:    attachment.URL,
 				Length: attachment.SizeInBytes,
 				Type:   attachment.MimeType,
 			})
@@ -105,7 +108,7 @@ func (Parser) Read(r io.Reader, charset func(charset string, input io.Reader) (i
 
 		if item.Image != "" {
 			i.Thumbnail = &common.Image{
-				Url: item.Image,
+				URL: item.Image,
 			}
 		}
 

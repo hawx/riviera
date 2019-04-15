@@ -28,6 +28,7 @@ func New(size int) *Events {
 	}
 }
 
+// Prepend an event to the list.
 func (e *Events) Prepend(ev Event) {
 	e.cur = (e.cur + 1) % e.cp
 	if e.ln < e.cp {
@@ -37,6 +38,7 @@ func (e *Events) Prepend(ev Event) {
 	e.evs[e.cp-e.cur-1] = ev
 }
 
+// List the events, truncating to the size.
 func (e *Events) List() []Event {
 	if e.ln < e.cp {
 		return e.evs[e.cp-e.ln:]

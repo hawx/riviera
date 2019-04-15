@@ -27,7 +27,7 @@ func TestRss09Feed(t *testing.T) {
 	assert.Equal("the Mozilla Organization\n    web site", channel.Description)
 
 	assert.Equal("Mozilla", channel.Image.Title)
-	assert.Equal("http://www.mozilla.org/images/moz.gif", channel.Image.Url)
+	assert.Equal("http://www.mozilla.org/images/moz.gif", channel.Image.URL)
 	assert.Equal("http://www.mozilla.org", channel.Image.Link)
 
 	if assert.Len(channel.Items, 5) {

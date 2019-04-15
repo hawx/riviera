@@ -2,6 +2,6 @@ package common
 
 type Author struct {
 	Name  string
-	Uri   string
+	URI   string
 	Email string
 }

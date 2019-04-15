@@ -29,13 +29,13 @@ func TestSimple(t *testing.T) {
 		}
 
 		if assert.Len(channel.Items, 2) {
-			assert.Equal("2", channel.Items[0].Guid.Guid)
+			assert.Equal("2", channel.Items[0].GUID.GUID)
 			assert.Equal("https://example.org/second-item", channel.Items[0].Links[0].Href)
 			assert.Equal("alternate", channel.Items[0].Links[0].Rel)
 			assert.Equal("This is a second item.", channel.Items[0].Content.Text)
-			assert.Equal("https://example.com/image.jpg", channel.Items[0].Thumbnail.Url)
+			assert.Equal("https://example.com/image.jpg", channel.Items[0].Thumbnail.URL)
 
-			assert.Equal("1", channel.Items[1].Guid.Guid)
+			assert.Equal("1", channel.Items[1].GUID.GUID)
 			assert.Equal("https://example.org/initial-post", channel.Items[1].Links[0].Href)
 			assert.Equal("alternate", channel.Items[1].Links[0].Rel)
 			assert.Equal("<p>Hello, world!</p>", channel.Items[1].Content.Text)
@@ -72,7 +72,7 @@ func TestJsonfeed(t *testing.T) {
 		assert.Equal("Brent Simmons and Manton Reece", channel.Author.Name)
 
 		if assert.Len(channel.Items, 1) {
-			assert.Equal("https://jsonfeed.org/2017/05/17/announcing_json_feed", channel.Items[0].Guid.Guid)
+			assert.Equal("https://jsonfeed.org/2017/05/17/announcing_json_feed", channel.Items[0].GUID.GUID)
 			assert.Equal("https://jsonfeed.org/2017/05/17/announcing_json_feed", channel.Items[0].Links[0].Href)
 			assert.Equal("alternate", channel.Items[0].Links[0].Rel)
 			assert.Equal("2017-05-17T08:02:12-07:00", channel.Items[0].PubDate)
@@ -121,7 +121,7 @@ func TestPodcast(t *testing.T) {
 		if assert.Len(channel.Items, 1) {
 			item := channel.Items[0]
 			assert.Equal("Special #1 - Chris Parrish", item.Title)
-			assert.Equal("http://therecord.co/chris-parrish", item.Guid.Guid)
+			assert.Equal("http://therecord.co/chris-parrish", item.GUID.GUID)
 			assert.Equal("http://therecord.co/chris-parrish", item.Links[0].Href)
 			assert.Equal("alternate", item.Links[0].Rel)
 			assert.Equal("Brent interviews Chris Parrish, co-host of The Record and one-half of Aged & Distilled.", item.Content.Text)
@@ -129,7 +129,7 @@ func TestPodcast(t *testing.T) {
 
 			if assert.Len(item.Enclosures, 1) {
 				enclosure := item.Enclosures[0]
-				assert.Equal("http://therecord.co/downloads/The-Record-sp1e1-ChrisParrish.m4a", enclosure.Url)
+				assert.Equal("http://therecord.co/downloads/The-Record-sp1e1-ChrisParrish.m4a", enclosure.URL)
 				assert.Equal("audio/x-m4a", enclosure.Type)
 				assert.Equal(int64(89970236), enclosure.Length)
 			}

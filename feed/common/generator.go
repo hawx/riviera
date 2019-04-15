@@ -1,7 +1,7 @@
 package common
 
 type Generator struct {
-	Uri     string
+	URI     string
 	Version string
 	Text    string
 }

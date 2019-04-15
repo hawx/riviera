@@ -17,7 +17,7 @@ func TestRiver(t *testing.T) {
 	r := New(db, Options{})
 
 	var buf bytes.Buffer
-	r.WriteTo(&buf)
+	r.Encode(&buf)
 
 	var v riverjs.River
 	json.Unmarshal(buf.Bytes(), &v)

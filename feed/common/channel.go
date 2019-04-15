@@ -25,15 +25,15 @@ type Channel struct {
 
 	// Atom fields
 	Author   Author
-	Id       string
+	ID       string
 	Rights   string
 	SubTitle SubTitle
 }
 
 func (c *Channel) Key() string {
 	switch {
-	case len(c.Id) != 0:
-		return c.Id
+	case len(c.ID) != 0:
+		return c.ID
 	default:
 		return c.Title
 	}

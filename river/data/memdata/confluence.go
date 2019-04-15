@@ -22,7 +22,7 @@ func (d *confluenceDatabase) Add(feed riverjs.Feed) {
 	d.mu.Lock()
 	defer d.mu.Unlock()
 
-	key := feed.WhenLastUpdate.UTC().Format(time.RFC3339) + " " + feed.FeedUrl
+	key := feed.WhenLastUpdate.UTC().Format(time.RFC3339) + " " + feed.FeedURL
 	d.feeds[key] = feed
 }
 
@@ -55,8 +55,8 @@ func (d *confluenceDatabase) Latest(cutoff time.Duration) []riverjs.Feed {
 	}
 
 	sort.Slice(feeds, func(i, j int) bool {
-		iKey := feeds[i].WhenLastUpdate.UTC().Format(time.RFC3339) + " " + feeds[i].FeedUrl
-		jKey := feeds[j].WhenLastUpdate.UTC().Format(time.RFC3339) + " " + feeds[j].FeedUrl
+		iKey := feeds[i].WhenLastUpdate.UTC().Format(time.RFC3339) + " " + feeds[i].FeedURL
+		jKey := feeds[j].WhenLastUpdate.UTC().Format(time.RFC3339) + " " + feeds[j].FeedURL
 
 		return iKey > jKey
 	})

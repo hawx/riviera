@@ -76,8 +76,8 @@ func Read(r io.Reader) (doc Opml, err error) {
 	return
 }
 
-// WriteTo writes the OPML document out.
-func (doc Opml) WriteTo(w io.Writer) error {
+// Encode writes the OPML document out.
+func (doc Opml) Encode(w io.Writer) error {
 	_, err := w.Write([]byte(xml.Header))
 	if err != nil {
 		return err

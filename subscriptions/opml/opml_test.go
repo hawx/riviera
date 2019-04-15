@@ -70,7 +70,7 @@ func TestWrite(t *testing.T) {
 	}
 
 	var buf bytes.Buffer
-	doc.WriteTo(&buf)
+	doc.Encode(&buf)
 
 	assert.Equal(t, `<?xml version="1.0" encoding="UTF-8"?>
 <opml version="2.0"><head><title>mySubscriptions.opml</title></head><body><outline type="rss" text="CNET News.com" xmlUrl="http://news.com.com/2547-1_3-0-5.xml" description="Tech news and business reports by CNET News.com. Focused on information technology, core topics include computers, hardware, software, networking, and Internet media." htmlUrl="http://news.com.com/" language="unknown" title="CNET News.com"></outline><outline type="rss" text="washingtonpost.com - Politics" xmlUrl="http://www.washingtonpost.com/wp-srv/politics/rssheadlines.xml" description="Politics" htmlUrl="http://www.washingtonpost.com/wp-dyn/politics?nav=rss_politics" language="unknown" title="washingtonpost.com - Politics"></outline></body></opml>`, buf.String())

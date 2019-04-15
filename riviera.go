@@ -10,7 +10,7 @@ import (
 	"sync"
 	"time"
 
-	"gopkg.in/fsnotify.v1"
+	fsnotify "gopkg.in/fsnotify.v1"
 	"hawx.me/code/riviera/river"
 	"hawx.me/code/riviera/river/data"
 	"hawx.me/code/riviera/river/data/boltdata"
@@ -54,8 +54,7 @@ func printHelp() {
       Serve on given port.
 
    --socket SOCK
-      Serve at given socket, instead.
-`)
+      Serve at given socket, instead.`)
 }
 
 var (

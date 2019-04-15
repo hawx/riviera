@@ -36,7 +36,7 @@ func TestDefaultMapping(t *testing.T) {
 				Body:       "this is tha content",
 				PubDate:    riverjs.Time(time.Date(2006, 1, 2, 20, 4, 19, 0, time.UTC)),
 				Title:      "cool feed thang",
-				Id:         "cool feed thangMon, 02 Jan 2006 20:04:19 UTC",
+				ID:         "cool feed thangMon, 02 Jan 2006 20:04:19 UTC",
 				Comments:   "",
 				Enclosures: []riverjs.Enclosure{},
 			},
@@ -54,7 +54,7 @@ func TestDefaultMapping(t *testing.T) {
 				Body:       "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec a diam lectus. Sed sit amet ipsum mauris. Maecenas congue ligula ac quam viverra nec consectetur ante hendrerit. Donec et mollis dolor. Praesent et diam eget libero egestas mattis sit amet vitae augue. Nam tincidunt…",
 				PubDate:    riverjs.Time(time.Date(2006, 1, 2, 20, 4, 19, 0, time.UTC)),
 				Title:      "cool feed thang",
-				Id:         "cool feed thangMon, 02 Jan 2006 20:04:19 UTC",
+				ID:         "cool feed thangMon, 02 Jan 2006 20:04:19 UTC",
 				Enclosures: []riverjs.Enclosure{},
 			},
 		},
@@ -63,12 +63,12 @@ func TestDefaultMapping(t *testing.T) {
 			&common.Item{
 				Description: "&apos;",
 				PubDate:     "Mon, 02 Jan 2006 20:04:19 UTC",
-				Id:          "5",
+				ID:          "5",
 			},
 			&riverjs.Item{
 				Body:       "'",
 				PubDate:    riverjs.Time(time.Date(2006, 1, 2, 20, 4, 19, 0, time.UTC)),
-				Id:         "5",
+				ID:         "5",
 				Enclosures: []riverjs.Enclosure{},
 			},
 		},
@@ -79,12 +79,12 @@ func TestDefaultMapping(t *testing.T) {
 			&common.Item{
 				Title:   "&#8220;The purpose of the IoT is to give humans superpowers&#8221;",
 				PubDate: "Mon, 02 Jan 2006 20:04:19 UTC",
-				Id:      "5",
+				ID:      "5",
 			},
 			&riverjs.Item{
 				Title:      `“The purpose of the IoT is to give humans superpowers”`,
 				PubDate:    riverjs.Time(time.Date(2006, 1, 2, 20, 4, 19, 0, time.UTC)),
-				Id:         "5",
+				ID:         "5",
 				Enclosures: []riverjs.Enclosure{},
 			},
 		},
@@ -94,11 +94,11 @@ func TestDefaultMapping(t *testing.T) {
 			"pubdate",
 			&common.Item{
 				PubDate: "Mon, 02 Jan 2006 20:04:19 UTC",
-				Id:      "-",
+				ID:      "-",
 			},
 			&riverjs.Item{
 				PubDate:    riverjs.Time(time.Date(2006, 1, 2, 20, 4, 19, 0, time.UTC)),
-				Id:         "-",
+				ID:         "-",
 				Enclosures: []riverjs.Enclosure{},
 			},
 		},
@@ -106,25 +106,25 @@ func TestDefaultMapping(t *testing.T) {
 			"pubdate in other format", // am I going to do all of these?
 			&common.Item{
 				PubDate: "2006-01-02T20:04:19+00:00",
-				Id:      "-",
+				ID:      "-",
 			},
 			&riverjs.Item{
 				PubDate:    riverjs.Time(time.Date(2006, 1, 2, 20, 4, 19, 0, time.Local)),
-				Id:         "-",
+				ID:         "-",
 				Enclosures: []riverjs.Enclosure{},
 			},
 		},
 
-		// Id
+		// ID
 		{
 			"id from id",
 			&common.Item{
 				PubDate: "Mon, 02 Jan 2006 20:04:19 UTC",
-				Id:      "5",
+				ID:      "5",
 			},
 			&riverjs.Item{
 				PubDate:    riverjs.Time(time.Date(2006, 1, 2, 20, 4, 19, 0, time.UTC)),
-				Id:         "5",
+				ID:         "5",
 				Enclosures: []riverjs.Enclosure{},
 			},
 		},
@@ -132,11 +132,11 @@ func TestDefaultMapping(t *testing.T) {
 			"id from guid",
 			&common.Item{
 				PubDate: "Mon, 02 Jan 2006 20:04:19 UTC",
-				Guid:    &common.Guid{Guid: "200823-4545345-435543-45"},
+				GUID:    &common.GUID{GUID: "200823-4545345-435543-45"},
 			},
 			&riverjs.Item{
 				PubDate:    riverjs.Time(time.Date(2006, 1, 2, 20, 4, 19, 0, time.UTC)),
-				Id:         "200823-4545345-435543-45",
+				ID:         "200823-4545345-435543-45",
 				Enclosures: []riverjs.Enclosure{},
 			},
 		},
@@ -149,7 +149,7 @@ func TestDefaultMapping(t *testing.T) {
 			&riverjs.Item{
 				Title:      "hey",
 				PubDate:    riverjs.Time(time.Date(2006, 1, 2, 20, 4, 19, 0, time.UTC)),
-				Id:         "heyMon, 02 Jan 2006 20:04:19 UTC",
+				ID:         "heyMon, 02 Jan 2006 20:04:19 UTC",
 				Enclosures: []riverjs.Enclosure{},
 			},
 		},
@@ -159,13 +159,13 @@ func TestDefaultMapping(t *testing.T) {
 			"links from guid",
 			&common.Item{
 				PubDate: "Mon, 02 Jan 2006 20:04:19 UTC",
-				Guid:    &common.Guid{Guid: "5", IsPermaLink: true},
+				GUID:    &common.GUID{GUID: "5", IsPermaLink: true},
 			},
 			&riverjs.Item{
 				Link:       "5",
 				PermaLink:  "5",
 				PubDate:    riverjs.Time(time.Date(2006, 1, 2, 20, 4, 19, 0, time.UTC)),
-				Id:         "5",
+				ID:         "5",
 				Enclosures: []riverjs.Enclosure{},
 			},
 		},
@@ -173,7 +173,7 @@ func TestDefaultMapping(t *testing.T) {
 			"links from (first) links",
 			&common.Item{
 				PubDate: "Mon, 02 Jan 2006 20:04:19 UTC",
-				Guid:    &common.Guid{Guid: "5", IsPermaLink: true},
+				GUID:    &common.GUID{GUID: "5", IsPermaLink: true},
 				Links: []common.Link{
 					{Href: "cool"},
 					{Href: "ignored"},
@@ -183,7 +183,7 @@ func TestDefaultMapping(t *testing.T) {
 				Link:       "cool",
 				PermaLink:  "cool",
 				PubDate:    riverjs.Time(time.Date(2006, 1, 2, 20, 4, 19, 0, time.UTC)),
-				Id:         "5",
+				ID:         "5",
 				Enclosures: []riverjs.Enclosure{},
 			},
 		},
@@ -191,7 +191,7 @@ func TestDefaultMapping(t *testing.T) {
 			"links from alternate links",
 			&common.Item{
 				PubDate: "Mon, 02 Jan 2006 20:04:19 UTC",
-				Guid:    &common.Guid{Guid: "5", IsPermaLink: true},
+				GUID:    &common.GUID{GUID: "5", IsPermaLink: true},
 				Links: []common.Link{
 					{Href: "cool"},
 					{Href: "alt", Rel: "alternate"},
@@ -201,7 +201,7 @@ func TestDefaultMapping(t *testing.T) {
 				Link:       "alt",
 				PermaLink:  "alt",
 				PubDate:    riverjs.Time(time.Date(2006, 1, 2, 20, 4, 19, 0, time.UTC)),
-				Id:         "5",
+				ID:         "5",
 				Enclosures: []riverjs.Enclosure{},
 			},
 		},
@@ -211,7 +211,7 @@ func TestDefaultMapping(t *testing.T) {
 			"enclosure",
 			&common.Item{
 				PubDate: "Mon, 02 Jan 2006 20:04:19 UTC",
-				Id:      "5",
+				ID:      "5",
 				Links: []common.Link{
 					{Href: "what"},
 					{Href: "thing", Type: "media/what", Rel: "enclosure"},
@@ -222,10 +222,10 @@ func TestDefaultMapping(t *testing.T) {
 				Link:      "what",
 				PermaLink: "what",
 				PubDate:   riverjs.Time(time.Date(2006, 1, 2, 20, 4, 19, 0, time.UTC)),
-				Id:        "5",
+				ID:        "5",
 				Enclosures: []riverjs.Enclosure{
-					{Url: "thing", Type: "media/what"},
-					{Url: "otherthing", Type: "media/what"},
+					{URL: "thing", Type: "media/what"},
+					{URL: "otherthing", Type: "media/what"},
 				},
 			},
 		},
@@ -235,16 +235,16 @@ func TestDefaultMapping(t *testing.T) {
 			"thumbnail",
 			&common.Item{
 				PubDate: "Mon, 02 Jan 2006 20:04:19 UTC",
-				Id:      "5",
+				ID:      "5",
 				Thumbnail: &common.Image{
-					Url: "http://example.com/thumb",
+					URL: "http://example.com/thumb",
 				},
 			},
 			&riverjs.Item{
 				PubDate: riverjs.Time(time.Date(2006, 1, 2, 20, 4, 19, 0, time.UTC)),
-				Id:      "5",
+				ID:      "5",
 				Thumbnail: &riverjs.Thumbnail{
-					Url: "http://example.com/thumb",
+					URL: "http://example.com/thumb",
 				},
 				Enclosures: []riverjs.Enclosure{},
 			},
@@ -253,18 +253,18 @@ func TestDefaultMapping(t *testing.T) {
 			"thumbnail with size",
 			&common.Item{
 				PubDate: "Mon, 02 Jan 2006 20:04:19 UTC",
-				Id:      "5",
+				ID:      "5",
 				Thumbnail: &common.Image{
-					Url:    "http://example.com/thumb",
+					URL:    "http://example.com/thumb",
 					Height: 50,
 					Width:  100,
 				},
 			},
 			&riverjs.Item{
 				PubDate: riverjs.Time(time.Date(2006, 1, 2, 20, 4, 19, 0, time.UTC)),
-				Id:      "5",
+				ID:      "5",
 				Thumbnail: &riverjs.Thumbnail{
-					Url:    "http://example.com/thumb",
+					URL:    "http://example.com/thumb",
 					Height: &fifty,
 					Width:  &oneHundred,
 				},
@@ -284,7 +284,7 @@ func TestDefaultMapping(t *testing.T) {
 		assert.Equal(expected.PubDate, mapped.PubDate, tc.name)
 		assert.Equal(expected.Title, mapped.Title, tc.name)
 		assert.Equal(expected.Link, mapped.Link, tc.name)
-		assert.Equal(expected.Id, mapped.Id, tc.name)
+		assert.Equal(expected.ID, mapped.ID, tc.name)
 		assert.Equal(expected.Comments, mapped.Comments, tc.name)
 		assert.Equal(expected.Enclosures, mapped.Enclosures, tc.name)
 	}

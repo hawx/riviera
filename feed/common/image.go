@@ -2,7 +2,7 @@ package common
 
 type Image struct {
 	Title       string
-	Url         string
+	URL         string
 	Link        string
 	Width       int
 	Height      int

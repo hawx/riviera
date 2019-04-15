@@ -26,14 +26,14 @@ func DefaultMapping(item *common.Item) *riverjs.Item {
 		Body:       stripAndCrop(item.Description),
 		PubDate:    riverjs.Time(pubDate),
 		Title:      html.UnescapeString(item.Title),
-		Id:         item.Key(),
+		ID:         item.Key(),
 		Comments:   item.Comments,
 		Enclosures: []riverjs.Enclosure{},
 	}
 
-	if item.Guid != nil && item.Guid.IsPermaLink {
-		i.PermaLink = item.Guid.Guid
-		i.Link = item.Guid.Guid
+	if item.GUID != nil && item.GUID.IsPermaLink {
+		i.PermaLink = item.GUID.GUID
+		i.Link = item.GUID.GUID
 	}
 
 	if len(item.Links) > 0 {
@@ -48,7 +48,7 @@ func DefaultMapping(item *common.Item) *riverjs.Item {
 
 			if link.Rel == "enclosure" {
 				i.Enclosures = append(i.Enclosures, riverjs.Enclosure{
-					Url:  link.Href,
+					URL:  link.Href,
 					Type: link.Type,
 				})
 			}
@@ -61,7 +61,7 @@ func DefaultMapping(item *common.Item) *riverjs.Item {
 
 	for _, enclosure := range item.Enclosures {
 		i.Enclosures = append(i.Enclosures, riverjs.Enclosure{
-			Url:    enclosure.Url,
+			URL:    enclosure.URL,
 			Type:   enclosure.Type,
 			Length: enclosure.Length,
 		})
@@ -69,7 +69,7 @@ func DefaultMapping(item *common.Item) *riverjs.Item {
 
 	if item.Thumbnail != nil {
 		i.Thumbnail = &riverjs.Thumbnail{
-			Url: item.Thumbnail.Url,
+			URL: item.Thumbnail.URL,
 		}
 
 		if item.Thumbnail.Height > 0 {

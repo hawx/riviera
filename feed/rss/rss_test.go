@@ -44,10 +44,10 @@ func TestMediaExtensions(t *testing.T) {
 		if assert.Len(channel.Items, 2) {
 			items := channel.Items
 			assert.Equal("1", items[0].Title)
-			assert.Equal("http://example.com/images/1.jpg", items[0].Thumbnail.Url)
+			assert.Equal("http://example.com/images/1.jpg", items[0].Thumbnail.URL)
 
 			assert.Equal("2", items[1].Title)
-			assert.Equal("http://example.com/images/2.jpg", items[1].Thumbnail.Url)
+			assert.Equal("http://example.com/images/2.jpg", items[1].Thumbnail.URL)
 			assert.Equal(100, items[1].Thumbnail.Width)
 			assert.Equal(123, items[1].Thumbnail.Height)
 		}

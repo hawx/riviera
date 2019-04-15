@@ -20,9 +20,9 @@ const docsPath = "http://scripting.com/stories/2010/12/06/innovationRiverOfNewsI
 
 // A River aggregates feeds that it is subscribed to, and writes them in riverjs format.
 type River interface {
-	// WriteTo writes the river to w in json format. It does not write the json in
+	// Encode writes the river to w in json format. It does not write the json in
 	// a javascript callback function.
-	WriteTo(w io.Writer) error
+	Encode(w io.Writer) error
 
 	// Log returns a list of fetch events.
 	Log() []events.Event
@@ -67,7 +67,7 @@ func New(store data.Database, options Options) River {
 	}
 }
 
-func (r *river) WriteTo(w io.Writer) error {
+func (r *river) Encode(w io.Writer) error {
 	updatedFeeds := riverjs.Feeds{
 		UpdatedFeeds: r.confluence.Latest(),
 	}

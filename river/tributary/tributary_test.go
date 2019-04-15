@@ -40,8 +40,8 @@ func TestTributary(t *testing.T) {
 	tributary.Start()
 
 	expected := riverjs.Feed{
-		FeedUrl:         s.URL,
-		WebsiteUrl:      "http://boingboing.net",
+		FeedURL:         s.URL,
+		WebsiteURL:      "http://boingboing.net",
 		FeedTitle:       "Boing Boing",
 		FeedDescription: "Brain candy for Happy Mutants",
 		WhenLastUpdate:  riverjs.Time(time.Now()),
@@ -49,7 +49,7 @@ func TestTributary(t *testing.T) {
 			Title:      "Save Noisebridge!",
 			Link:       "http://feedproxy.google.com/~r/boingboing/iBag/~3/EKKb-61Ismc/story01.htm",
 			PermaLink:  "http://feedproxy.google.com/~r/boingboing/iBag/~3/EKKb-61Ismc/story01.htm",
-			Id:         "http://boingboing.net/?p=221544",
+			ID:         "http://boingboing.net/?p=221544",
 			PubDate:    riverjs.Time(time.Date(2013, 03, 27, 12, 40, 18, 0, time.UTC)),
 			Body:       "A reader writes, \"Noisebridge, San Francisco's Hackerspace, is having some hard times, so we're throwing an epic benefit and party this Saturday, to include eclectic performers, interactive art, a raffle and more! For more details, if any BBers want to put on demos or ideas shar…",
 			Enclosures: []riverjs.Enclosure{},
@@ -63,8 +63,8 @@ func TestTributary(t *testing.T) {
 
 	select {
 	case f := <-feeds:
-		assert.Equal(expected.FeedUrl, f.FeedUrl)
-		assert.Equal(expected.WebsiteUrl, f.WebsiteUrl)
+		assert.Equal(expected.FeedURL, f.FeedURL)
+		assert.Equal(expected.WebsiteURL, f.WebsiteURL)
 		assert.Equal(expected.FeedTitle, f.FeedTitle)
 		assert.Equal(expected.FeedDescription, f.FeedDescription)
 		assert.WithinDuration(expected.WhenLastUpdate.Time, f.WhenLastUpdate.Time, time.Second)
@@ -111,8 +111,8 @@ good engineering culture— is our obsession with aggressively measuring everyth
 	tributary.Start()
 
 	expected := riverjs.Feed{
-		FeedUrl:         s.URL + "/atom.xml",
-		WebsiteUrl:      s.URL,
+		FeedURL:         s.URL + "/atom.xml",
+		WebsiteURL:      s.URL,
 		FeedTitle:       "GitHub Engineering",
 		FeedDescription: "",
 		WhenLastUpdate:  riverjs.Time(time.Now()),
@@ -120,7 +120,7 @@ good engineering culture— is our obsession with aggressively measuring everyth
 			Title:      "Brubeck, a statsd-compatible metrics aggregator",
 			Link:       s.URL + "/brubeck/",
 			PermaLink:  s.URL + "/brubeck/",
-			Id:         "/brubeck",
+			ID:         "/brubeck",
 			PubDate:    riverjs.Time(time.Date(2015, 06, 15, 0, 0, 0, 0, time.FixedZone("", 0))),
 			Body:       "One of the key points of GitHub's engineering culture —and I believe, of any good engineering culture— is our obsession with aggressively measuring everything.\n",
 			Enclosures: []riverjs.Enclosure{},
@@ -134,8 +134,8 @@ good engineering culture— is our obsession with aggressively measuring everyth
 
 	select {
 	case f := <-feeds:
-		assert.Equal(expected.FeedUrl, f.FeedUrl)
-		assert.Equal(expected.WebsiteUrl, f.WebsiteUrl)
+		assert.Equal(expected.FeedURL, f.FeedURL)
+		assert.Equal(expected.WebsiteURL, f.WebsiteURL)
 		assert.Equal(expected.FeedTitle, f.FeedTitle)
 		assert.Equal(expected.FeedDescription, f.FeedDescription)
 		assert.WithinDuration(expected.WhenLastUpdate.Time, f.WhenLastUpdate.Time, time.Second)
@@ -154,7 +154,7 @@ func assertItemEqual(t *testing.T, a, b riverjs.Item) {
 	assert.WithinDuration(t, a.PubDate.Time, b.PubDate.Time, time.Second)
 	assert.Equal(t, a.Title, b.Title)
 	assert.Equal(t, a.Link, b.Link)
-	assert.Equal(t, a.Id, b.Id)
+	assert.Equal(t, a.ID, b.ID)
 	assert.Equal(t, a.Comments, b.Comments)
 	assert.Equal(t, a.Enclosures, b.Enclosures)
 }

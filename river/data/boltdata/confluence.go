@@ -36,7 +36,7 @@ func newConfluenceDatabase(db *bolt.DB) (confluence.Database, error) {
 func (d *confluenceDatabase) Add(feed riverjs.Feed) {
 	d.db.Update(func(tx *bolt.Tx) error {
 		b := tx.Bucket(riverBucketName)
-		key := feed.WhenLastUpdate.UTC().Format(time.RFC3339) + " " + feed.FeedUrl
+		key := feed.WhenLastUpdate.UTC().Format(time.RFC3339) + " " + feed.FeedURL
 		value, _ := json.Marshal(feed)
 
 		return b.Put([]byte(key), value)

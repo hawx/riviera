@@ -19,8 +19,10 @@ import (
 
 const userAgent = "riviera golang"
 
+// ItemHandler is a callback function invoked when a feed has been fetched.
 type ItemHandler func(f *Feed, ch *common.Channel, newitems []*common.Item)
 
+// Feed manages polling of a web feed, either in atom, rss, rdf or jsonfeed format.
 type Feed struct {
 	// Custom cache timeout.
 	cacheTimeout time.Duration
@@ -31,7 +33,7 @@ type Feed struct {
 	// Channels with content.
 	channels []*common.Channel
 
-	// Url from which this feed was created.
+	// URL from which this feed was created.
 	url string
 
 	// Known containing a list of known Items and Channels for this instance
@@ -49,6 +51,7 @@ type Feed struct {
 	eTag string
 }
 
+// New creates a new feed that can be polled for updates.
 func New(cachetimeout time.Duration, ih ItemHandler, database Database) *Feed {
 	v := new(Feed)
 	v.cacheTimeout = cachetimeout
@@ -117,6 +120,10 @@ func (f *Feed) load(r io.Reader, charset func(charset string, input io.Reader) (
 	return
 }
 
+// ErrUnsupportedFormat is returned when a feed is encountered in a format that
+// is not understood.
+var ErrUnsupportedFormat = errors.New("Unsupported feed")
+
 var parsers = []common.Parser{
 	atom.Parser{},
 	rss.Parser{},
@@ -124,19 +131,26 @@ var parsers = []common.Parser{
 	jsonfeed.Parser{},
 }
 
+// Parse reads the content from the provided reader, returning any feed channels
+// found. If the feed is of a format not supported it will return
+// ErrUnsupportedFormat.
 func Parse(r io.Reader, charset func(charset string, input io.Reader) (io.Reader, error)) (chs []*common.Channel, err error) {
 	data, _ := ioutil.ReadAll(r)
 	br := bytes.NewReader(data)
 
 	for _, parser := range parsers {
 		if parser.CanRead(br, charset) {
-			br.Seek(0, io.SeekStart)
+			if _, err := br.Seek(0, io.SeekStart); err != nil {
+				return nil, err
+			}
 			return parser.Read(br, charset)
 		}
-		br.Seek(0, io.SeekStart)
+		if _, err := br.Seek(0, io.SeekStart); err != nil {
+			return nil, err
+		}
 	}
 
-	return nil, errors.New("Unsupported feed")
+	return nil, ErrUnsupportedFormat
 }
 
 func (f *Feed) notifyListeners() {
@@ -155,10 +169,10 @@ func (f *Feed) notifyListeners() {
 	}
 }
 
-// This function returns true or false, depending on whether the CacheTimeout
-// value has expired or not. Additionally, it will ensure that we adhere to the
-// RSS spec's SkipDays and SkipHours values. If this function returns true, you
-// can be sure that a fresh feed update will be performed.
+// CanUpdate returns true or false depending on whether the CacheTimeout value
+// has expired or not. Additionally, it will ensure that we adhere to the RSS
+// spec's SkipDays and SkipHours values. If this function returns true, you can
+// be sure that a fresh feed update will be performed.
 func (f *Feed) CanUpdate() bool {
 	// Make sure we are not within the specified cache-limit.
 	// This ensures we don't request data too often.
@@ -191,7 +205,8 @@ func (f *Feed) CanUpdate() bool {
 	return true
 }
 
-// Returns the number of seconds needed to elapse before the feed should update.
+// DurationTillUpdate returns the number of seconds needed to elapse before the
+// feed should update.
 func (f *Feed) DurationTillUpdate() time.Duration {
 	return f.cacheTimeout - time.Now().UTC().Sub(f.lastupdate)
 }

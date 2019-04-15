@@ -22,8 +22,11 @@ var days = map[string]int{
 	"Sunday":    7,
 }
 
+// Parser is capable of reader RSS feeds.
 type Parser struct{}
 
+// CanRead returns true if the reader provides data that is XML and contains a
+// known RSS version.
 func (Parser) CanRead(r io.Reader, charset func(charset string, input io.Reader) (io.Reader, error)) bool {
 	decoder := xml.NewDecoder(r)
 	decoder.CharsetReader = charset
@@ -119,7 +122,7 @@ func (Parser) Read(r io.Reader, charset func(charset string, input io.Reader) (i
 	if feed.Channel.Image != nil {
 		ch.Image = common.Image{
 			Title:       feed.Channel.Image.Title,
-			Url:         feed.Channel.Image.URL,
+			URL:         feed.Channel.Image.URL,
 			Link:        feed.Channel.Image.Link,
 			Width:       feed.Channel.Image.Width,
 			Height:      feed.Channel.Image.Height,
@@ -166,10 +169,10 @@ func (Parser) Read(r io.Reader, charset func(charset string, input io.Reader) (i
 			i.Author.Name = *item.Creator
 		}
 
-		if item.Guid != nil {
-			i.Guid = &common.Guid{
-				Guid:        item.Guid.Text,
-				IsPermaLink: item.Guid.IsPermaLink == "true",
+		if item.GUID != nil {
+			i.GUID = &common.GUID{
+				GUID:        item.GUID.Text,
+				IsPermaLink: item.GUID.IsPermaLink == "true",
 			}
 		}
 
@@ -182,7 +185,7 @@ func (Parser) Read(r io.Reader, charset func(charset string, input io.Reader) (i
 
 		for _, enclosure := range item.Enclosure {
 			i.Enclosures = append(i.Enclosures, common.Enclosure{
-				Url:    enclosure.URL,
+				URL:    enclosure.URL,
 				Length: enclosure.Length,
 				Type:   enclosure.Type,
 			})
@@ -190,14 +193,14 @@ func (Parser) Read(r io.Reader, charset func(charset string, input io.Reader) (i
 
 		if item.Source != nil {
 			i.Source = &common.Source{
-				Url:  item.Source.URL,
+				URL:  item.Source.URL,
 				Text: item.Source.Text,
 			}
 		}
 
 		if item.MediaThumbnail != nil {
 			i.Thumbnail = &common.Image{
-				Url: item.MediaThumbnail.URL,
+				URL: item.MediaThumbnail.URL,
 			}
 
 			if item.MediaThumbnail.Width != nil {
@@ -301,7 +304,7 @@ type rssItem struct {
 	Category    []rssCategory  `xml:"category"`
 	Comments    string         `xml:"comments"`
 	Enclosure   []rssEnclosure `xml:"enclosure"`
-	Guid        *rssGuid       `xml:"guid"`
+	GUID        *rssGUID       `xml:"guid"`
 	PubDate     string         `xml:"pubDate"`
 	Source      *rssSource     `xml:"source"`
 
@@ -324,7 +327,7 @@ type rssEnclosure struct {
 	Type   string `xml:"type,attr"`
 }
 
-type rssGuid struct {
+type rssGUID struct {
 	IsPermaLink string `xml:"isPermaLink,attr"`
 	Text        string `xml:",chardata"`
 }
