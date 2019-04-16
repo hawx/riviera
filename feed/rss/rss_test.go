@@ -10,11 +10,23 @@ import (
 func TestAuthor(t *testing.T) {
 	assert := assert.New(t)
 
-	file, _ := os.Open("../testdata/boing.rss")
+	file, _ := os.Open("testdata/boing.rss")
 	defer file.Close()
 
-	channels, err := new(Parser).Read(file, nil)
-	assert.Nil(err)
+	parser := Parser{}
+
+	if ok := parser.CanRead(file, nil); !assert.True(ok) {
+		return
+	}
+
+	if _, err := file.Seek(0, 0); !assert.Nil(err) {
+		return
+	}
+
+	channels, err := parser.Read(file, nil, nil)
+	if !assert.Nil(err) {
+		return
+	}
 
 	if assert.Len(channels, 1) {
 		channel := channels[0]
@@ -30,11 +42,23 @@ func TestAuthor(t *testing.T) {
 func TestMediaExtensions(t *testing.T) {
 	assert := assert.New(t)
 
-	file, _ := os.Open("../testdata/media_extensions.rss")
+	file, _ := os.Open("testdata/media_extensions.rss")
 	defer file.Close()
 
-	channels, err := new(Parser).Read(file, nil)
-	assert.Nil(err)
+	parser := Parser{}
+
+	if ok := parser.CanRead(file, nil); !assert.True(ok) {
+		return
+	}
+
+	if _, err := file.Seek(0, 0); !assert.Nil(err) {
+		return
+	}
+
+	channels, err := parser.Read(file, nil, nil)
+	if !assert.Nil(err) {
+		return
+	}
 
 	if assert.Len(channels, 1) {
 		channel := channels[0]

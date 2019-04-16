@@ -6,6 +6,7 @@ package jsonfeed
 import (
 	"encoding/json"
 	"io"
+	"net/url"
 
 	"hawx.me/code/riviera/feed/common"
 )
@@ -26,7 +27,7 @@ func (Parser) CanRead(r io.Reader, charset func(charset string, input io.Reader)
 	return feedVersion.Version == "https://jsonfeed.org/version/1"
 }
 
-func (Parser) Read(r io.Reader, charset func(charset string, input io.Reader) (io.Reader, error)) (foundChannels []*common.Channel, err error) {
+func (Parser) Read(r io.Reader, _ *url.URL, charset func(charset string, input io.Reader) (io.Reader, error)) (foundChannels []*common.Channel, err error) {
 	var feed jsonFeed
 	if err = json.NewDecoder(r).Decode(&feed); err != nil {
 		return

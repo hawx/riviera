@@ -13,7 +13,17 @@ func TestSimple(t *testing.T) {
 	file, _ := os.Open("testdata/simple.json")
 	defer file.Close()
 
-	channels, err := new(Parser).Read(file, nil)
+	parser := Parser{}
+
+	if ok := parser.CanRead(file, nil); !assert.True(ok) {
+		return
+	}
+
+	if _, err := file.Seek(0, 0); !assert.Nil(err) {
+		return
+	}
+
+	channels, err := parser.Read(file, nil, nil)
 	assert.Nil(err)
 
 	if assert.Len(channels, 1) {
@@ -55,7 +65,17 @@ func TestJsonfeed(t *testing.T) {
 	file, _ := os.Open("testdata/jsonfeed.json")
 	defer file.Close()
 
-	channels, err := new(Parser).Read(file, nil)
+	parser := Parser{}
+
+	if ok := parser.CanRead(file, nil); !assert.True(ok) {
+		return
+	}
+
+	if _, err := file.Seek(0, 0); !assert.Nil(err) {
+		return
+	}
+
+	channels, err := parser.Read(file, nil, nil)
 	assert.Nil(err)
 
 	if assert.Len(channels, 1) {
@@ -103,7 +123,17 @@ func TestPodcast(t *testing.T) {
 	file, _ := os.Open("testdata/podcast.json")
 	defer file.Close()
 
-	channels, err := new(Parser).Read(file, nil)
+	parser := Parser{}
+
+	if ok := parser.CanRead(file, nil); !assert.True(ok) {
+		return
+	}
+
+	if _, err := file.Seek(0, 0); !assert.Nil(err) {
+		return
+	}
+
+	channels, err := parser.Read(file, nil, nil)
 	assert.Nil(err)
 
 	if assert.Len(channels, 1) {

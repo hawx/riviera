@@ -5,7 +5,7 @@ package hfeed
 
 import (
 	"io"
-	"log"
+	"net/url"
 
 	"hawx.me/code/riviera/feed/common"
 	"willnorris.com/go/microformats"
@@ -19,67 +19,99 @@ type Parser struct{}
 func (Parser) CanRead(r io.Reader, charset func(charset string, input io.Reader) (io.Reader, error)) bool {
 	data := microformats.Parse(r, nil)
 
+	_, ok := findHFeed(data)
+	return ok
+}
+
+func findHFeed(data *microformats.Data) (*microformats.Microformat, bool) {
 	for _, item := range data.Items {
-		if contains(item.Type, "h-feed") {
-			return true
+		if found, ok := findType(item, "h-feed"); ok {
+			return found, ok
 		}
 	}
 
-	return false
+	return nil, false
 }
 
-func (Parser) Read(r io.Reader, charset func(charset string, input io.Reader) (io.Reader, error)) (foundChannels []*common.Channel, err error) {
-	data := microformats.Parse(r, nil)
+func findType(item *microformats.Microformat, name string) (*microformats.Microformat, bool) {
+	if contains(item.Type, "h-feed") {
+		return item, true
+	}
 
-	for _, item := range data.Items {
-		if contains(item.Type, "h-feed") {
-			channel := &common.Channel{}
-			log.Println(item.Properties)
+	for _, child := range item.Children {
+		if found, ok := findType(child, name); ok {
+			return found, ok
+		}
+	}
 
-			for _, child := range item.Children {
-				if contains(child.Type, "h-entry") {
-					item := &common.Item{}
+	return nil, false
+}
 
-					if uid, ok := getFirst(child.Properties, "uid").(string); ok {
-						item.GUID = &common.GUID{GUID: uid}
+func (p Parser) Read(r io.Reader, rootURL *url.URL, charset func(charset string, input io.Reader) (io.Reader, error)) (foundChannels []*common.Channel, err error) {
+	data := microformats.Parse(r, rootURL)
+
+	item, ok := findHFeed(data)
+	if !ok {
+		return
+	}
+
+	channel := &common.Channel{
+		Links: []common.Link{
+			{
+				Href: rootURL.String(),
+				Rel:  "alternate",
+			},
+			{
+				Href: rootURL.String(),
+				Rel:  "self",
+			},
+		},
+	}
+
+	if name, ok := getFirst(item.Properties, "name").(string); ok {
+		channel.Title = name
+	}
+
+	for _, child := range item.Children {
+		if contains(child.Type, "h-entry") {
+			item := &common.Item{}
+
+			if uid, ok := getFirst(child.Properties, "uid").(string); ok {
+				item.GUID = &common.GUID{GUID: uid}
+			}
+
+			if name, ok := getFirst(child.Properties, "name").(string); ok {
+				item.Title = name
+			}
+
+			if content, ok := getFirst(child.Properties, "content").(map[string]interface{}); ok {
+				if text, ok := content["text"].(string); ok {
+					item.Content = &common.Content{
+						Text: text,
 					}
-
-					if name, ok := getFirst(child.Properties, "name").(string); ok {
-						item.Title = name
+				} else if html, ok := content["html"].(string); ok {
+					item.Content = &common.Content{
+						Text: html,
 					}
-
-					if content, ok := getFirst(child.Properties, "content").(map[string]interface{}); ok {
-						if html, ok := content["html"].(string); ok {
-							item.Content = &common.Content{
-								Text: html,
-							}
-						} else if text, ok := content["text"].(string); ok {
-							item.Content = &common.Content{
-								Text: text,
-							}
-						}
-					}
-
-					if url, ok := getFirst(child.Properties, "url").(string); ok {
-						item.Links = []common.Link{{
-							Href: url,
-							Rel:  "alternate",
-						}}
-					}
-
-					if published, ok := getFirst(child.Properties, "published").(string); ok {
-						item.PubDate = published
-					}
-
-					log.Println(child.Properties)
-
-					channel.Items = append(channel.Items, item)
 				}
 			}
 
-			foundChannels = append(foundChannels, channel)
+			if url, ok := getFirst(child.Properties, "url").(string); ok {
+				item.Links = []common.Link{{
+					Href: url,
+					Rel:  "alternate",
+				}}
+			}
+
+			if published, ok := getFirst(child.Properties, "published").(string); ok {
+				item.PubDate = published
+			}
+
+			channel.Items = append(channel.Items, item)
 		}
 	}
+
+	foundChannels = append(foundChannels, channel)
 
 	return
 }

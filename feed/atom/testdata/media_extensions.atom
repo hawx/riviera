@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<feed xmlns="http://www.w3.org/2005/Atom" xmlns:media="http://search.yahoo.com/mrss/">
+  <title>Media Extensions Testcase</title>
+  <link rel="self" href="https://example.com/media-extensions" />
+  <updated>2017-11-06T11:12:45+0900</updated>
+  <entry>
+    <title>1</title>
+    <link rel="alternate" href="http://example.com/media-extesions/1/" />
+    <summary>Blah</summary>
+    <published>2017-11-06T11:12:45+0900</published>
+    <media:thumbnail url="http://example.com/images/1.jpg" />
+  </entry>
+  <entry>
+    <title>2</title>
+    <link rel="alternate" href="http://example.com/media-extensions/2/" />
+    <summary>Blah 2</summary>
+    <published>2017-11-06T11:12:45+0900</published>
+    <media:thumbnail url="http://example.com/images/2.jpg" width="100" height="123" />
+  </entry>
+</feed>

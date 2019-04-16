@@ -8,10 +8,12 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
+	"net/url"
 	"time"
 
 	"hawx.me/code/riviera/feed/atom"
 	"hawx.me/code/riviera/feed/common"
+	"hawx.me/code/riviera/feed/hfeed"
 	"hawx.me/code/riviera/feed/jsonfeed"
 	"hawx.me/code/riviera/feed/rdf"
 	"hawx.me/code/riviera/feed/rss"
@@ -34,7 +36,7 @@ type Feed struct {
 	channels []*common.Channel
 
 	// URL from which this feed was created.
-	url string
+	uri *url.URL
 
 	// Known containing a list of known Items and Channels for this instance
 	known Database
@@ -77,7 +79,7 @@ func (f *Feed) Fetch(uri string, client *http.Client, charset func(charset strin
 		return -1, nil
 	}
 
-	f.url = uri
+	f.uri, _ = url.Parse(uri)
 
 	req, err := http.NewRequest("GET", uri, nil)
 	if err != nil {
@@ -106,7 +108,7 @@ func (f *Feed) Fetch(uri string, client *http.Client, charset func(charset strin
 }
 
 func (f *Feed) load(r io.Reader, charset func(charset string, input io.Reader) (io.Reader, error)) (err error) {
-	f.channels, err = Parse(r, charset)
+	f.channels, err = Parse(r, f.uri, charset)
 	if err != nil || len(f.channels) == 0 {
 		return
 	}
@@ -129,12 +131,13 @@ var parsers = []common.Parser{
 	rss.Parser{},
 	rdf.Parser{},
 	jsonfeed.Parser{},
+	hfeed.Parser{},
 }
 
 // Parse reads the content from the provided reader, returning any feed channels
 // found. If the feed is of a format not supported it will return
 // ErrUnsupportedFormat.
-func Parse(r io.Reader, charset func(charset string, input io.Reader) (io.Reader, error)) (chs []*common.Channel, err error) {
+func Parse(r io.Reader, rootURL *url.URL, charset func(charset string, input io.Reader) (io.Reader, error)) (chs []*common.Channel, err error) {
 	data, _ := ioutil.ReadAll(r)
 	br := bytes.NewReader(data)
 
@@ -143,7 +146,7 @@ func Parse(r io.Reader, charset func(charset string, input io.Reader) (io.Reader
 			if _, err := br.Seek(0, io.SeekStart); err != nil {
 				return nil, err
 			}
-			return parser.Read(br, charset)
+			return parser.Read(br, rootURL, charset)
 		}
 		if _, err := br.Seek(0, io.SeekStart); err != nil {
 			return nil, err

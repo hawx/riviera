@@ -7,6 +7,7 @@ package rdf
 import (
 	"encoding/xml"
 	"io"
+	"net/url"
 	"time"
 
 	"hawx.me/code/riviera/feed/common"
@@ -49,7 +50,7 @@ func (Parser) CanRead(r io.Reader, charset func(charset string, input io.Reader)
 	}
 }
 
-func (Parser) Read(r io.Reader, charset func(string, io.Reader) (io.Reader, error)) (foundChannels []*common.Channel, err error) {
+func (Parser) Read(r io.Reader, _ *url.URL, charset func(string, io.Reader) (io.Reader, error)) (foundChannels []*common.Channel, err error) {
 	decoder := xml.NewDecoder(r)
 	decoder.CharsetReader = charset
 

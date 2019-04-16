@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"golang.org/x/net/html/charset"
-
 	"hawx.me/code/assert"
 )
 
@@ -15,7 +14,17 @@ func TestRss09Feed(t *testing.T) {
 	file, _ := os.Open("testdata/rss09.rdf")
 	defer file.Close()
 
-	channels, err := new(Parser).Read(file, charset.NewReaderLabel)
+	parser := Parser{}
+
+	if ok := parser.CanRead(file, charset.NewReaderLabel); !assert.True(ok) {
+		return
+	}
+
+	if _, err := file.Seek(0, 0); !assert.Nil(err) {
+		return
+	}
+
+	channels, err := parser.Read(file, nil, charset.NewReaderLabel)
 	assert.Nil(err)
 	assert.Len(channels, 1)
 
@@ -54,7 +63,17 @@ func TestSteamFeed(t *testing.T) {
 	file, _ := os.Open("testdata/steam-news.xml")
 	defer file.Close()
 
-	channels, err := new(Parser).Read(file, charset.NewReaderLabel)
+	parser := Parser{}
+
+	if ok := parser.CanRead(file, charset.NewReaderLabel); !assert.True(ok) {
+		return
+	}
+
+	if _, err := file.Seek(0, 0); !assert.Nil(err) {
+		return
+	}
+
+	channels, err := parser.Read(file, nil, charset.NewReaderLabel)
 	assert.Nil(err)
 	assert.Len(channels, 1)
 

@@ -6,6 +6,7 @@ package rss
 import (
 	"encoding/xml"
 	"io"
+	"net/url"
 	"strconv"
 	"strings"
 
@@ -56,7 +57,7 @@ func (Parser) CanRead(r io.Reader, charset func(charset string, input io.Reader)
 	}
 }
 
-func (Parser) Read(r io.Reader, charset func(charset string, input io.Reader) (io.Reader, error)) (foundChannels []*common.Channel, err error) {
+func (Parser) Read(r io.Reader, _ *url.URL, charset func(charset string, input io.Reader) (io.Reader, error)) (foundChannels []*common.Channel, err error) {
 	decoder := xml.NewDecoder(r)
 	decoder.CharsetReader = charset
 

@@ -6,6 +6,7 @@ package atom
 import (
 	"encoding/xml"
 	"io"
+	"net/url"
 
 	"hawx.me/code/riviera/feed/common"
 )
@@ -36,7 +37,7 @@ func (Parser) CanRead(r io.Reader, charset func(charset string, input io.Reader)
 	return false
 }
 
-func (Parser) Read(r io.Reader, charset func(charset string, input io.Reader) (io.Reader, error)) (foundChannels []*common.Channel, err error) {
+func (Parser) Read(r io.Reader, _ *url.URL, charset func(charset string, input io.Reader) (io.Reader, error)) (foundChannels []*common.Channel, err error) {
 	decoder := xml.NewDecoder(r)
 	decoder.CharsetReader = charset
 
