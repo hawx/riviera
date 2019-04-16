@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<title>Tantek &#xC7;elik</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<link rel="icon" href="logo.jpg"/>
+<link rel="apple-touch-icon-precomposed" href="logo.jpg"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<link rel="webmention" href="http://webmention.io/tantek.com/webmention"/>
+<link rel="hub" href="https://pubsubhubbub.superfeedr.com/"/>
+<link rel="self" href="http://tantek.com/"/>
+<link rel="openid.delegate" href="http://tantek.com/"/>
+<link rel="openid.server" href="https://indieauth.com/openid"/>
+<link rel="alternate" type="application/atom+xml" href="updates.atom"/>
+<style type="text/css">/**/ 
+/* HTML5+CSS work in progress. Copy paste AT YOUR OWN RISK! */
+
+@import "2018/simple.css";
+h2 { font-size:1em; }
+
+body { 
+  margin:auto;
+  padding:1.5em;
+  max-width:940px;
+}
+
+iframe { max-width:100%; }
+abbr { text-decoration:none }
+
+.header {
+ border-bottom:solid 1px #666;
+ margin-top:0;
+ margin-bottom:1em;
+}
+
+.header h1 {
+  margin:0;
+  padding:5px 0 0;
+  font-size:3em;
+  line-height:1.3;
+  font-weight:bold;
+  white-space:nowrap;
+}
+.header h2 {
+  font-size:1.5em;
+  font-weight:normal;
+  line-height:1em;
+  min-width:20em;
+  min-height:3em;
+  margin:0;
+}
+
+.aside dt, .aside dd {margin:0;padding:0}
+.aside dt { margin-top:.77em; color:#666; }
+.aside dd { color:#000}
+
+form.search {
+  clear: right;
+  text-align: right;
+  margin-bottom: 1em;
+  white-space: nowrap; 
+  font-size: 1.3em;
+}
+
+.stream>ol { margin:0; padding:0; }
+
+div.stream li.h-entry .figure { margin:0 -1em; }
+
+span.see-more { display:inline; }
+
+.interact img,
+.p-org.h-card img,
+.p-category.h-card img { height:1.4em; vertical-align:-.3em }
+
+@media screen and (min-width:40em) {
+/* progressive enhance wider screens */
+
+span.see-more { display:none; }
+
+body { padding:2em; }
+
+.header { height:90px; margin-top:1.3em }
+
+form.search { 
+  margin-top: -3.9em; 
+  width: 34%;
+  float: right; 
+}
+
+.stream {
+  clear:left;
+  float:left;
+  width:62%;
+  margin-right:4%;
+}
+
+.stream>ol { margin-right:3em; }
+
+.hentry ol, .hentry ul { margin-left:30px; }
+
+.aside {
+  float:left;
+  width:33%;
+}
+
+.footer .section {
+  float:left;
+  width:30%;
+  margin-right:3%;
+}
+
+div.stream li.h-entry .figure { margin:0; }
+
+} /* end wider screen enhancements */
+
+
+.photo { 
+  width:73px; 
+  float:left;
+  margin:0 20px 0 0;
+}
+
+form.search input[type=search] { width:62%; }
+
+form.search input, form.search button {
+  font-size:1em;
+  height:1.7em;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  margin:0;
+  vertical-align:bottom;
+}
+
+.stream>ol { list-style:none; }
+
+.aside h2,.footer h2 {
+  font-size: 1.3em;
+  text-transform:uppercase;
+  line-height:1.25;  
+  margin:0 0 1em;
+}
+
+.aside .section { margin-top:2em; }
+.aside .section.hello { margin-top:0; }
+
+.aside .section h2 {  margin-bottom:0.5em;
+}
+
+.aside p,.aside li,.aside dl,.footer p,.footer li {
+  font-size:1.3em;
+  line-height:1.54;
+  margin:0;
+  color:#666;
+  list-style:none;
+}
+.hello p { color:#000; }
+.elsewhere img {
+  vertical-align:bottom;
+  padding-bottom:.2em;
+}
+.aside h2 {
+  font-size:1.4em;
+  line-height:1.43;
+  font-weight:bold;
+}
+
+div.footer {
+  margin-left:1em;
+  clear:both;
+  margin-top:1em;
+  padding-top:5em;
+}
+.footer address { white-space:nowrap; }
+
+.footer p { margin-top:1em; }
+.footer .section li { list-style:disc inside; }
+
+address {
+  font-style:normal;
+  text-align:center;
+  clear:both;
+  margin:1em 5%;
+  padding:3em;
+}
+
+ul.nav,.nav li,ul.offsite { list-style:none; }
+ul.nav { float:right; margin-right: 5%; }
+ul.offsite,.offsite li,.nav li { list-style:inline; display:inline; }
+a:link { color:#2240C0; }
+a:link:hover { color:#22B040; }
+a:visited:hover {color:#118020; }
+
+/* events */
+#events li.vevent { list-style:none;margin-top:1em; }
+#events abbr.location {
+ display:block; text-align:center;
+ text-transform:uppercase;
+ font-weight:bold; font-size:2em; word-spacing:-.1em; font-size:1.5em;
+}
+#events li.vevent a { 
+  display:block; width:167px; text-align:center;
+  border:2px solid #000; padding:2px 1px 0 1px; 
+}
+#events li.vevent object,.vevent img { max-width:160px }
+#events li.vevent .with { display:block }
+.subhead { display:block }
+.html5 { 
+  display:block; padding-top:3px;
+  color:#3C790A;
+  font-family: Helvetica, sans-serif; font-weight: 900; 
+  font-size: 27px; line-height:.7em; 
+}
+.html5 span { 
+  display:block;
+  font-size:66%; line-height:1em; text-transform:capitalize;
+}
+#events .vevent a:visited:hover { color:#66F; }
+#events .vevent a:link:hover { color:#33F; }
+input,button { font-size:1em; }
+button { margin: 0 0.5em 0 0; padding:0 0.5em; }
+/**/</style>
+</head>
+<body class="h-card vcard">
+<header><div class="header">
+<img class="photo u-photo" src="photo.jpg" alt=""/><a class="u-url u-uid" rel="author" href=""></a>
+<div class="hgroup" style="margin-bottom:-1em">
+<h1 class="p-name fn">Tantek &#xC7;elik</h1>
+<h2 class="p-role role">
+<span class="p-category category">Inventor</span>, <span class="p-category category">writer</span>, <span class="p-category category">teacher</span>, <span class="p-category category">runner</span>, <span class="p-category category">coder</span><span class="see-more">, <a href="#hello">more</a>.</span>
+</h2>
+</div>
+<span class="see-more" style="float:left; max-width:6em; font-size:2.4em; margin:0; padding:0; text-align:center">
+<indie-action do="follow" with="http://tantek.com/"><!--
+<a href="https://twitter.com/intent/follow?screen_name=t"><abbr title="Follow Tantek on Twitter"><img style="margin:0 -0.3em -0.3em -0.4em" src="icon/twitter.png" alt="Follow @t" /></abbr></a>-->
+</indie-action>
+<a href="http://tantek.com/contact"><abbr title="Message Tantek">&#128172;</abbr></a>
+<a rel="payment" href="http://tantek.com/tip/1" title="Tip: Did you read something of value here and want to encourage more posts like that? Feel free to tip a small amount and mention which topics you enjoyed! (Just please avoid specific products or services. Thanks! -t)">&#128079; </a>
+</span>
+<form class="search" action="https://duckduckgo.com/html/" method="get"><div>
+<input type="hidden" name="type" value="list"/>
+<input type="search" value="site:tantek.com " name="q" style="max-width:10.5em"/>
+<button type="submit">Search</button>
+</div></form>
+</div></header>
+
+<!-- h-feed filled in dynamically -->
+<div class="h-feed section stream" id="updates">
+<div class="pinned"></div>
+<ol>
+<li class="h-entry hentry as-note">
+<p class="article"><span class="reply-context" style="display:block">&#8618; In reply to <a href="https://tantek.com/2019/093/t1/few-days-off" class="u-in-reply-to h-cite">Tantek&rsquo;s note</a></span> <span class="p-name entry-title e-content entry-content">Despite not checking FB (always a good start), I&rsquo;ve found it takes a while (at least a day?) to stop feeling compelled to check, keep up with, or &ldquo;work on&rdquo; whatever projects (job related or not) are top of mind. Email, Slack, etc.</span></p>
+<span class="info footer"><a href="2019/093/t2/stop-check-email-slack" class="dt-published published dt-updated updated u-url u-uid"><time class="value" datetime="23:49-0700">23:49</time> on <time class="value">2019-04-03</time></a></span>
+</li>
+<li class="h-entry hentry as-note">
+<p class="article"><span class="p-name entry-title e-content entry-content">Taking a few days off from many things for warmer, sunnier shores, and a yoga retreat.<br class="auto-break"/><br class="auto-break"/>Still haven&rsquo;t checked Facebook notifications since the last retreat, January over a year ago.<br class="auto-break"/><br class="auto-break"/>Brought a notepad &amp; books. Going to read, write, post what surfaces.</span></p>
+<span class="info footer"><a href="2019/093/t1/few-days-off" class="dt-published published dt-updated updated u-url u-uid"><time class="value" datetime="07:53-0700">07:53</time> on <time class="value">2019-04-03</time></a></span>
+</li>
+<li class="h-entry hentry as-note">
+<p class="article"><span class="p-name entry-title e-content entry-content">More anniversaries (this month) in addition to #<span class="p-category auto-tag">TheMatrix:</span><br class="auto-break"/><br class="auto-break"/>20th: #<span class="p-category auto-tag">CruelIntentions</span> <a class="auto-link" href="https://hellogiggles.com/reviews-coverage/movies/why-kathryn-cruel-intentions-still-matters-2019/">https://hellogiggles.com/reviews-coverage/movies/why-kathryn-cruel-intentions-still-matters-2019/</a><br class="auto-break"/><br class="auto-break"/>30th: #<span class="p-category auto-tag">Web30</span> #<span class="p-category auto-tag">TimBL</span> information management proposal <a class="auto-link" href="http://info.cern.ch/Proposal.html">http://info.cern.ch/Proposal.html</a><br class="auto-break"/><br class="auto-break"/>30 years ago today: #<span class="p-category auto-tag">Heathers</span> movie release <a class="auto-link" href="https://www.newyorker.com/culture/touchstones/an-appreciation-of-the-dark-comedy-heathers">https://www.newyorker.com/culture/touchstones/an-appreciation-of-the-dark-comedy-heathers</a></span></p>
+<span class="info footer"><a href="2019/090/t4/anniversaries-cruel-intentions-web30-heathers" class="dt-published published dt-updated updated u-url u-uid"><time class="value" datetime="23:59-0700">23:59</time> on <time class="value">2019-03-31</time></a></span>
+</li>
+<li class="h-entry hentry as-note">
+<p class="article"><span class="reply-context" style="display:block">&#8618; In reply to <a href="https://tantek.com/2019/090/t2/years-ago-the-matrix" class="u-in-reply-to h-cite">Tantek&rsquo;s note</a></span> <span class="p-name entry-title e-content entry-content">#<span class="p-category auto-tag">TheMatrix</span> was a huge influence on how I viewed the evolution of human computer interactions &amp; systems. Had forgotten today was 20th anniversary.<br class="auto-break"/>No human reminded me.<br class="auto-break"/><a class="auto-link h-cassis-username" href="https://twitter.com/Instagram">@Instagram</a>&rsquo;s ad-targeting #<span class="p-category auto-tag">AI</span> did <a class="auto-link" href="https://twitter.com/WBHomeEnt/status/1112399155681353728">https://twitter.com/WBHomeEnt/status/1112399155681353728</a> (<a class="auto-link h-cassis-username" href="https://twitter.com/iTunes">@iTunes</a> #<span class="p-category auto-tag">Matrix</span> 4k ad)</span></p>
+<span class="info footer"><a href="2019/090/t3/no-human-ai-matrix-ad" class="dt-published published dt-updated updated u-url u-uid"><time class="value" datetime="23:28-0700">23:28</time> on <time class="value">2019-03-31</time></a></span>
+</li>
+<li class="h-entry hentry as-note">
+<p class="article"><span class="p-name entry-title e-content entry-content">20 years ago today, having only seen a brief trailer but convinced it was going be a big deal, I took my team working on the #<span class="p-category auto-tag">Tasmanengine</span> for <a class="auto-link h-cassis-username" href="https://twitter.com/Microsoft">@Microsoft</a> #<span class="p-category auto-tag">IE5Mac</span> to the opening day of #<span class="p-category auto-tag">TheMatrix</span> at AMC Mercado 20. <a class="auto-link h-cassis-username" href="https://twitter.com/sfalken">@sfalken</a> <a class="auto-link h-cassis-username" href="https://twitter.com/jimmyg">@jimmyg</a> #<span class="p-category auto-tag">Matrix</span> #<span class="p-category auto-tag">1999_090</span></span></p>
+<span class="info footer"><a href="2019/090/t2/years-ago-the-matrix" class="dt-published published dt-updated updated u-url u-uid"><time class="value" datetime="23:13-0700">23:13</time> on <time class="value">2019-03-31</time></a></span>
+</li>
+<li class="h-entry hentry as-note">
+<p class="article"><span class="p-name entry-title e-content entry-content">Google+ shuts down in 2 days (2019-04-02) #<span class="p-category auto-tag">notajoke</span><br class="auto-break"/><br class="auto-break"/>Export your <a class="auto-link h-cassis-username" href="https://twitter.com/GooglePlus">@GooglePlus</a> NOW. #<span class="p-category auto-tag">ownyourdata</span><br class="auto-break"/>May take &ldquo;hours or possibly days&rdquo; to create.<br class="auto-break"/><br class="auto-break"/>As a light user (last post 6+ years ago), mine took minutes. 4.8MB zip file.<br class="auto-break"/><br class="auto-break"/>More: <a class="auto-link" href="https://indieweb.org/Google_Plus">https://indieweb.org/Google_Plus</a></span></p>
+<span class="info footer"><a href="2019/090/t1/export-googleplus-now" class="dt-published published dt-updated updated u-url u-uid"><time class="value" datetime="15:10-0700">15:10</time> on <time class="value">2019-03-31</time></a></span>
+</li>
+<li class="h-entry hentry as-note">
+<p class="article"><span class="reply-context" style="display:block">&#8618; In reply to <a href="https://twitter.com/rickydelaveaga/status/1109552405245378560" class="u-in-reply-to h-cite">@rickydelaveaga&rsquo;s tweet</a></span> <span class="p-name entry-title e-content entry-content"><a class="auto-link h-cassis-username" href="https://twitter.com/rickydelaveaga">@rickydelaveaga</a> <a class="auto-link h-cassis-username" href="https://twitter.com/ian">@ian</a> <a class="auto-link h-cassis-username" href="https://twitter.com/andigalpern">@andigalpern</a> <a class="auto-link h-cassis-username" href="https://twitter.com/indiewebcamp">@indiewebcamp</a> <a class="auto-link h-cassis-username" href="https://twitter.com/brianleroux">@brianleroux</a> Yes we are on for Homebrew Website Club San Francisco 2019-04-17 <a class="auto-link h-cassis-username" href="https://twitter.com/MozSF">@MozSF</a>!<br class="auto-break"/><br class="auto-break"/>Event &amp; RSVP: <a class="auto-link" href="https://tantek.com/2019/107/e1/homebrew-website-club-sf">https://tantek.com/2019/107/e1/homebrew-website-club-sf</a><br class="auto-break"/><br class="auto-break"/>Join us!</span></p>
+<span class="info footer"><a href="2019/088/t2/" class="dt-published published dt-updated updated u-url u-uid"><time class="value" datetime="16:50-0700">16:50</time> on <time class="value">2019-03-29</time></a></span>
+</li>
+<li class="h-event vevent hentry as-event">
+<div class="article">
+<a href="2019/107/e1/homebrew-website-club-sf" rel="bookmark" class="u-url u-uid"><h1 class="entry-title p-name summary">
+Homebrew Website Club SF!
+</h1></a><div class="entry-content e-content">
+<p>
+When: <time class="dt-start dtstart">2019-04-17 17:30</time>&#x2026;<time class="dt-end dtend">19:30</time>
+<span style="display:block">
+Where: <a class="u-location h-card location" href="https://wiki.mozilla.org/SF">Mozilla San Francisco</a>
+</span>
+Host: <a class="u-organizer h-card" href="http://tantek.com/">Tantek &#xC7;elik</a>
+</p>
+<div class="p-summary description">
+<p>
+17:30: Optional writing hour and quiet socializing<br/>
+18:30: IndieWeb demos and hack night!<br/>
+</p>
+<p><img class="u-featured" style="max-width:100%;width:100%;height:300px;object-fit:cover;object-position:50% 40%" src="https://indieweb.org/images/b/b1/2017-hwc-80s-retro.jpg" alt="Homebrew Website Club retro 1980s-style logo"/></p>
+<p>Topics for this week:</p>
+<ul>
+<li><a href="https://tools.ietf.org/html/rfc7231#section-5.1.1">When to return HTTP 417</a></li>
+<li>
+<a href="https://indieweb.org/2019/Berlin">IndieWebCamp Berlin</a> is May 4-5! <a href="https://indieweb.org/2019/Berlin">Make your plans!</a>
+</li>
+<li>
+<a href="https://indieweb.org/2019/D%C3%BCsseldorf">IndieWebCamp D&uuml;sseldorf</a> is scheduled May 11-12! <a href="https://btco.nf/DUS2019indiewebcamp">Sign-up!</a>
+</li>
+<!--<li><a href="https://indieweb.org/2019-01-01-commitments">Year-end hack projects</a></li>
+<li><a href="https://indieweb.org/2018-12-indieweb-challenge">2018 IndieWeb Challenge</a> completed!</li>-->
+<li>Demos of personal website breakthroughs</li>
+<li>Create or update your personal web site!</li>
+</ul>
+<p>
+Join a community with like-minded interests. Bring friends that want a personal site, or are interested in a healthy, independent web!
+</p>
+<p>
+Any questions? Ask in 
+<a href="https://indieweb.org/discuss">#indieweb Slack or IRC</a>
+</p>
+<p>
+More information: 
+<a class="u-url" href="https://indieweb.org/events/2019-04-17-homebrew-website-club">IndieWeb Wiki Event Page</a>
+</p>
+<p>
+RSVP: <!-- <a class="u-syndication" href="https://www.facebook.com/events/696256410773385/">on the Facebook event</a> or--> post an <a href="https://indieweb.org/rsvp">indie RSVP</a> on your own site!
+</p>
+</div>
+</div>
+</div>
+<span class="info footer"><a href="2019/107/e1/homebrew-website-club-sf" class="dt-published published dt-updated updated u-url u-uid"><time class="value" datetime="16:38-0700">16:38</time> on <time class="value">2019-03-29</time></a></span>
+</li>
+<li class="h-entry hentry as-note">
+<p class="article"><span class="reply-context" style="display:block">&#8618; In reply to <a href="https://tantek.com/2019/083/t1/europeans-no-article17-article13" class="u-in-reply-to h-cite">Tantek&rsquo;s note</a></span> <span class="p-name entry-title e-content entry-content">348 Members of European Parliament (MEP) ignored experts &amp; protests and voted to require magic beans, the so-called #<span class="p-category auto-tag">Article13</span> #<span class="p-category auto-tag">Article17</span> &ldquo;upload filter&rdquo;, a technology that does not exist. What #<span class="p-category auto-tag">antiscience</span> will they vote for next? Vote them out.<br class="auto-break"/>More: <br class="auto-break"/>* <a class="auto-link" href="https://www.eff.org/deeplinks/2019/03/eus-parliament-signs-disastrous-internet-law-what-happens-next">https://www.eff.org/deeplinks/2019/03/eus-parliament-signs-disastrous-internet-law-what-happens-next</a><br class="auto-break"/>* <a class="auto-link" href="https://www.theverge.com/2019/3/26/18280726/europe-copyright-directive">https://www.theverge.com/2019/3/26/18280726/europe-copyright-directive</a><br class="auto-break"/>* <a class="auto-link" href="https://thenextweb.com/dd/2019/03/25/inside-githubs-fight-to-protect-devs-from-eus-disastrous-copyright-reform/">https://thenextweb.com/dd/2019/03/25/inside-githubs-fight-to-protect-devs-from-eus-disastrous-copyright-reform/</a></span></p>
+<span class="info footer"><a href="2019/088/t1/mep-ignored-experts-voted-magic-beans" class="dt-published published dt-updated updated u-url u-uid"><time class="value" datetime="16:22-0700">16:22</time> on <time class="value">2019-03-29</time></a></span>
+</li>
+<li class="h-entry hentry as-note">
+<p class="article"><span class="p-name entry-title e-content entry-content">Want to hear <a class="auto-link h-cassis-username" href="https://twitter.com/zeldman">@zeldman</a> and me talk #<span class="p-category auto-tag">webstandards</span> #<span class="p-category auto-tag">CSS</span> #<span class="p-category auto-tag">microformats</span> #<span class="p-category auto-tag">independentweb</span> what to do about the #<span class="p-category auto-tag">toolchain</span> rift(s) and latest advances in the #<span class="p-category auto-tag">indieweb</span>?<br class="auto-break"/><br class="auto-break"/>1hr+ raw &amp; uncut <a class="auto-link h-cassis-username" href="https://twitter.com/TheBigWebShow">@TheBigWebShow</a> &#8470; 186: <a class="auto-link" href="http://5by5.tv/bigwebshow/186">http://5by5.tv/bigwebshow/186</a><br class="auto-break"/><br class="auto-break"/><a class="auto-link" href="https://twitter.com/zeldman/status/1111017460210253826">https://twitter.com/zeldman/status/1111017460210253826</a></span></p>
+<span class="info footer"><a href="2019/086/t1/webstandards-css-toolchain-indieweb" class="dt-published published dt-updated updated u-url u-uid"><time class="value" datetime="16:24-0700">16:24</time> on <time class="value">2019-03-27</time></a></span>
+</li>
+<li class="h-entry hentry as-note">
+<p class="article"><span class="p-name entry-title e-content entry-content">Europeans! (yes you too UK folks)<br class="auto-break"/>Call your MEP to vote NO on #<span class="p-category auto-tag">CopyrightDirective</span> #<span class="p-category auto-tag">Article17</span> (ex. #<span class="p-category auto-tag">Article13</span>)!<br class="auto-break"/>See <a class="auto-link h-cassis-username" href="https://twitter.com/EFF">@EFF</a> thread &amp; instructions<br class="auto-break"/><a class="auto-link" href="https://twitter.com/EFF/status/1109737081478119424">https://twitter.com/EFF/status/1109737081478119424</a><br class="auto-break"/><br class="auto-break"/>#<span class="p-category auto-tag">SaveYourInternet</span></span></p>
+<span class="info footer"><a href="2019/083/t1/europeans-no-article17-article13" class="dt-published published dt-updated updated u-url u-uid"><time class="value" datetime="23:32-0700">23:32</time> on <time class="value">2019-03-24</time></a></span>
+</li>
+<li class="h-entry hentry as-note">
+<p class="article"><span class="p-name entry-title e-content entry-content"><a class="auto-link figure u-bridgy-flickr-photo" href="https://fastly.4sqi.net/img/general/original/476_KKcHgrSsPRIXA7qa6qJNsKDbvNVIZ0APjiQxyU9lhew.jpg"><img class="auto-embed u-photo" alt="Tantek and Bryan in downtown Mill Valley" src="https://fastly.4sqi.net/img/general/width960/476_KKcHgrSsPRIXA7qa6qJNsKDbvNVIZ0APjiQxyU9lhew.jpg"/></a><a class="auto-link figure u-bridgy-flickr-photo" href="https://fastly.4sqi.net/img/general/original/476_STUmTqoRlB4hJ__ivn5gUMaM9IkXyrBPyesOrOBCHDI.jpg"><img class="auto-embed u-photo" alt="Trees and bright green grass lining the steps at the start of Temelpa trail" src="https://fastly.4sqi.net/img/general/width960/476_STUmTqoRlB4hJ__ivn5gUMaM9IkXyrBPyesOrOBCHDI.jpg"/></a><a class="auto-link figure u-bridgy-flickr-photo" href="https://fastly.4sqi.net/img/general/original/476_PgCqvoz1HC1GKUwouDMWNW4wUKZMAnGvFo9pq8W9dik.jpg"><img class="auto-embed u-photo" alt="Overcast sky over San Francisco skyline in the distance, looking down from Temelpa trail at rolling green hills" src="https://fastly.4sqi.net/img/general/width960/476_PgCqvoz1HC1GKUwouDMWNW4wUKZMAnGvFo9pq8W9dik.jpg"/></a><a class="auto-link figure u-bridgy-flickr-photo" href="https://fastly.4sqi.net/img/general/original/476_jOgdouj2-JIECDFwHQ39ei15x1JybQzEdDRbvvQdvRo.jpg"><img class="auto-embed u-photo" alt="Tantek standing in front of the Tam East Peak building with Mt Tam Lookout sign overhead" src="https://fastly.4sqi.net/img/general/width960/476_jOgdouj2-JIECDFwHQ39ei15x1JybQzEdDRbvvQdvRo.jpg"/></a><a class="auto-link figure u-bridgy-flickr-photo" href="https://fastly.4sqi.net/img/general/original/476_qQq-N7F2ldy3Y8v-bKFcz5RSjbvn1dvDzfeTQWTQlRI.jpg"><img class="auto-embed u-photo" alt="A few bushes and rocks in the foreground at Tam East Peak, and no further visibility due to being in the clouds" src="https://fastly.4sqi.net/img/general/width960/476_qQq-N7F2ldy3Y8v-bKFcz5RSjbvn1dvDzfeTQWTQlRI.jpg"/></a><a class="auto-link figure u-bridgy-flickr-photo" href="https://fastly.4sqi.net/img/general/original/476_hY1JX0jF4kB121ZffkmhobT7PHRS5rDrm0Pe6Mn2MLs.jpg"><img class="auto-embed u-photo" alt="Tantek wearing a full rain slicker with hood standing in front of the Tam East Peak building with Mt Tam Lookout sign overhead, surrounded by horizontal rain" src="https://fastly.4sqi.net/img/general/width960/476_hY1JX0jF4kB121ZffkmhobT7PHRS5rDrm0Pe6Mn2MLs.jpg"/></a><a class="auto-link figure u-bridgy-flickr-photo" href="https://fastly.4sqi.net/img/general/original/476_Mkn_0Y63JZSNH132CYQmxMIRtVqov_DbN12A03nxdmg.jpg"><img class="auto-embed u-photo" alt="Bryan and Tantek in full slickers, wet, sitting down indoors, smiling broadly" src="https://fastly.4sqi.net/img/general/width960/476_Mkn_0Y63JZSNH132CYQmxMIRtVqov_DbN12A03nxdmg.jpg"/></a>Ran up Mt Tam in rain today. Twice. ~17.8 miles, 5300+' climbed. First #<span class="p-category auto-tag">solotam</span>. First #<span class="p-category auto-tag">doubletam</span>. I got knocked down, but I got up again. Twice.<br class="auto-break"/><br class="auto-break"/>1 Started with <a class="auto-link h-cassis-username" href="https://twitter.com/BryanTing">@BryanTing</a>(&#128247;)<br class="auto-break"/>2 Temelpa trailhead<br class="auto-break"/>3 #<span class="p-category auto-tag">SF</span> #<span class="p-category auto-tag">skyline</span> still visible under the cloud cover<br class="auto-break"/>4 First Tam ascent done!<br class="auto-break"/>5 Clouds blocking the scenic view at Tam East Peak<br class="auto-break"/>6 Second Tam ascent done in horizontal rain!<br class="auto-break"/>7 Finished with Bryan Ting(&#128247;)<br class="auto-break"/><br class="auto-break"/>Ask me about fallen trees at headheight across trails, and how slippery wet flat rocks can be.<br class="auto-break"/><br class="auto-break"/>#<span class="p-category auto-tag">MtTam</span> #<span class="p-category auto-tag">DoubleTam</span> #<span class="p-category auto-tag">MountTam</span> #<span class="p-category auto-tag">steps</span> #<span class="p-category auto-tag">Marin</span> #<span class="p-category auto-tag">MillValley</span> #<span class="p-category auto-tag">trail</span> #<span class="p-category auto-tag">trails</span> #<span class="p-category auto-tag">trailrun</span> #<span class="p-category auto-tag">run</span> #<span class="p-category auto-tag">TemelpaTrail</span> #<span class="p-category auto-tag">MtTamEastPeak</span> #<span class="p-category auto-tag">weatherproof</span> #<span class="p-category auto-tag">horizontalrain</span> #<span class="p-category auto-tag">50ktraining</span> #<span class="p-category auto-tag">rainrunning</span> #<span class="p-category auto-tag">runningintherain</span> #<span class="p-category auto-tag">behardcore</span> #<span class="p-category auto-tag">befierce</span> #<span class="p-category auto-tag">getup</span> #<span class="p-category auto-tag">getupagain</span> #<span class="p-category auto-tag">fitstrongfierce</span> #<span class="p-category auto-tag">workharddreambigdocoolshit</span></span></p>
+<span class="info footer"><a href="2019/081/t1/ran-tam-rain-twice" class="dt-published published dt-updated updated u-url u-uid"><time class="value" datetime="23:41-0700">23:41</time> on <time class="value">2019-03-22</time></a></span>
+</li>
+<li class="h-entry hentry as-note">
+<p class="article"><span class="reply-context" style="display:block">&#8618; In reply to <a href="https://tantek.com/2019/079/t2/thanks" class="u-in-reply-to h-cite">Tantek&rsquo;s note</a></span> <span class="p-name entry-title e-content entry-content">Summary:<br class="auto-break"/>01:42 suspended per Twitter email: "abusive behavior" and "targeted harassment of someone"<br class="auto-break"/>18:36 restored per "account got caught up in one of these spam groups by mistake"<br class="auto-break"/><br class="auto-break"/>My tweets are pretty boring. Running pics. #<span class="p-category auto-tag">IndieWeb</span> #<span class="p-category auto-tag">CSS</span><br class="auto-break"/><br class="auto-break"/>One comparing Twitter to the Matrix about an abstract &ldquo;someone&rdquo;. Does Twitter&rsquo;s automated system think &ldquo;harassment of someone&rdquo; literally means referring to the literal text &ldquo;someone&rdquo;? Is one offhand tweet considered &ldquo;harassment&rdquo;?</span></p>
+<span class="info footer"><a href="2019/079/t3/summary-suspended-restored" class="dt-published published dt-updated updated u-url u-uid"><time class="value" datetime="20:49-0700">20:49</time> on <time class="value">2019-03-20</time></a></span>
+</li>
+<li class="h-entry hentry as-note">
+<p class="article"><span class="reply-context" style="display:block">&#8618; In reply to <a href="https://twitter.com/zeldman/status/1108401652946661379" class="u-in-reply-to h-cite">@zeldman&rsquo;s tweet</a></span> <span class="p-name entry-title e-content entry-content">Thanks <a class="auto-link h-cassis-username" href="https://twitter.com/zeldman">@zeldman</a> <a class="auto-link h-cassis-username" href="https://twitter.com/absalomedia">@absalomedia</a> <a class="auto-link h-cassis-username" href="https://twitter.com/adactio">@adactio</a> <a class="auto-link h-cassis-username" href="https://twitter.com/meyerweb">@meyerweb</a> <a class="auto-link h-cassis-username" href="https://twitter.com/SaraSoueidan">@SaraSoueidan</a> <a class="auto-link h-cassis-username" href="https://twitter.com/keithjgrant">@keithjgrant</a> <a class="auto-link h-cassis-username" href="https://twitter.com/benwerd">@benwerd</a> <a class="auto-link h-cassis-username" href="https://twitter.com/pdxposhy">@pdxposhy</a> <a class="auto-link h-cassis-username" href="https://twitter.com/bastianallgeier">@bastianallgeier</a> <a class="auto-link h-cassis-username" href="https://twitter.com/m_ott">@m_ott</a> <a class="auto-link h-cassis-username" href="https://twitter.com/ohhelloana">@ohhelloana</a> <a class="auto-link h-cassis-username" href="https://twitter.com/jackyalcine">@jackyalcine</a> <a class="auto-link h-cassis-username" href="https://twitter.com/ken_bauer">@ken_bauer</a> <a class="auto-link h-cassis-username" href="https://twitter.com/jgarber">@jgarber</a> <a class="auto-link h-cassis-username" href="https://twitter.com/tomcoates">@tomcoates</a><br class="auto-break"/><br class="auto-break"/>If my boring account can be falsely suspended, what of those less privileged? Quietly silenced &amp; forgotten?<br class="auto-break"/><br class="auto-break"/>Tweets:<br class="auto-break"/>* <a class="auto-link" href="https://twitter.com/zeldman/status/1108401652946661379">https://twitter.com/zeldman/status/1108401652946661379</a><br class="auto-break"/>* <a class="auto-link" href="https://twitter.com/absalomedia/status/1108456176054751232">https://twitter.com/absalomedia/status/1108456176054751232</a><br class="auto-break"/>* <a class="auto-link" href="https://twitter.com/adactio/status/1108472538743689216">https://twitter.com/adactio/status/1108472538743689216</a><br class="auto-break"/>* <a class="auto-link" href="https://twitter.com/meyerweb/status/1108474263722434560">https://twitter.com/meyerweb/status/1108474263722434560</a><br class="auto-break"/>* <a class="auto-link" href="https://twitter.com/SaraSoueidan/status/1108474081677053952">https://twitter.com/SaraSoueidan/status/1108474081677053952</a><br class="auto-break"/>* <a class="auto-link" href="https://twitter.com/keithjgrant/status/1108475701160824832">https://twitter.com/keithjgrant/status/1108475701160824832</a><br class="auto-break"/>* <a class="auto-link" href="https://twitter.com/benwerd/status/1108478286089195520">https://twitter.com/benwerd/status/1108478286089195520</a><br class="auto-break"/>* <a class="auto-link" href="https://twitter.com/pdxposhy/status/1108478396793667584">https://twitter.com/pdxposhy/status/1108478396793667584</a><br class="auto-break"/>* <a class="auto-link" href="https://twitter.com/bastianallgeier/status/1108483684242460673">https://twitter.com/bastianallgeier/status/1108483684242460673</a><br class="auto-break"/>* <a class="auto-link" href="https://twitter.com/m_ott/status/1108486885033340928">https://twitter.com/m_ott/status/1108486885033340928</a><br class="auto-break"/>* <a class="auto-link" href="https://twitter.com/ohhelloana/status/1108492852441550852">https://twitter.com/ohhelloana/status/1108492852441550852</a><br class="auto-break"/>* <a class="auto-link" href="https://twitter.com/jr_sawv/status/1108499831843102721">https://twitter.com/jr_sawv/status/1108499831843102721</a><br class="auto-break"/>* <a class="auto-link" href="https://twitter.com/JFSIII/status/1108560555214815233">https://twitter.com/JFSIII/status/1108560555214815233</a><br class="auto-break"/>and back:<br class="auto-break"/>* <a class="auto-link" href="https://twitter.com/jackyalcine/status/1108550208357453824">https://twitter.com/jackyalcine/status/1108550208357453824</a><br class="auto-break"/>* <a class="auto-link" href="https://twitter.com/ken_bauer/status/1108566015502401536">https://twitter.com/ken_bauer/status/1108566015502401536</a><br class="auto-break"/>* <a class="auto-link" href="https://twitter.com/jgarber/status/1108566493355278342">https://twitter.com/jgarber/status/1108566493355278342</a><br class="auto-break"/>* <a class="auto-link" href="https://twitter.com/pdxposhy/status/1108566867474448384">https://twitter.com/pdxposhy/status/1108566867474448384</a><br class="auto-break"/>* <a class="auto-link" href="https://twitter.com/tomcoates/status/1108571838316048384">https://twitter.com/tomcoates/status/1108571838316048384</a><br class="auto-break"/>* <a class="auto-link" href="https://twitter.com/tomcoates/status/1108572526546845696">https://twitter.com/tomcoates/status/1108572526546845696</a></span></p>
+<span class="info footer"><a href="2019/079/t2/thanks" class="dt-published published dt-updated updated u-url u-uid"><time class="value" datetime="20:34-0700">20:34</time> on <time class="value">2019-03-20</time></a></span>
+</li>
+<li class="h-entry hentry as-note">
+<p class="article"><span class="p-name entry-title e-content entry-content">Implemented alt text for <a class="auto-link h-cassis-username" href="https://twitter.com/cassisjs">@cassisjs</a> auto_link image embeds (live on <a class="auto-link" href="https://tantek.com/cassis.js">https://tantek.com/cassis.js</a>), as paranthetical after image URL. Now photo posts with alt text!<br class="auto-break"/><br class="auto-break"/>imageURL (alt text) -auto_link&rarr; &lt;img alt="alt text"&gt; -Bridgy&rarr; POSSE tweet photo(s) + alt(s)!</span></p>
+<span class="info footer"><a href="2019/079/t1/implemented-alt-text-image-embeds" class="dt-published published dt-updated updated u-url u-uid"><time class="value" datetime="01:05-0700">01:05</time> on <time class="value">2019-03-20</time></a></span>
+</li>
+<li class="h-entry hentry as-note">
+<p class="article"><span class="p-name entry-title e-content entry-content"><a class="auto-link figure u-bridgy-flickr-photo" href="https://fastly.4sqi.net/img/general/original/476_aRp-mdq5Iilm9f3xcisFrKHRQfdQeXCB-MHDpHJSmV8.jpg"><img class="auto-embed u-photo" alt="Outdoor gravel steps winding uphill between green hillsides under a blue sky." src="https://fastly.4sqi.net/img/general/width960/476_aRp-mdq5Iilm9f3xcisFrKHRQfdQeXCB-MHDpHJSmV8.jpg"/></a><a class="auto-link figure u-bridgy-flickr-photo" href="https://fastly.4sqi.net/img/general/original/476_P1Xmqr3iYd7_5dZ0--BKImjZU-uA1GKwQSgSOdCGLk8.jpg"><img class="auto-embed u-photo" alt="Clear blue sky, Pacific Ocean peaking between rolling green hills." src="https://fastly.4sqi.net/img/general/width960/476_P1Xmqr3iYd7_5dZ0--BKImjZU-uA1GKwQSgSOdCGLk8.jpg"/></a><a class="auto-link figure u-bridgy-flickr-photo" href="https://fastly.4sqi.net/img/general/original/476_2SEafhmeiKEvLxPtG6fha_GJfYCmOV60ZOByFI8Q_K0.jpg"><img class="auto-embed u-photo" alt="Sun beams on a blue sky, distant mountains, and nearby rolling hills with trees and a winding trail cut into their side." src="https://fastly.4sqi.net/img/general/width960/476_2SEafhmeiKEvLxPtG6fha_GJfYCmOV60ZOByFI8Q_K0.jpg"/></a><a class="auto-link figure u-bridgy-flickr-photo" href="https://fastly.4sqi.net/img/general/original/476_nyvl8Umy3wi5hoVcGPVMmkjhPoIsRRlCOau70WwD6hs.jpg"><img class="auto-embed u-photo" alt="Ridgeline view, green hills dotted with bushes, the blue Pacific Ocean on the horizon." src="https://fastly.4sqi.net/img/general/width960/476_nyvl8Umy3wi5hoVcGPVMmkjhPoIsRRlCOau70WwD6hs.jpg"/></a><a class="auto-link figure u-bridgy-flickr-photo" href="https://fastly.4sqi.net/img/general/original/476_7oJDG5jYegOfK7Yj7ZUKEYzik1fFgkg4m3tXS2WNkGA.jpg"><img class="auto-embed u-photo" alt="Clear skies and light surf at Muir Beach." src="https://fastly.4sqi.net/img/general/width960/476_7oJDG5jYegOfK7Yj7ZUKEYzik1fFgkg4m3tXS2WNkGA.jpg"/></a><a class="auto-link figure u-bridgy-flickr-photo" href="https://fastly.4sqi.net/img/general/original/476_GGKgmqrINdZ4l7kRJ414FM-o3VkkhA2MiccDoQ5PtCs.jpg"><img class="auto-embed u-photo" alt="Rolling green hills dropping off into the Pacific Ocean into Pirate&rsquo;s Cove." src="https://fastly.4sqi.net/img/general/width960/476_GGKgmqrINdZ4l7kRJ414FM-o3VkkhA2MiccDoQ5PtCs.jpg"/></a><a class="auto-link figure u-bridgy-flickr-photo" href="https://fastly.4sqi.net/img/general/original/476_nqFF9RSURbfOytK1kq6Se5Cf6oDPImreLt5FtFh75Sg.jpg"><img class="auto-embed u-photo" alt="Blue sky, a glimpse of San Francisco&rsquo;s tallest buildings peaking out behind distant hills, downhill Fox Trail in the foreground." src="https://fastly.4sqi.net/img/general/width960/476_nqFF9RSURbfOytK1kq6Se5Cf6oDPImreLt5FtFh75Sg.jpg"/></a><a class="auto-link figure u-bridgy-flickr-photo" href="https://fastly.4sqi.net/img/general/original/476_SAAHI7wNTp8lrPIV3Hr3NzT0aDdP5PPYcah2_KOqw9w.jpg"><img class="auto-embed u-photo" alt="Winding downhill trail between green lined hillsides, Pacific Ocean in the distance with a mist hovering on the horizon." src="https://fastly.4sqi.net/img/general/width960/476_SAAHI7wNTp8lrPIV3Hr3NzT0aDdP5PPYcah2_KOqw9w.jpg"/></a>#<span class="p-category auto-tag">trailtuesdaythrowback</span> to 13.2+ miles and ~2500' last #<span class="p-category auto-tag">Saturday</span> at #<span class="p-category auto-tag">SFRC</span>. Clear blue skies, a stark contrast from the previous week&rsquo;s cold rain!<br class="auto-break"/><br class="auto-break"/>1 Gravel steps up Miwok<br class="auto-break"/>2 Hills and the Pacific from Miwok<br class="auto-break"/>3 Miwok looking back towards Tennessee Valley<br class="auto-break"/>4 Dias Ridge looking west to the Pacific<br class="auto-break"/>5 Muir Beach<br class="auto-break"/>6 Up Coastal Trail looking south to Pirates Cove<br class="auto-break"/>7 Looking down Fox Trail towards the #<span class="p-category auto-tag">SF</span> #<span class="p-category auto-tag">skyline</span><br class="auto-break"/>8 Coastal Fire Road winding downhill<br class="auto-break"/><br class="auto-break"/>#<span class="p-category auto-tag">bluesky</span> #<span class="p-category auto-tag">Miwok</span> #<span class="p-category auto-tag">Miwoktrail</span> #<span class="p-category auto-tag">steps</span> #<span class="p-category auto-tag">Marin</span> #<span class="p-category auto-tag">TennesseeValley</span> #<span class="p-category auto-tag">trail</span> #<span class="p-category auto-tag">trails</span> #<span class="p-category auto-tag">trailrun</span> #<span class="p-category auto-tag">run</span> #<span class="p-category auto-tag">DiasRidge</span> #<span class="p-category auto-tag">MuirBeach</span> #<span class="p-category auto-tag">CoastalTrail</span> #<span class="p-category auto-tag">CoastalFireRoad</span> #<span class="p-category auto-tag">Pacific</span> #<span class="p-category auto-tag">Ocean</span> #<span class="p-category auto-tag">surf</span> #<span class="p-category auto-tag">sand</span> #<span class="p-category auto-tag">latergram</span> #<span class="p-category auto-tag">nofilter</span> #<span class="p-category auto-tag">2019_075</span></span></p>
+<span class="info footer"><a href="2019/078/t1/last-saturday-sfrc-clear-skies" class="dt-published published dt-updated updated u-url u-uid"><time class="value" datetime="23:19-0700">23:19</time> on <time class="value">2019-03-19</time></a></span>
+</li>
+<li class="h-entry hentry as-note">
+<p class="article"><span class="p-name entry-title e-content entry-content"><a class="auto-link figure u-bridgy-flickr-photo" href="https://fastly.4sqi.net/img/general/original/476_rEjJjzsGjhmyKVnR69OFxbFs1Yb_3sEatCUbrOF9CfI.jpg"><img class="auto-embed u-photo" alt="Square stained glass with a red and orange colored half sun setting in the top third with beams going out to the edges, and a series of waves in the bottom two thirds, sequentially larger to show the appearance of approaching the observer" src="https://fastly.4sqi.net/img/general/width960/476_rEjJjzsGjhmyKVnR69OFxbFs1Yb_3sEatCUbrOF9CfI.jpg"/></a>&#127749;&#127754; #<span class="p-category auto-tag">sunset</span> over crashing #<span class="p-category auto-tag">waves</span>, stained glass art <a class="auto-link h-cassis-username" href="https://twitter.com/TLChihuahua">@TLChihuahua</a> on Divisadero last night.<br class="auto-break"/><br class="auto-break"/>#<span class="p-category auto-tag">art</span> #<span class="p-category auto-tag">stainedglass</span> #<span class="p-category auto-tag">thelittlechihuahua</span> #<span class="p-category auto-tag">tlc</span> #<span class="p-category auto-tag">latergram</span> #<span class="p-category auto-tag">yestergram</span> #<span class="p-category auto-tag">2019_076</span></span></p>
+<span class="info footer"><a href="2019/077/t1/sunset-crashing-waves-stained-glass" class="dt-published published dt-updated updated u-url u-uid"><time class="value" datetime="08:55-0700">08:55</time> on <time class="value">2019-03-18</time></a></span>
+</li>
+<li class="h-entry hentry as-note">
+<p class="article"><span class="p-name entry-title e-content entry-content"><a class="auto-link figure u-bridgy-flickr-photo" href="https://fastly.4sqi.net/img/general/original/476_UcCtDgN-N3Qs0sOS8GkwZbUsUOurnXO0vpIr7wNDeDw.jpg"><img class="auto-embed u-photo" alt="a jpg. " src="https://fastly.4sqi.net/img/general/width960/476_UcCtDgN-N3Qs0sOS8GkwZbUsUOurnXO0vpIr7wNDeDw.jpg"/></a><a class="auto-link figure u-bridgy-flickr-photo" href="https://fastly.4sqi.net/img/general/original/476_5CDZx0TG2s_Av0DAZAGTcDkyiAO-S3glhIU3nXLgcAM.jpg"><img class="auto-embed u-photo" alt="a jpg. " src="https://fastly.4sqi.net/img/general/width960/476_5CDZx0TG2s_Av0DAZAGTcDkyiAO-S3glhIU3nXLgcAM.jpg"/></a><a class="auto-link figure u-bridgy-flickr-photo" href="https://fastly.4sqi.net/img/general/original/476_EL75GJboP1kllQuGxB4e-Tv2H0JMkLJOGAxp5XME6xA.jpg"><img class="auto-embed u-photo" alt="a jpg. " src="https://fastly.4sqi.net/img/general/width960/476_EL75GJboP1kllQuGxB4e-Tv2H0JMkLJOGAxp5XME6xA.jpg"/></a><a class="auto-link figure u-bridgy-flickr-photo" href="https://fastly.4sqi.net/img/general/original/476__q2gxBE2_xzr-plfayViz_JIOMkGE6M4crOrkk4DbMU.jpg"><img class="auto-embed u-photo" alt="a jpg. " src="https://fastly.4sqi.net/img/general/width960/476__q2gxBE2_xzr-plfayViz_JIOMkGE6M4crOrkk4DbMU.jpg"/></a><a class="auto-link figure u-bridgy-flickr-photo" href="https://fastly.4sqi.net/img/general/original/476_Y4wWeqMAEYU_2wxZ4JmBBXFxzvGcAZpy0nzZClL46dI.jpg"><img class="auto-embed u-photo" alt="a jpg. " src="https://fastly.4sqi.net/img/general/width960/476_Y4wWeqMAEYU_2wxZ4JmBBXFxzvGcAZpy0nzZClL46dI.jpg"/></a><a class="auto-link figure u-bridgy-flickr-photo" href="https://fastly.4sqi.net/img/general/original/476_JqkzWugluQkr5AQ6nqdv0cFImpodxgbNZ6f7_eNVgPQ.jpg"><img class="auto-embed u-photo" alt="a jpg. " src="https://fastly.4sqi.net/img/general/width960/476_JqkzWugluQkr5AQ6nqdv0cFImpodxgbNZ6f7_eNVgPQ.jpg"/></a>&#127795; Easy 10km #<span class="p-category auto-tag">run</span> in #<span class="p-category auto-tag">GoldenGatePark</span> on re-opened #<span class="p-category auto-tag">trails</span> for #<span class="p-category auto-tag">Sunday</span> #<span class="p-category auto-tag">runday</span> #<span class="p-category auto-tag">funday</span>!<br class="auto-break"/>#<span class="p-category auto-tag">fromwhereIrun</span> #<span class="p-category auto-tag">trailrun</span> #<span class="p-category auto-tag">California</span> #<span class="p-category auto-tag">SF</span> #<span class="p-category auto-tag">SanFrancisco</span> #<span class="p-category auto-tag">optoutside</span> #<span class="p-category auto-tag">nofilter</span><br class="auto-break"/><br class="auto-break"/>1 freshly re-opened #<span class="p-category auto-tag">GGP</span> trails<br class="auto-break"/>2 #<span class="p-category auto-tag">running</span> around Stow lake<br class="auto-break"/>3 up Strawberry Hill<br class="auto-break"/>4 Huntington Falls<br class="auto-break"/>5 blooming #<span class="p-category auto-tag">flowers</span> by the boathouse<br class="auto-break"/>6 Phil Arnold #<span class="p-category auto-tag">Trail</span> / Oak Woodlands trailhead on the Bay Area Ridge Trail, just off the Eastern JFK entrance to Golden Gate Park.</span></p>
+<span class="info footer"><a href="2019/076/t1/easy-run-goldengatepark-trails" class="dt-published published dt-updated updated u-url u-uid"><time class="value" datetime="20:55-0700">20:55</time> on <time class="value">2019-03-17</time></a></span>
+</li>
+<li class="h-entry hentry as-note">
+<p class="article"><span class="reply-context" style="display:block">&#8618; In reply to <a href="https://twitter.com/jgarber/status/1105109845131362304" class="u-in-reply-to h-cite">@jgarber&rsquo;s tweet</a></span> <span class="p-name entry-title e-content entry-content"><a class="auto-link h-cassis-username" href="https://twitter.com/jgarber">@jgarber</a> thank you sir! Hope to catch up soon.</span></p>
+<span class="info footer"><a href="2019/073/t3/" class="dt-published published dt-updated updated u-url u-uid"><time class="value" datetime="23:49-0700">23:49</time> on <time class="value">2019-03-14</time></a></span>
+</li>
+<li class="h-entry hentry as-note">
+<p class="article"><span class="reply-context" style="display:block">&#8618; In reply to <a href="https://twitter.com/shiflett/status/1105106638887743489" class="u-in-reply-to h-cite">@shiflett&rsquo;s tweet</a></span> <span class="p-name entry-title e-content entry-content"><a class="auto-link h-cassis-username" href="https://twitter.com/shiflett">@shiflett</a> thank you for the well wishes! And for setting a good example with all your Good Work and more <a class="auto-link h-cassis-username" href="https://twitter.com/facultyco">@facultyco</a>.</span></p>
+<span class="info footer"><a href="2019/073/t2/" class="dt-published published dt-updated updated u-url u-uid"><time class="value" datetime="23:49-0700">23:49</time> on <time class="value">2019-03-14</time></a></span>
+</li>
+<li class="h-entry hentry as-note">
+<p class="article"><span class="reply-context" style="display:block">&#8618; In reply to <a href="https://twitter.com/mathowie/status/1105173957450166272" class="u-in-reply-to h-cite">@mathowie&rsquo;s tweet</a></span> <span class="p-name entry-title e-content entry-content"><a class="auto-link h-cassis-username" href="https://twitter.com/leahculver">@leahculver</a> <a class="auto-link h-cassis-username" href="https://twitter.com/mathowie">@mathowie</a> brilliant idea and thanks for suggesting it!<br class="auto-break"/><a class="auto-link h-cassis-username" href="https://twitter.com/FringaleSF">@FringaleSF</a> was a great spot to try every dessert on the menu &#x2014; highly recommended.<br class="auto-break"/>And thanks for the birthday wishes!<br class="auto-break"/><br class="auto-break"/><a class="auto-link" href="https://a.wholelottanothing.org/2018/12/08/hashtag-rich-guy-goals/">https://a.wholelottanothing.org/2018/12/08/hashtag-rich-guy-goals/</a></span></p>
+<span class="info footer"><a href="2019/073/t1/" class="dt-published published dt-updated updated u-url u-uid"><time class="value" datetime="23:11-0700">23:11</time> on <time class="value">2019-03-14</time></a></span>
+</li>
+<li class="h-event vevent hentry as-event">
+<div class="article">
+<a href="2019/079/e1/homebrew-website-club-sf" rel="bookmark" class="u-url u-uid"><h1 class="entry-title p-name summary">
+Homebrew Website Club SF!
+</h1></a><div class="entry-content e-content">
+<p>
+When: <time class="dt-start dtstart">2019-03-20 17:30</time>&#x2026;<time class="dt-end dtend">19:30</time>
+<span style="display:block">
+Where: <a class="u-location h-card location" href="https://wiki.mozilla.org/SF">Mozilla San Francisco</a>
+</span>
+Host: <a class="u-organizer h-card" href="http://tantek.com/">Tantek &#xC7;elik</a>
+</p>
+<div class="p-summary description">
+<p>
+17:30: Optional writing hour and quiet socializing<br/>
+18:30: IndieWeb demos and hack night!<br/>
+</p>
+<p><img class="u-featured" style="max-width:100%;width:100%;height:300px;object-fit:cover;object-position:50% 40%" src="https://indieweb.org/images/b/b1/2017-hwc-80s-retro.jpg" alt="Homebrew Website Club retro 1980s-style logo"/></p>
+<p>Topics for this week:</p>
+<ul>
+<li>
+<a href="https://indieweb.org/2019/Austin">IndieWebCamp Austin</a> &amp; <a href="https://indieweb.org/2019/Online">IndieWebCamp Online</a> projects &amp; demos!</li>
+<li>
+<a href="https://indieweb.org/2019/New_Haven">IndieWebCamp New Haven</a> is this March 30-31! <a href="https://2019.indieweb.org/newhaven">Sign-up!</a>
+</li>
+<li>
+<a href="https://indieweb.org/2019/D%C3%BCsseldorf">IndieWebCamp D&uuml;sseldorf</a> is scheduled May 11-12! <a href="https://btco.nf/DUS2019indiewebcamp">Sign-up!</a>
+</li>
+<!--<li><a href="https://indieweb.org/2019-01-01-commitments">Year-end hack projects</a></li>
+<li><a href="https://indieweb.org/2018-12-indieweb-challenge">2018 IndieWeb Challenge</a> completed!</li>-->
+<li>Demos of personal website breakthroughs</li>
+<li>Create or update your personal web site!</li>
+</ul>
+<p>
+Join a community with like-minded interests. Bring friends that want a personal site, or are interested in a healthy, independent web!
+</p>
+<p>
+Any questions? Ask in 
+<a href="https://indieweb.org/discuss">#indieweb Slack or IRC</a>
+</p>
+<p>
+More information: 
+<a class="u-url" href="https://indieweb.org/events/2019-03-20-homebrew-website-club">IndieWeb Wiki Event Page</a>
+</p>
+<p>
+RSVP: <!-- <a class="u-syndication" href="https://www.facebook.com/events/696256410773385/">on the Facebook event</a> or--> post an <a href="https://indieweb.org/rsvp">indie RSVP</a> on your own site!
+</p>
+</div>
+</div>
+</div>
+<span class="info footer"><a href="2019/079/e1/homebrew-website-club-sf" class="dt-published published dt-updated updated u-url u-uid"><time class="value" datetime="20:25-0700">20:25</time> on <time class="value">2019-03-14</time></a></span>
+</li>
+<li>
+<p><span class="h-entry article"><span class="p-name p-summary">likes <a class="u-like-of" href="https://twitter.com/jgarber/status/512346005371502593">@jgarber&rsquo;s tweet</a></span> <a class="u-url" href="2019/072/f8">at <time class="dt-published" datetime="2019-03-13T18:54-0700">18:54</time></a></span>, <span class="h-entry article"><abbr class="p-name p-summary" title="likes @jgarber&rsquo;s tweet"><a class="u-like-of" href="https://twitter.com/jgarber/status/1105109845131362304">tweet</a></abbr> <a class="u-url" href="2019/072/f7">at <time class="dt-published" datetime="2019-03-13T18:53-0700">18:53</time></a></span>, <span class="h-entry article"><abbr class="p-name p-summary" title="likes @shiflett&rsquo;s tweet"><a class="u-like-of" href="https://twitter.com/shiflett/status/1105106638887743489">@shiflett&rsquo;s tweet</a></abbr> <a class="u-url" href="2019/072/f6">at <time class="dt-published" datetime="2019-03-13T18:53-0700">18:53</time></a></span>, <span class="h-entry article"><abbr class="p-name p-summary" title="likes @shiflett&rsquo;s tweet"><a class="u-like-of" href="https://twitter.com/shiflett/status/972843783338442752">tweet</a></abbr> <a class="u-url" href="2019/072/f5">at <time class="dt-published" datetime="2019-03-13T18:53-0700">18:53</time></a></span>, <span class="h-entry article"><abbr class="p-name p-summary" title="likes @mathowie&rsquo;s tweet"><a class="u-like-of" href="https://twitter.com/mathowie/status/1105173957450166272">@mathowie&rsquo;s tweet</a></abbr> <a class="u-url" href="2019/072/f4">at <time class="dt-published" datetime="2019-03-13T18:53-0700">18:53</time></a></span>, <span class="h-entry article"><abbr class="p-name p-summary" title="likes @leahculver&rsquo;s tweet"><a class="u-like-of" href="https://twitter.com/leahculver/status/1104628271159758848">@leahculver&rsquo;s tweet</a></abbr> <a class="u-url" href="2019/072/f3">at <time class="dt-published" datetime="2019-03-13T18:53-0700">18:53</time></a></span>, <span class="h-entry article"><abbr class="p-name p-summary" title="likes @leahculver&rsquo;s tweet"><a class="u-like-of" href="https://twitter.com/leahculver/status/1071953860514635776">tweet</a></abbr> <a class="u-url" href="2019/072/f2">at <time class="dt-published" datetime="2019-03-13T18:52-0700">18:52</time></a></span>, and <span class="h-entry article"><abbr class="p-name p-summary" title="likes @leahculver&rsquo;s tweet"><a class="u-like-of" href="https://twitter.com/leahculver/status/1311446783">tweet</a></abbr> <a class="u-url" href="2019/072/f1">at <time class="dt-published" datetime="2019-03-13T18:52-0700">18:52</time></a></span></p>
+<span class="info footer"><a href="2019/072/f">on <time>2019-03-13</time></a></span>
+</li>
+<li class="h-entry hentry as-note">
+<p class="article"><span class="p-name entry-title e-content entry-content">Shine On You Crazy Diamond, <a class="auto-link h-cassis-username" href="https://twitter.com/pinkfloyd">@pinkfloyd</a> 1975<br class="auto-break"/><br class="auto-break"/>Shine bright like a diamond, <a class="auto-link h-cassis-username" href="https://twitter.com/rihanna">@rihanna</a> 2012<br class="auto-break"/><br class="auto-break"/>Don't ever be afraid to shine. Remember, the sun doesn't give a fuck if it blinds you.-*<br class="auto-break"/><br class="auto-break"/>Shine bright and be inspired by the lights. &#10024; <a class="auto-link" href="http://tantek.com/2019/063/t3">tantek.com/2019/063/t3</a><br class="auto-break"/><br class="auto-break"/>*Unknown source/year. Via <a class="auto-link" href="https://www.instagram.com/p/Bu7LsxpgmHx/">https://www.instagram.com/p/Bu7LsxpgmHx/</a>, oldest tweet found in search 2015-12-14 <a class="auto-link" href="https://twitter.com/LadyLiIiana/status/676383911258161153">https://twitter.com/LadyLiIiana/status/676383911258161153</a> (earlier references welcome!)</span></p>
+<span class="info footer"><a href="2019/072/t1/shine-bright" class="dt-published published dt-updated updated u-url u-uid"><time class="value" datetime="07:37-0700">07:37</time> on <time class="value">2019-03-13</time></a></span>
+</li>
+<li class="h-entry hentry as-note">
+<p class="article"><span class="reply-context" style="display:block"><data class="p-rsvp" value="yes">RSVP yes</data> to: <a href="https://twitter.com/BrazenRacing/status/1105544339684364289" class="u-in-reply-to h-cite">@BrazenRacing&rsquo;s tweet</a></span> <span class="p-name entry-title e-content entry-content">signed up for <a class="auto-link h-cassis-username" href="https://twitter.com/BrazenRacing">@BrazenRacing</a> 50th Annual #<span class="p-category auto-tag">DoubleDipsea</span> #<span class="p-category auto-tag">trailrace</span> on 2019-06-15! It&rsquo;ll be my second. Goals: finish strong, beat last year&rsquo;s time.<br class="auto-break"/>Register: <a class="auto-link" href="https://brazenracing.com/doubledipsea/register/">https://brazenracing.com/doubledipsea/register/</a><br class="auto-break"/><br class="auto-break"/>Previously, previously:<br class="auto-break"/>* <a class="auto-link" href="http://tantek.com/2018/168/t1/finished-first-doubledipsea">tantek.com/2018/168/t1/finished-first-doubledipsea</a> (<a class="auto-link" href="https://twitter.com/t/status/1008498200561537024">https://twitter.com/t/status/1008498200561537024</a>)<br class="auto-break"/>* <a class="auto-link" href="http://tantek.com/2017/167/t2/went-double-dipsea-cheer-ran">tantek.com/2017/167/t2/went-double-dipsea-cheer-ran</a></span></p>
+<span class="info footer"><a href="2019/071/t2/signed-up-doubledipsea" class="dt-published published dt-updated updated u-url u-uid"><time class="value" datetime="21:56-0700">21:56</time> on <time class="value">2019-03-12</time></a></span>
+</li>
+<li class="h-entry hentry as-note">
+<p class="article"><span class="reply-context" style="display:block">&#8618; In reply to <a href="https://github.com/arewedistributedyet/arewedistributedyet/issues/27#issuecomment-472186795" class="u-in-reply-to h-cite">a comment on issue 27 of GitHub project &ldquo;arewedistributedyet&rdquo;</a></span> <span class="p-name entry-title e-content entry-content"><a class="auto-link" href="https://github.com/lgrahl">https://github.com/lgrahl</a>, by &ldquo;which umbrella organisation&rdquo;, which organizations do you think are setup / intended to handle incubation efforts that are not yet ready for standardization? Or do you think there is already something that has been incubated that is ready for standardization? If so, could you link to what in particular and where it was incubated?<br class="auto-break"/><br class="auto-break"/>While I am a fan of doing standardization work <a class="auto-link h-cassis-username" href="https://twitter.com/WHATWG">@WHATWG</a> (and <a class="auto-link h-cassis-username" href="https://twitter.com/W3C">@W3C</a> and <a class="auto-link h-cassis-username" href="https://twitter.com/IETF">@IETF</a>, depending on which is most appropriate accordingly), I will point out that WHATWG themselves note that they &ldquo;anticipate features will be &ldquo;incubated&rdquo; outside of WHATWG standards&rdquo; per <a class="auto-link" href="https://whatwg.org/working-mode#new-proposals">https://whatwg.org/working-mode#new-proposals</a><br class="auto-break"/><br class="auto-break"/>You also referenced W3C&rsquo;s paid membership model. Note that W3C Community Groups (which this is a proposal for) are open to all (anyone may participate) and without fee (no membership is required) per <a class="auto-link" href="https://www.w3.org/community/about/">https://www.w3.org/community/about/</a><br class="auto-break"/><br class="auto-break"/>The existing W3C CG WICG <a class="auto-link" href="https://www.w3.org/community/wicg/">https://www.w3.org/community/wicg/</a> has a fairly good track record for incubating proposals in their GitHub repos which then either graduate to a working group (some have gone to W3C, others to WHATWG), or incubation stalls/fails as a result of discovering an area or proposal is unworkable or lacks market interest etc.<br class="auto-break"/><br class="auto-break"/>Are there other incubation-friendly/centric organizations that you think would be a better home for a dweb/p2p incubation group than a W3C CG?</span></p>
+<span class="info footer"><a href="2019/071/t1/" class="dt-published published dt-updated updated u-url u-uid"><time class="value" datetime="16:33-0700">16:33</time> on <time class="value">2019-03-12</time></a></span>
+</li>
+<li class="h-entry hentry as-note">
+<p class="article"><span class="reply-context" style="display:block">&#8618; In reply to <a href="https://twitter.com/val_brigatti/status/1105073553689530369" class="u-in-reply-to h-cite">@val_brigatti&rsquo;s tweet</a></span> <span class="p-name entry-title e-content entry-content"><a class="auto-link h-cassis-username" href="https://twitter.com/val_brigatti">@val_brigatti</a> thank you! Starting the day early here in California. Hoping to see a nice sunrise :)</span></p>
+<span class="info footer"><a href="2019/070/t2/" class="dt-published published dt-updated updated u-url u-uid"><time class="value" datetime="06:05-0700">06:05</time> on <time class="value">2019-03-11</time></a></span>
+</li>
+<li class="h-entry hentry as-note">
+<p class="article"><span class="reply-context" style="display:block">&#8618; In reply to <a href="https://twitter.com/zeldman/status/1105072108080648193" class="u-in-reply-to h-cite">@zeldman&rsquo;s tweet</a></span> <span class="p-name entry-title e-content entry-content">Thank you <a class="auto-link h-cassis-username" href="https://twitter.com/zeldman">@zeldman</a> &ndash; grateful to still be here to help fight the good fight. We have our work cut out for ourselves this year Jeffrey.</span></p>
+<span class="info footer"><a href="2019/070/t1/thank-you-zeldman" class="dt-published published dt-updated updated u-url u-uid"><time class="value" datetime="06:03-0700">06:03</time> on <time class="value">2019-03-11</time></a></span>
+</li>
+<li class="h-entry hentry as-note">
+<p class="article"><span class="reply-context" style="display:block">&#8618; In reply to <a href="https://twitter.com/schofeld/status/347371870242361344" class="u-in-reply-to h-cite">@schofeld&rsquo;s tweet</a></span> <span class="p-name entry-title e-content entry-content"><a class="auto-link h-cassis-username" href="https://twitter.com/h2vx">@h2vx</a> <a class="auto-link h-cassis-username" href="https://twitter.com/schofeld">@schofeld</a> thanks for your patience. <a class="auto-link" href="https://h2vx.com/">https://h2vx.com/</a> updated (from dev.h2vx version) with support for #<span class="p-category auto-tag">HTML5</span> elements:<br class="auto-break"/>article aside figure footer header hgroup mark meter nav progress section time<br class="auto-break"/>#<span class="p-category auto-tag">h2vx</span> to-do: time datetime attribute</span></p>
+<span class="info footer"><a href="2019/066/t2/h2vx-support-html5-elements" class="dt-published published dt-updated updated u-url u-uid"><time class="value" datetime="10:27-0800">10:27</time> on <time class="value">2019-03-07</time></a></span>
+</li>
+<li class="h-entry hentry as-note">
+<p class="article"><span class="p-name entry-title e-content entry-content">10/10 site migrations completed!<br class="auto-break"/>8/10 functional with #<span class="p-category auto-tag">HTTPS</span> <a class="auto-link h-cassis-username" href="https://twitter.com/IndieWebCamp">@IndieWebCamp</a> Austin, <a class="auto-link" href="https://tantek.com/">https://tantek.com/</a> Monday, and <a class="auto-link" href="https://h2vx.com/">https://h2vx.com/</a> up today ~06:21 PST thanks to <a class="auto-link h-cassis-username" href="https://twitter.com/DreamHost">@DreamHost</a> enabling #<span class="p-category auto-tag">phptidy</span>. #<span class="p-category auto-tag">microformats</span> #<span class="p-category auto-tag">hcard</span> #<span class="p-category auto-tag">hcalendar</span> #<span class="p-category auto-tag">h2vx</span> <a class="auto-link h-cassis-username" href="https://twitter.com/h2vx">@h2vx</a></span></p>
+<span class="info footer"><a href="2019/066/t1/migrations-completed-https-h2vx" class="dt-published published dt-updated updated u-url u-uid"><time class="value" datetime="08:47-0800">08:47</time> on <time class="value">2019-03-07</time></a></span>
+</li>
+<li class="h-entry hentry as-article">
+<div class="article">
+<span class="reply-context" style="display:block">New issue on <a href="https://github.com/aaronpk/webmention.io/issues" class="u-in-reply-to h-cite">GitHub project &ldquo;webmention.io&rdquo;</a></span> <a href="2019/065/b1/webmention-io-target-accept-protocol-relative-url" rel="bookmark" class="u-url u-uid"><h1 class="entry-title p-name">
+Webmention.io /api target= param should accept protocol relative URL to return http + https mentions
+</h1></a><div class="entry-content e-content">
+<p>
+The webmention.io /api endpoints accept a 'target' query parameter which currently must be an absolute URL. This proposal extends the 'target' query parameter to also accept a protocol relative URL (i.e. starting with "//") and return all mentions of that target with any protocol (e.g. both 'http:' and 'https:').
+</p>
+<p>
+Use-case: this will allow sites which have migrated from http to https, or which still serve both http and https and accept webmentions for both, to easily query webmention.io for all mentions to either http/https versions of their permalinks, to show webmentions regardless of which protocol was used in their webmention target URLs.
+</p>
+<p>
+Test-case: http://tantek.com/2019/065/e1/homebrew-website-club-sf is live with an iframe that embeds a display of RSVP webmentions via a service using a protocol relative URL in the target param to a webmention.io api call. Check both of these:
+</p>
+<ul>
+<li><a href="http://tantek.com/2019/065/e1/homebrew-website-club-sf">http://tantek.com/2019/065/e1/homebrew-website-club-sf</a></li>
+<li><a href="https://tantek.com/2019/065/e1/homebrew-website-club-sf">https://tantek.com/2019/065/e1/homebrew-website-club-sf</a></li>
+</ul>
+<p>
+And you should see at least one RSVP displayed in the bottom from v2.jacky.wtf, likely with a green checkmark &#9989;. Here&rsquo;s a direct link to just the RSVP display for that post but hardcoded to 'http:' mentions only: <a href="https://stream.thatmustbe.us/?url=https%3A%2F%2Fwebmention.io%2Fapi%2Fmentions.jf2%3Fwm-property%3Drsvp%26sort-by%3Drsvp%26target%3Dhttp%3A%2F%2Ftantek.com%2F2019%2F065%2Fe1%2Fhomebrew-website-club-sf&amp;op=jf2-mf2&amp;ashtml=1&amp;style=img%7Bheight:44px;vertical-align:bottom%7D.h-feed%3E.p-name,.h-entry%3E.u-url:first-child,.h-entry%3E.p-name,.u-url%3E.p-name,.p-in-reply-to,.p-like-of,.p-mention-of,*%5Bclass%5E=p-wm-%5D,.dt-published,.p-syndication%7Bdisplay:none%7D.h-card%7Bfloat:left;border:solid%201px%20%23999;margin:0%202px%202px%200;line-height:44px%7D.p-rsvp:before%7Bcontent:%22%E2%98%85%22;float:left;color:white;background:blue;font-size:10px;line-height:1.5;width:13px;height:13px;text-align:center;margin:35px%200%20-3px%20-14px;border-radius:3px;position:relative;z-index:1%7D.p-rsvp%5Bvalue=yes%5D:before%7Bcontent:%22%E2%9C%85%22;font-size:13px;margin:34px%200%20-3px%20-16px;background:none%7D.p-rsvp%5Bvalue=no%5D:before%7Bcontent:%22%E2%9D%8C%22;background:white;color:red;font-size:13px%7Dbody%7Bmargin:0%7Dimg%5Bsrc=%22%22%5D%7Bwidth:0.6em%7D">v2.jacky.wtf RSVP</a>.
+</p>
+</div>
+</div>
+<span class="info footer"><a href="2019/065/b1/webmention-io-target-accept-protocol-relative-url" class="dt-published published dt-updated updated u-url u-uid"><time class="value" datetime="10:29-0800">10:29</time> on <time class="value">2019-03-06</time></a></span>
+</li>
+<li class="h-entry hentry as-note">
+<p class="article"><span class="p-name entry-title e-content entry-content">Shine bright and be inspired by the lights. &#10024;<br class="auto-break"/><br class="auto-break"/>(first written as a comment on <a class="auto-link" href="https://www.instagram.com/p/Buha6xZFmzU/">https://www.instagram.com/p/Buha6xZFmzU/</a>)</span></p>
+<span class="info footer"><a href="2019/063/t3/shine-bright-inspired-lights" class="dt-published published dt-updated updated u-url u-uid"><time class="value" datetime="23:23-0800">23:23</time> on <time class="value">2019-03-04</time></a></span>
+</li>
+<li class="h-entry hentry as-note">
+<p class="article"><span class="reply-context" style="display:block">&#8618; In reply to <a href="https://twitter.com/jimmyg/status/1102809924831232000" class="u-in-reply-to h-cite">@jimmyg&rsquo;s tweet</a></span> <span class="p-name entry-title e-content entry-content"><a class="auto-link h-cassis-username" href="https://twitter.com/jimmyg">@jimmyg</a> I setup <a class="auto-link" href="https://letsencrypt.org/">https://letsencrypt.org/</a> via one-click activation on my new hosting <a class="auto-link h-cassis-username" href="https://twitter.com/Dreamhost">@Dreamhost</a>.</span></p>
+<span class="info footer"><a href="2019/063/t2/letsencrypt-one-click-dreamhost" class="dt-published published dt-updated updated u-url u-uid"><time class="value" datetime="22:01-0800">22:01</time> on <time class="value">2019-03-04</time></a></span>
+</li>
+<li class="h-event vevent hentry as-event">
+<div class="article">
+<a href="2019/065/e1/homebrew-website-club-sf" rel="bookmark" class="u-url u-uid"><h1 class="entry-title p-name summary">
+Homebrew Website Club SF!
+</h1></a><div class="entry-content e-content">
+<p>
+When: <time class="dt-start dtstart">2019-03-06 17:30</time>&#x2026;<time class="dt-end dtend">19:30</time>
+<span style="display:block">
+Where: <a class="u-location h-card location" href="https://wiki.mozilla.org/SF">Mozilla San Francisco</a>
+</span>
+Host: <a class="u-organizer h-card" href="http://tantek.com/">Tantek &#xC7;elik</a>
+</p>
+<div class="p-summary description">
+<p>
+17:30: Optional writing hour and quiet socializing<br/>
+18:30: IndieWeb demos and hack night!<br/>
+</p>
+<p><img class="u-featured" style="max-width:100%;width:100%;height:300px;object-fit:cover;object-position:50% 40%" src="https://indieweb.org/images/b/b1/2017-hwc-80s-retro.jpg" alt="Homebrew Website Club retro 1980s-style logo"/></p>
+<p>Topics for this week:</p>
+<ul>
+<li>
+<a href="https://indieweb.org/2019/Austin">IndieWebCamp Austin</a> projects &amp; demos!</li>
+<li>
+<a href="https://indieweb.org/2019/Online">IndieWebCamp Online</a> is this weekend! <a href="https://2019.indieweb.org/online">Sign-up!</a>
+</li>
+<li>
+<a href="https://indieweb.org/2019/New_Haven">IndieWebCamp New Haven</a> is this March 30-31! <a href="https://2019.indieweb.org/newhaven">Sign-up!</a>
+</li>
+<li>
+<a href="https://indieweb.org/2019/D%C3%BCsseldorf">IndieWebCamp D&uuml;sseldorf</a> is scheduled May 11-12! <a href="https://btco.nf/DUS2019indiewebcamp">Sign-up!</a>
+</li>
+<!--<li><a href="https://indieweb.org/2019-01-01-commitments">Year-end hack projects</a></li>
+<li><a href="https://indieweb.org/2018-12-indieweb-challenge">2018 IndieWeb Challenge</a> completed!</li>-->
+<li>Demos of personal website breakthroughs</li>
+<li>Create or update your personal web site!</li>
+</ul>
+<p>
+Join a community with like-minded interests. Bring friends that want a personal site, or are interested in a healthy, independent web!
+</p>
+<p>
+Any questions? Ask in 
+<a href="https://indieweb.org/discuss">#indieweb Slack or IRC</a>
+</p>
+<p>
+More information: 
+<a class="u-url" href="https://indieweb.org/events/2019-03-06-homebrew-website-club">IndieWeb Wiki Event Page</a>
+</p>
+<p>
+RSVP: <!-- <a class="u-syndication" href="https://www.facebook.com/events/696256410773385/">on the Facebook event</a> or--> post an <a href="https://indieweb.org/rsvp">indie RSVP</a> on your own site!
+</p>
+</div>
+</div>
+</div>
+<span class="info footer"><a href="2019/065/e1/homebrew-website-club-sf" class="dt-published published dt-updated updated u-url u-uid"><time class="value" datetime="15:34-0800">15:34</time> on <time class="value">2019-02-28</time></a></span>
+</li>
+<li class="h-entry hentry as-note">
+<p class="article"><span class="p-name entry-title e-content entry-content"><a class="auto-link" href="https://tantek.com/">https://tantek.com/</a> migration complete. Now with #<span class="p-category auto-tag">HTTPS</span>!</span></p>
+<span class="info footer"><a href="2019/063/t1/migration-complete" class="dt-published published dt-updated updated u-url u-uid"><time class="value" datetime="21:40-0800">21:40</time> on <time class="value">2019-03-04</time></a></span>
+</li>
+</ol>
+</div>
+
+<aside><div class="aside" id="contact">
+
+<div class="p-note note">
+<div class="section hello" id="hello">
+<h2>Hello</h2>
+<p>Hi. I work on web standards and the indie web. I run trails at sunrise, practice yoga movement &amp; philosophy, code &amp; design my website, and write when I can.</p>
+</div>
+
+<div class="section interact">
+<ul>
+<li>
+<indie-action do="follow" with="http://tantek.com/">
+<!-- <a href="https://twitter.com/intent/follow?screen_name=t"><img style="height:1.8em;margin:0 -.2em -0.2em -.3em" src="icon/twitter.png" alt="Follow @t" /> Follow</a> -->
+</indie-action>
+</li>
+<li><a href="http://tantek.com/contact">&#128172; Contact</a></li>
+<li><a href="http://tantek.com/tip/1" title="Did you read something of value here and want to encourage more posts like that? Feel free to tip a small amount and mention which topics you enjoyed! (Just please avoid specific products or services. Thanks! -t)">&#128079; Tip</a></li>
+</ul>
+</div>
+
+<div class="section information">
+<ul>
+<li>
+<a href="https://indieweb.org/founders">Founder</a> at <a href="https://indieweb.org/" class="p-org org h-card"><img src="https://twitter.com/indiewebcamp/profile_image?size=original" alt=""/> IndieWeb</a>
+</li>
+<li>
+<a href="https://xn--sr8hvo.ws/%F0%9F%93%8A/previous">&larr;</a>
+Member of IndieWeb Webring &#128376;&#128141;
+<a href="https://xn--sr8hvo.ws/%F0%9F%93%8A/next">&rarr;</a>
+</li>
+<li>
+<a href="http://microformats.org/about/people">Founder</a> at <a href="http://microformats.org/" class="p-org org h-card"><img src="https://twitter.com/microformats/profile_image?size=original" alt=""/> microformats.org</a>
+</li>
+<li>
+<a class="p-role" href="https://wiki.mozilla.org/Standards">Web Standards Lead</a> at <a href="https://mozilla.org/" class="p-org org h-card"><img src="https://twitter.com/mozilla/profile_image?size=original" alt=""/> Mozilla</a>
+</li>
+<li>
+<a class="p-role" href="https://www.w3.org/Style/CSS/members">CSS Working Group</a> member at <a href="https://www.w3.org/" class="p-org org h-card"><img src="https://twitter.com/w3c/profile_image?size=original" alt=""/> W3C</a>
+</li>
+<li>BSCS &amp; MSCS <a href="http://stanford.edu/" class="p-category category h-card"><img src="https://twitter.com/stanford/profile_image?size=original" alt=""/> Stanford University</a>
+</li>
+</ul>
+</div>
+</div>
+
+<!-- h-feed filled in dynamically -->
+<div id="recent-articles" class="section recent-articles h-feed">
+<h2 class="p-name">Recent Articles</h2>
+<ul>
+<li class="h-entry"><a href="2017/253/b1/my-first-marathon">My First #Marathon @theSFMarathon</a></li>
+<li class="h-entry"><a href="2017/034/b1/indie-microblogging-hits-stretch-goal-indieweb">Indie Microblogging Kickstarter Micro.blog Hits Goal &amp; Stretch Goal For Safe Replies! #indieweb</a></li>
+<li class="h-entry"><a href="2016/330/b1/2017-01-01-indieweb-commitment-own-my-rsvps">My 2017-01-01 #IndieWeb Commitment: Own All My RSVPs To Public Events</a></li>
+</ul>
+</div>
+
+<div class="section elsewhere">
+<h2>Elsewhere</h2>
+<ul class="facets">
+<li><a rel="me" class="u-url url" href="https://en.wikipedia.org/wiki/User:Tantek" title="encyclopedia contributions on Wikipedia"><img src="images/wikipedia-16x16.png" alt=""/> Wikipedia</a></li>
+
+<li><a rel="me" class="u-url url" href="http://last.fm/user/tantekc" title="music on last.fm"><img src="images/lastfm-16x16.png" alt=""/> last.fm</a></li>
+<li><a rel="me" class="u-url url" href="https://plus.google.com/109182513536739786206" title="occasional Google Plus posts"><img src="images/google+-16x16.png" alt=""/> Google+</a></li>
+<li><a href="http://upcoming.org/user/6623" title="past events, talks, and conferences on Upcoming"><img src="images/upcoming-16x16.png" alt=""/> Upcoming</a></li>
+<li><a href="http://www.imdb.com/name/nm8414793" title="film appearance(s)on IMDB"><img src="images/imdb-16x16.png" alt=""/> IMDB</a></li>
+
+<li><a rel="me" class="u-url url" href="https://micro.blog/t"><img src="https://micro.blog/images/splash_750.png" style="height:16px" alt=""/> micro.blog</a></li>
+<li><a rel="me" class="u-url url" href="https://twitter.com/intent/user?screen_name=t"><img src="images/twitter-16x16.png" alt=""/> Twitter</a></li>
+<li><a rel="me" class="u-url url" href="http://lanyrd.com/people/t" title="conferences past, present, and future on Lanyrd"><img src="images/lanyrd-16x16.png" alt=""/> Lanyrd</a></li>
+<li><a rel="me" class="u-url url" href="https://github.com/tantek" title="open source on Github"><img src="images/github-16x16.png" alt=""/> Github</a></li>
+<!--<li><a rel="me" class="u-url url" href="http://tantek.pbwiki.com/" title="projects, notes, and events on PBWiki">PBworks wiki</a></li>-->
+<li><a rel="me" class="u-url url" href="http://foursquare.com/t" title="geolocation checkins on Foursquare"><img src="images/foursquare-16x16.png" alt=""/> Foursquare</a></li>
+
+<li><a rel="me" class="u-url url" href="https://www.flickr.com/people/tantek/" title="photos on Flickr"><img src="images/flickr-16x16.png" alt=""/> Flickr</a></li>
+<li><a rel="me" class="u-url url" href="http://dribbble.com/tantek/" title="design snippets on Dribbble"><img src="images/dribbble-16x16.png" alt=""/> Dribbble</a></li>
+<li><a rel="me" class="u-url url" href="https://www.instagram.com/tantek/" title="Private Instagram Account primarily as a means to the ends of posting photos from my iPod touch"><img src="images/instagram-16x16.png" alt=""/> Instagram</a></li>
+</ul>
+</div>
+
+<!-- <div class="section">
+<h2>Contact</h2>
+<ul>
+<li><a href="http://tantek.com/w/CommunicationProtocols">Preferred</a>: <a class="u-url url u-impp" href="aim:goim?screenname=tantekc"><img src="images/aim-16x16.png" alt="" /> aim:tantekc</a></li>
+<li><a class="u-url url" type="text/directory" href="http://h2vx.com/vcf/tantek.com/" title="Download my vCard to add my contact information to your Address Book"><img src="images/vcard-16x16.png" alt="" /> download vCard</a></li>
+</ul>
+</div>-->
+
+<div class="section">
+<h2>Buy my book!</h2>
+<a href="http://tantek.com/html5now"><img src="images/html5nowdvd.jpg" alt="HTML5 Now!"/></a>
+<p>A step-by-step tutorial for getting started with HTML5 today. Includes reference guide and DVD with 2.5 hours of video plus 100 page searchable full-color PDF eBook.</p>
+<p><a href="http://tantek.com/html5now">Buy at Amazon.com</a></p>
+</div>
+
+</div></aside>
+
+<footer><div class="footer">
+
+<div class="section">
+<h2>Launched &amp; Live</h2>
+<ul>
+<li>
+<a href="http://tantek.com/html5now">HTML5 Now! book &amp; DVD</a> (<a href="https://twitter.com/html5now">@html5now</a>) - quickly learn how to write HTML5, from simple documents to video and vector graphics.</li>
+<li>
+<a href="http://asin.cc" title="Amazon product link shortener">ASIN.cc</a> (<a href="https://twitter.com/asindotcc">@asindotcc</a>) - a handy URL shortener for books and Amazon products</li>
+<li>
+<a href="http://h2vx.com/" title="hCard to vCard, hCalendar to iCalendar conversion services">H2VX</a> (<a href="https://twitter.com/h2vx">@h2vx</a>) - add hCard contacts and hCalendar events from web pages to your address book and calendar programs</li>
+<li class="h-card">
+<a class="p-name u-url" href="http://microformats.org/wiki">microformats.org</a> (<a class="u-url" href="https://twitter.com/microformats">@microformats</a>) - <span class="p-note">the fastest way to turn your web pages into simple APIs and simultaneously look better in search engines</span>
+</li>
+</ul>
+</div>
+<div class="section">
+<h2>Currently Working On</h2>
+<ul>
+<li>
+<a href="https://wiki.mozilla.org/Tantek-Mozilla-projects">Mozilla projects</a> - open standards: 
+<a class="p-category category" href="http://microformats.org/wiki/microformats2">microformats2</a> (e.g. <a class="p-category category" href="http://microformats.org/wiki/h-card">h-card</a>, 
+<a class="p-category category" href="http://microformats.org/wiki/h-cite">h-cite</a>, 
+<a class="p-category category" href="http://microformats.org/wiki/h-entry">h-entry</a>, &amp;
+<a class="p-category category" href="http://microformats.org/wiki/h-event">h-event</a>),
+some <span class="p-category category">HTML5</span> &amp;
+<span class="p-category category">CSS3</span>,
+growing the <a class="p-category category p-org org h-org" href="https://indieweb.org/">IndieWeb</a> &amp; <a href="https://indieweb.org/events/next-hwc">Homebrew Website</a> communities.</li>
+<li>
+<a href="https://indieweb.org/">IndieWeb community</a> (<a href="https://twitter.com/indiewebcamp">@indiewebcamp</a>) <a href="https://indieweb.org/events">events</a>, 
+<a href="http://tantek.com/2014/067/b1/building-blocks-people-focused-mobile-communication">people-focused mobile communication</a>, 
+<a class="p-category category" href="https://indieweb.org/authorship">authorship</a>, 
+<a class="p-category category" href="https://indieweb.org/POSSE">POSSE</a>, 
+<a class="p-category category" href="https://indieweb.org/post-type-discovery">post type discovery</a>,
+<a class="p-category category" href="https://indieweb.org/webactions">webactions</a>, and measuring progress with <a class="p-category category" href="https://indieweb.org/IndieMark">IndieMark</a>.
+</li>
+<li>
+<a class="p-category category" href="http://cassisproject.com" title="CASSIS language and library"><abbr title="Client And Server Scripting Implementation Subset for Javascript and PHP">CASSIS</abbr></a> 
+(<a href="http://github.com/tantek/cassis/">on github</a>, <a href="https://twitter.com/cassisjs">@cassisjs</a>) - a functional programming language and framework for  code that natively executes in PHP and Javascript.</li>
+<!-- 
+need help with this: https://indieweb.org/User:Tantek.com#RelMeAuth_PHP_library
+<li><a class="p-category category" href="http://microformats.org/wiki/RelMeAuth" title="Simplified personal logins with rel-me and OAuth">RelMeAuth</a> - use a personal site and rel="me" hyperlinks to profiles on popular OAuth supporting services like <a href="https://twitter.com/t">Twitter</a>, <a href="https://github.com/tantek">Github</a> etc. to sign-in with your own URL.
+</li> -->
+<li>
+<a class="p-category category" href="https://indieweb.org/Falcon">Falcon</a> (<a href="https://twitter.com/falcon">@falcon</a>) - server-based personal tweeting/blogging application. See in particular, what <a href="https://indieweb.org/Falcon#Working_On">I'm currently working on</a>.
+</li>
+<li>
+<a href="http://tantek.com/w/Whistle">Whistle</a> - personal algorithmically reversible URL shortener.</li>
+</ul>
+</div>
+
+<div class="section h-feed" id="events">
+<h2 class="p-name">Speaking &amp; Events</h2>
+<ol>
+
+<li class="h-event vevent">
+<span class="dt-start dtstart"><time>2018-11-28</time></span> <a class="u-url url" href="https://indieweb.org/events/2018-11-28-homebrew-website-club"><span class="p-name summary">Homebrew Website Club</span> <abbr class="p-location location" title="San Francisco, California, USA">San Francisco</abbr></a>
+</li>
+
+<li class="h-event vevent">
+<span class="dt-start dtstart"><time>2018-12-12</time></span> <a class="u-url url" href="https://indieweb.org/events/2018-12-12-homebrew-website-club"><span class="p-name summary">Homebrew Website Club</span> <abbr class="p-location location" title="San Francisco, California, USA">San Francisco</abbr></a>
+</li>
+
+<li class="h-event vevent">
+<span class="dt-start dtstart"><time>2018-12-26</time></span> <a class="u-url url" href="https://indieweb.org/events/2018-12-26-homebrew-website-club"><span class="p-name summary">Homebrew Website Club</span> <abbr class="p-location location" title="San Francisco, California, USA">San Francisco</abbr></a>
+</li>
+
+</ol>
+<!-- <p>See <a href="http://lanyrd.com/profile/t/future/">my Lanyrd</a> for more.</p>-->
+<p>
+<a href="webcal://dev.h2vx.com/ics/tantek.com">Subscribe to events</a>
+</p>
+</div>
+
+<div class="favorite-quotes" id="favorite-quotes" style="padding-top:2em;clear:both">
+<blockquote>I always had a repulsive sort of need to be something more than human. I felt very very puny as a human. I thought, &ldquo;Fuck that. I want to be a superman.&rdquo; <br/>
+&#x2014; <a href="https://en.wikiquote.org/wiki/David_Bowie#Quotes">David Bowie</a>, 1976</blockquote>
+<blockquote>There are two wolves and they are always fighting. One is darkness and despair, the other is light and hope. Which wolf wins? </blockquote>
+<blockquote>I get things are bad. But what are we doing to fix it?<br/>
+&#x2014; Casey Newton (<a href="https://en.wikiquote.org/wiki/Tomorrowland_%28film%29#Casey_Newton">Tomorrowland, 2015</a>)</blockquote>
+
+</div>
+
+<address class="copyright">&#xA9; <time>1996</time>-<time>2017</time> Tantek &#xC7;elik <span class="c">All Rights Reserved.</span>
+<span style="display:block" class="photo-credit">
+Icon photo by <a href="http://www.rebeccadanielsphoto.com/" class="h-card">Rebecca Daniels</a>.
+</span>
+</address>
+
+</div></footer>
+<script type="text/javascript" src="cassis.js"></script>
+<script type="text/javascript">/**/ 
+var es = document.getElementById("link");
+if (es) {
+  es.onclick = function() {
+   var e = targetelement();
+   e.focus();
+   e.select();
+  };
+}
+/**/</script>
+</body>
+</html>
