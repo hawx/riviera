@@ -4,9 +4,11 @@
 package hfeed
 
 import (
+	htmlPkg "html"
 	"io"
 	"net/url"
 
+	strip "github.com/grokify/html-strip-tags-go"
 	"hawx.me/code/riviera/feed/common"
 	"willnorris.com/go/microformats"
 )
@@ -86,10 +88,20 @@ func (p Parser) Read(r io.Reader, rootURL *url.URL, charset func(charset string,
 
 			if content, ok := getFirst(child.Properties, "content").(map[string]interface{}); ok {
 				if text, ok := content["text"].(string); ok {
+					if item.Title == text {
+						item.Title = ""
+					}
+
 					item.Content = &common.Content{
 						Text: text,
 					}
+
 				} else if html, ok := content["html"].(string); ok {
+					html = htmlPkg.UnescapeString(strip.StripTags(html))
+					if html == item.Title {
+						item.Title = ""
+					}
+
 					item.Content = &common.Content{
 						Text: html,
 					}
