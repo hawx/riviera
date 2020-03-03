@@ -132,3 +132,74 @@ func TestRealLife(t *testing.T) {
 		}
 	}
 }
+
+func TestTopLevelEntries(t *testing.T) {
+	assert := assert.New(t)
+
+	file, _ := os.Open("testdata/me.hawx.me.html")
+	defer file.Close()
+
+	rootURL, _ := url.Parse("https://me.hawx.me/")
+
+	parser := Parser{}
+
+	if ok := parser.CanRead(file, nil); !assert.True(ok) {
+		return
+	}
+
+	if _, err := file.Seek(0, 0); !assert.Nil(err) {
+		return
+	}
+
+	channels, err := parser.Read(file, rootURL, nil)
+	if !assert.Nil(err) {
+		return
+	}
+
+	if assert.Len(channels, 1) {
+		channel := channels[0]
+
+		assert.Equal("", channel.Title)
+		if assert.Len(channel.Links, 2) {
+			assert.Equal("https://me.hawx.me/", channel.Links[0].Href)
+			assert.Equal("alternate", channel.Links[0].Rel)
+
+			assert.Equal("https://me.hawx.me/", channel.Links[1].Href)
+			assert.Equal("self", channel.Links[1].Rel)
+		}
+
+		if assert.Len(channel.Items, 25) {
+			item := channel.Items[0]
+			assert.Nil(item.GUID)
+			assert.Equal("@SimpsonsQOTD's tweet\n          at\n            \n              20:14", item.Title)
+			assert.Nil(item.Content)
+			assert.Equal("https://me.hawx.me/entry/3069f49f-f5d7-486b-b7e7-e47ac3528bfb", item.Links[0].Href)
+			assert.Equal("alternate", item.Links[0].Rel)
+			assert.Equal("2020-02-28T20:14:31Z", item.PubDate)
+
+			item = channel.Items[1]
+			assert.Nil(item.GUID)
+			assert.Equal("@VeneficusIpse's tweet\n          at\n            \n              20:15", item.Title)
+			assert.Nil(item.Content)
+			assert.Equal("https://me.hawx.me/entry/5c386721-f474-4771-bd9b-80987ee8e18f", item.Links[0].Href)
+			assert.Equal("alternate", item.Links[0].Rel)
+			assert.Equal("2020-02-28T20:15:14Z", item.PubDate)
+
+			item = channel.Items[2]
+			assert.Nil(item.GUID)
+			assert.Equal("", item.Title)
+			assert.Equal("Blog update: \n- WebSub ✔️\n- Flickr ✔️, but only likes (https://me.hawx.me/entry/ba11f3aa-4c9b-4544-93d7-2fc74220cbda), and replies at the moment", item.Content.Text)
+			assert.Equal("https://me.hawx.me/entry/a844f900-034b-4e6a-aa10-3146de45bf84", item.Links[0].Href)
+			assert.Equal("alternate", item.Links[0].Rel)
+			assert.Equal("2020-02-27T19:19:35Z", item.PubDate)
+
+			item = channel.Items[12]
+			assert.Nil(item.GUID)
+			assert.Equal("", item.Title)
+			assert.Equal("Can I reply to myself?", item.Content.Text)
+			assert.Equal("https://me.hawx.me/entry/12020c6f-4fa7-40b3-a4bb-5d458ec650a1", item.Links[0].Href)
+			assert.Equal("alternate", item.Links[0].Rel)
+			assert.Equal("2020-02-13T19:43:17Z", item.PubDate)
+		}
+	}
+}

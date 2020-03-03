@@ -21,7 +21,11 @@ type Parser struct{}
 func (Parser) CanRead(r io.Reader, charset func(charset string, input io.Reader) (io.Reader, error)) bool {
 	data := microformats.Parse(r, nil)
 
-	_, ok := findHFeed(data)
+	if _, ok := findHFeed(data); ok {
+		return true
+	}
+
+	_, ok := findHEntries(data)
 	return ok
 }
 
@@ -33,6 +37,18 @@ func findHFeed(data *microformats.Data) (*microformats.Microformat, bool) {
 	}
 
 	return nil, false
+}
+
+func findHEntries(data *microformats.Data) ([]*microformats.Microformat, bool) {
+	var entries []*microformats.Microformat
+
+	for _, item := range data.Items {
+		if contains(item.Type, "h-entry") {
+			entries = append(entries, item)
+		}
+	}
+
+	return entries, len(entries) > 0
 }
 
 func findType(item *microformats.Microformat, name string) (*microformats.Microformat, bool) {
@@ -54,7 +70,14 @@ func (p Parser) Read(r io.Reader, rootURL *url.URL, charset func(charset string,
 
 	item, ok := findHFeed(data)
 	if !ok {
-		return
+		items, ok := findHEntries(data)
+		if !ok {
+			return
+		}
+
+		item = &microformats.Microformat{
+			Children: items,
+		}
 	}
 
 	channel := &common.Channel{
