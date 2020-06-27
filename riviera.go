@@ -7,10 +7,12 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"strings"
 	"sync"
 	"time"
 
 	fsnotify "gopkg.in/fsnotify.v1"
+	"hawx.me/code/riviera/garden"
 	"hawx.me/code/riviera/river"
 	"hawx.me/code/riviera/river/data"
 	"hawx.me/code/riviera/river/data/boltdata"
@@ -154,9 +156,15 @@ func main() {
 	})
 	defer waitFor("feeds", feeds.Close)
 
+	garden := garden.New(store, garden.Options{})
+	defer waitFor("garden", garden.Close)
+
 	subs := subscriptions.FromOpml(outline)
 	for _, sub := range subs.List() {
 		feeds.Add(sub.URI)
+		if err := garden.Add(sub.URI); err != nil {
+			log.Printf("add to garden failed: %s\n", err)
+		}
 	}
 
 	watcher, err := watchFile(opmlPath, func() {
@@ -170,10 +178,14 @@ func main() {
 		added, removed := subscriptions.Diff(subs, subscriptions.FromOpml(outline))
 		for _, uri := range added {
 			feeds.Add(uri)
+			if err := garden.Add(uri); err != nil {
+				log.Printf("add to garden failed: %s\n", err)
+			}
 			subs.Add(uri)
 		}
 		for _, uri := range removed {
 			feeds.Remove(uri)
+			garden.Remove(uri)
 			subs.Remove(uri)
 		}
 	})
@@ -183,6 +195,16 @@ func main() {
 	defer waitFor("watcher", watcher.Close)
 
 	http.Handle("/river/", http.StripPrefix("/river", river.Handler(feeds)))
+	http.HandleFunc("/garden", func(w http.ResponseWriter, r *http.Request) {
+		if strings.ToUpper(r.Method) != "GET" {
+			w.Header().Set("Accept", "GET")
+			w.WriteHeader(http.StatusMethodNotAllowed)
+			return
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		garden.Encode(w)
+	})
 
 	serve.Serve(*port, *socket, http.DefaultServeMux)
 	wg.Wait()

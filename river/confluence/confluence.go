@@ -85,13 +85,13 @@ func (c *confluence) Log() []events.Event {
 func (c *confluence) Add(stream tributary.Tributary) {
 	name := stream.Name()
 	c.mu.Lock()
+	defer c.mu.Unlock()
 
 	if _, exists := c.streams[name]; exists {
 		return
 	}
 
 	c.streams[name] = stream
-	c.mu.Unlock()
 
 	stream.Feeds(c.feeds)
 	stream.Events(c.events)

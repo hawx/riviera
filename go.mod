@@ -9,9 +9,9 @@ require (
 	github.com/kylelemons/godebug v0.0.0-20170820004349-d65d576e9348 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/stretchr/testify v1.2.2
-	golang.org/x/net v0.0.0-20181220203305-927f97764cc3
-	golang.org/x/sys v0.0.0-20181228144115-9a3f9b0469bb // indirect
+	golang.org/x/net v0.0.0-20200226121028-0de0cce0169b
 	golang.org/x/text v0.3.0 // indirect
+	golang.org/x/tools v0.0.0-20200623045635-ff88973b1e4e // indirect
 	gopkg.in/fsnotify.v1 v1.4.7
 	hawx.me/code/assert v0.0.0-20150803185601-4570da094475
 	hawx.me/code/serve v0.0.0-20190207181551-eb94630184cf
