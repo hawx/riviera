@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"golang.org/x/net/html/charset"
+	"hawx.me/code/riviera/data"
 	"hawx.me/code/riviera/feed"
 	"hawx.me/code/riviera/feed/common"
 	"hawx.me/code/riviera/garden/gardenjs"
@@ -19,12 +20,18 @@ type Flower struct {
 	client *http.Client
 	size   int
 	quit   chan struct{}
+	db     Database
 
 	items gardenjs.Feed
 }
 
-func NewFlower(store feed.Database, cacheTimeout time.Duration, uri string, size int) (*Flower, error) {
+func NewFlower(db Database, cacheTimeout time.Duration, uri string, size int) (*Flower, error) {
 	parsedURI, err := url.Parse(uri)
+	if err != nil {
+		return nil, err
+	}
+
+	store, err := db.Feed(uri)
 	if err != nil {
 		return nil, err
 	}
@@ -34,7 +41,9 @@ func NewFlower(store feed.Database, cacheTimeout time.Duration, uri string, size
 		client: http.DefaultClient,
 		quit:   make(chan struct{}),
 		size:   size,
+		db:     db,
 	}
+
 	f.feed = feed.New(cacheTimeout, f.itemHandler, store)
 
 	return f, nil
@@ -80,24 +89,23 @@ func (f *Flower) itemHandler(feed *feed.Feed, ch *common.Channel, newitems []*co
 		return
 	}
 
-	for _, item := range newitems {
+	items := make([]data.FeedItem, len(newitems))
+
+	for i, item := range newitems {
 		converted := mapping.DefaultMapping(item)
 
 		if converted != nil {
 			converted.Link = maybeResolvedLink(f.uri, converted.Link)
 			converted.PermaLink = maybeResolvedLink(f.uri, converted.PermaLink)
 
-			f.items.Items = append([]gardenjs.Item{{
+			items[i] = data.FeedItem{
+				Key:       converted.PermaLink,
 				PermaLink: converted.PermaLink,
 				PubDate:   converted.PubDate.Add(0),
 				Title:     converted.Title,
 				Link:      converted.Link,
-			}}, f.items.Items...)
+			}
 		}
-	}
-
-	if len(f.items.Items) > f.size {
-		f.items.Items = f.items.Items[:f.size]
 	}
 
 	feedURL := f.uri.String()
@@ -114,10 +122,17 @@ func (f *Flower) itemHandler(feed *feed.Feed, ch *common.Channel, newitems []*co
 		}
 	}
 
-	f.items.URL = feedURL
-	f.items.WebsiteURL = websiteURL
-	f.items.Title = ch.Title
-	f.items.UpdatedAt = time.Now()
+	log.Println("updating feed")
+	if err := f.db.UpdateFeed(data.Feed{
+		FeedURL:     feedURL,
+		WebsiteURL:  websiteURL,
+		Title:       ch.Title,
+		Description: ch.Description,
+		UpdatedAt:   time.Now(),
+		Items:       items,
+	}); err != nil {
+		log.Println(err)
+	}
 }
 
 func maybeResolvedLink(root *url.URL, other string) string {

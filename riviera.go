@@ -12,6 +12,7 @@ import (
 	"time"
 
 	fsnotify "gopkg.in/fsnotify.v1"
+	data2 "hawx.me/code/riviera/data"
 	"hawx.me/code/riviera/garden"
 	"hawx.me/code/riviera/river"
 	"hawx.me/code/riviera/river/data"
@@ -64,6 +65,7 @@ var (
 	refresh = flag.String("refresh", "15m", "")
 
 	boltdbPath = flag.String("boltdb", "", "")
+	dbPath     = flag.String("db", "", "")
 
 	port   = flag.String("port", "8080", "")
 	socket = flag.String("socket", "", "")
@@ -121,6 +123,14 @@ func main() {
 		log.Println(name, "closed")
 	}
 
+	log.Println("opening db at", *dbPath)
+	db, err := data2.Open(*dbPath)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	defer waitFor("db", db.Close)
+
 	opmlPath := flag.Arg(0)
 
 	duration, err := time.ParseDuration(*cutOff)
@@ -156,7 +166,7 @@ func main() {
 	})
 	defer waitFor("feeds", feeds.Close)
 
-	garden := garden.New(store, garden.Options{})
+	garden := garden.New(db, garden.Options{})
 	defer waitFor("garden", garden.Close)
 
 	subs := subscriptions.FromOpml(outline)
@@ -203,7 +213,9 @@ func main() {
 		}
 
 		w.Header().Set("Content-Type", "application/json")
-		garden.Encode(w)
+		if err := garden.Encode(w); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
 	})
 
 	serve.Serve(*port, *socket, http.DefaultServeMux)

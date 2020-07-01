@@ -16,12 +16,14 @@ package garden
 import (
 	"encoding/json"
 	"errors"
-	"hawx.me/code/riviera/garden/gardenjs"
-	"hawx.me/code/riviera/river/data"
 	"io"
 	"sort"
 	"sync"
 	"time"
+
+	"hawx.me/code/riviera/data"
+	"hawx.me/code/riviera/feed"
+	"hawx.me/code/riviera/garden/gardenjs"
 )
 
 type Options struct {
@@ -30,7 +32,7 @@ type Options struct {
 }
 
 type Garden struct {
-	store        data.Database
+	store        Database
 	size         int
 	cacheTimeout time.Duration
 
@@ -38,7 +40,13 @@ type Garden struct {
 	flowers map[string]*Flower
 }
 
-func New(store data.Database, options Options) *Garden {
+type Database interface {
+	Feed(uri string) (feed.Database, error)
+	Read(uri string) (data.Feed, error)
+	UpdateFeed(data.Feed) error
+}
+
+func New(store Database, options Options) *Garden {
 	if options.Size <= 0 {
 		options.Size = 10
 	}
@@ -61,8 +69,28 @@ func (g *Garden) Encode(w io.Writer) error {
 		},
 	}
 
-	for _, flower := range g.flowers {
-		garden.Feeds = append(garden.Feeds, flower.Latest())
+	for uri, _ := range g.flowers {
+		feed, err := g.store.Read(uri)
+		if err != nil {
+			return err
+		}
+
+		mapped := gardenjs.Feed{
+			WebsiteURL: feed.WebsiteURL,
+			Title:      feed.Title,
+			UpdatedAt:  feed.UpdatedAt,
+		}
+
+		for _, item := range feed.Items {
+			mapped.Items = append(mapped.Items, gardenjs.Item{
+				PermaLink: item.PermaLink,
+				PubDate:   item.PubDate,
+				Title:     item.Title,
+				Link:      item.Link,
+			})
+		}
+
+		garden.Feeds = append(garden.Feeds, mapped)
 	}
 
 	sort.Slice(garden.Feeds, func(i, j int) bool {
@@ -80,12 +108,7 @@ func (g *Garden) Add(uri string) error {
 		return errors.New("already added uri")
 	}
 
-	feedStore, err := g.store.Feed(uri)
-	if err != nil {
-		return err
-	}
-
-	flower, err := NewFlower(feedStore, g.cacheTimeout, uri, g.size)
+	flower, err := NewFlower(g.store, g.cacheTimeout, uri, g.size)
 	if err != nil {
 		return err
 	}
