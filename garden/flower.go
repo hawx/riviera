@@ -31,11 +31,6 @@ func NewFlower(db Database, cacheTimeout time.Duration, uri string, size int) (*
 		return nil, err
 	}
 
-	store, err := db.Feed(uri)
-	if err != nil {
-		return nil, err
-	}
-
 	f := &Flower{
 		uri:    parsedURI,
 		client: http.DefaultClient,
@@ -44,7 +39,7 @@ func NewFlower(db Database, cacheTimeout time.Duration, uri string, size int) (*
 		db:     db,
 	}
 
-	f.feed = feed.New(cacheTimeout, f.itemHandler, store)
+	f.feed = feed.New(cacheTimeout, f.itemHandler, db)
 
 	return f, nil
 }

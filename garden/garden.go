@@ -22,7 +22,6 @@ import (
 	"time"
 
 	"hawx.me/code/riviera/data"
-	"hawx.me/code/riviera/feed"
 	"hawx.me/code/riviera/garden/gardenjs"
 )
 
@@ -41,7 +40,7 @@ type Garden struct {
 }
 
 type Database interface {
-	Feed(uri string) (feed.Database, error)
+	Contains(key string) bool
 	Read(uri string) (data.Feed, error)
 	UpdateFeed(data.Feed) error
 }

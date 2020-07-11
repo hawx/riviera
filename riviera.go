@@ -15,9 +15,6 @@ import (
 	data2 "hawx.me/code/riviera/data"
 	"hawx.me/code/riviera/garden"
 	"hawx.me/code/riviera/river"
-	"hawx.me/code/riviera/river/data"
-	"hawx.me/code/riviera/river/data/boltdata"
-	"hawx.me/code/riviera/river/data/memdata"
 	"hawx.me/code/riviera/river/mapping"
 	"hawx.me/code/riviera/subscriptions"
 	"hawx.me/code/riviera/subscriptions/opml"
@@ -70,14 +67,6 @@ var (
 	port   = flag.String("port", "8080", "")
 	socket = flag.String("socket", "", "")
 )
-
-func loadDatastore() (data.Database, error) {
-	if *boltdbPath != "" {
-		return boltdata.Open(*boltdbPath)
-	}
-
-	return memdata.Open(), nil
-}
 
 func watchFile(path string, f func()) (io.Closer, error) {
 	watcher, err := fsnotify.NewWatcher()
@@ -145,20 +134,13 @@ func main() {
 		return
 	}
 
-	store, err := loadDatastore()
-	if err != nil {
-		log.Println(err)
-		return
-	}
-	defer waitFor("datastore", store.Close)
-
 	outline, err := opml.Load(opmlPath)
 	if err != nil {
 		log.Println(err)
 		return
 	}
 
-	feeds := river.New(store, river.Options{
+	feeds := river.New(db, river.Options{
 		Mapping:   mapping.DefaultMapping,
 		CutOff:    duration,
 		Refresh:   cacheTimeout,
