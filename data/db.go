@@ -253,8 +253,8 @@ func (d *feedDB) Contains(key string) bool {
 	return true
 }
 
-func (d *DB) Confluence() (confluence.Database, error) {
-	return &confluenceDB{db: d.db}, nil
+func (d *DB) Confluence() confluence.Database {
+	return &confluenceDB{db: d.db}
 }
 
 type confluenceDB struct {

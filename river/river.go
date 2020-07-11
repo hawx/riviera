@@ -8,8 +8,8 @@ import (
 	"io"
 	"time"
 
+	"hawx.me/code/riviera/feed"
 	"hawx.me/code/riviera/river/confluence"
-	"hawx.me/code/riviera/river/data"
 	"hawx.me/code/riviera/river/events"
 	"hawx.me/code/riviera/river/mapping"
 	"hawx.me/code/riviera/river/riverjs"
@@ -37,17 +37,29 @@ type River interface {
 	Close() error
 }
 
+// Database is a key-value store with data arranged in buckets.
+type Database interface {
+	// Feed returns a database for storing known items from a named feed.
+	Feed(name string) (feed.Database, error)
+
+	// Confluence returns a database for storing past rivers.
+	Confluence() confluence.Database
+
+	// Close releases all database resources.
+	Close() error
+}
+
 // river acts as the top-level factory. It manages the creation of the initial
 // confluence and creating new tributaries to add to it.
 type river struct {
 	confluence   confluence.Confluence
-	store        data.Database
+	store        Database
 	cacheTimeout time.Duration
 	mapping      mapping.Mapping
 }
 
 // New creates an empty river.
-func New(store data.Database, options Options) River {
+func New(store Database, options Options) River {
 	if options.Mapping == nil {
 		options.Mapping = DefaultOptions.Mapping
 	}
@@ -58,7 +70,7 @@ func New(store data.Database, options Options) River {
 		options.Refresh = DefaultOptions.Refresh
 	}
 
-	confluenceStore, _ := store.Confluence()
+	confluenceStore := store.Confluence()
 	return &river{
 		confluence:   confluence.New(confluenceStore, options.CutOff, options.LogLength),
 		store:        store,

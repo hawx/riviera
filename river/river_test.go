@@ -7,12 +7,12 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
-	"hawx.me/code/riviera/river/data/memdata"
+	"hawx.me/code/riviera/data"
 	"hawx.me/code/riviera/river/riverjs"
 )
 
 func TestRiver(t *testing.T) {
-	db := memdata.Open()
+	db, _ := data.Open("file:TestRiver?cache=shared&mode=memory")
 
 	r := New(db, Options{})
 
@@ -30,5 +30,5 @@ func TestRiver(t *testing.T) {
 	assert.Equal("3", v.Metadata.Version)
 	assert.Equal(float64(0), v.Metadata.Secs)
 
-	assert.Equal(riverjs.Feeds{UpdatedFeeds: []riverjs.Feed{}}, v.UpdatedFeeds)
+	assert.Equal(riverjs.Feeds{}, v.UpdatedFeeds)
 }

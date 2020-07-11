@@ -28,7 +28,7 @@ func TestFeedDB(t *testing.T) {
 func TestBucket(t *testing.T) {
 	assert := assert.Wrap(t)
 
-	db, err := Open("file:TestFeedDB?cache=shared&mode=memory")
+	db, err := Open("file:TestBucket?cache=shared&mode=memory")
 	assert(err).Must.Nil()
 	defer db.Close()
 
@@ -49,12 +49,11 @@ func TestBucket(t *testing.T) {
 func TestPersistedRiver(t *testing.T) {
 	assert := assert.Wrap(t)
 
-	db, err := Open("file:TestFeedDB?cache=shared&mode=memory")
+	db, err := Open("file:TestPersistedRiver?cache=shared&mode=memory")
 	assert(err).Must.Nil()
 	defer db.Close()
 
-	riv, err := db.Confluence()
-	assert(err).Nil()
+	riv := db.Confluence()
 
 	now := time.Now().Round(time.Second)
 	feeds := []riverjs.Feed{

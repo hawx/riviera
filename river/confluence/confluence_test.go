@@ -5,14 +5,15 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"hawx.me/code/riviera/data"
 	"hawx.me/code/riviera/river/confluence"
-	"hawx.me/code/riviera/river/data/memdata"
 	"hawx.me/code/riviera/river/events"
 	"hawx.me/code/riviera/river/riverjs"
 )
 
 func TestConfluence(t *testing.T) {
-	db, _ := memdata.Open().Confluence()
+	db2, _ := data.Open("file:TestConfluence?cache=shared&mode=memory")
+	db := db2.Confluence()
 	c := confluence.New(db, -time.Minute, 3)
 
 	assert.Empty(t, c.Latest())
@@ -59,7 +60,8 @@ func (d *dummyTrib) Stop() {
 }
 
 func TestConfluenceWithTributary(t *testing.T) {
-	db, _ := memdata.Open().Confluence()
+	db2, _ := data.Open("file:TestConfluenceWithTributary?cache=shared&mode=memory")
+	db := db2.Confluence()
 	c := confluence.New(db, -time.Minute, 3)
 
 	now := time.Now().Local().Round(time.Second)
@@ -93,7 +95,8 @@ func TestConfluenceWithTributary(t *testing.T) {
 }
 
 func TestConfluenceWithTributaryWhenTooOld(t *testing.T) {
-	db, _ := memdata.Open().Confluence()
+	db2, _ := data.Open("file:TestConfluenceWithTributaryWhenTooOld?cache=shared&mode=memory")
+	db := db2.Confluence()
 	c := confluence.New(db, -time.Minute, 3)
 
 	feed := riverjs.Feed{

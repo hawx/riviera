@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
-	"hawx.me/code/riviera/river/data/memdata"
+	"hawx.me/code/riviera/data"
 	"hawx.me/code/riviera/river/mapping"
 	"hawx.me/code/riviera/river/riverjs"
 	"hawx.me/code/riviera/river/tributary"
@@ -35,7 +35,8 @@ func TestTributary(t *testing.T) {
 	}))
 	defer s.Close()
 
-	db, _ := memdata.Open().Feed(s.URL)
+	db2, _ := data.Open("file:TestTributary?cache=shared&mode=memory")
+	db, _ := db2.Feed(s.URL)
 	tributary := tributary.New(db, s.URL, time.Minute, mapping.DefaultMapping)
 	tributary.Start()
 
@@ -106,7 +107,8 @@ good engineering culture— is our obsession with aggressively measuring everyth
 	}))
 	defer s.Close()
 
-	db, _ := memdata.Open().Feed(s.URL)
+	db2, _ := data.Open("file:TestTributary?cache=shared&mode=memory")
+	db, _ := db2.Feed(s.URL)
 	tributary := tributary.New(db, s.URL, time.Minute, mapping.DefaultMapping)
 	tributary.Start()
 
