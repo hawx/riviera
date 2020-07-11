@@ -4,6 +4,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"html/template"
 	"io"
 	"log"
 	"net/http"
@@ -64,8 +65,9 @@ var (
 	boltdbPath = flag.String("boltdb", "", "")
 	dbPath     = flag.String("db", "", "")
 
-	port   = flag.String("port", "8080", "")
-	socket = flag.String("socket", "", "")
+	webPath = flag.String("web", "web", "")
+	port    = flag.String("port", "8080", "")
+	socket  = flag.String("socket", "", "")
 )
 
 func watchFile(path string, f func()) (io.Closer, error) {
@@ -186,7 +188,23 @@ func main() {
 	}
 	defer waitFor("watcher", watcher.Close)
 
+	templates, err := template.ParseGlob(*webPath + "/template/*.gotmpl")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	http.Handle("/public/", http.StripPrefix("/public", http.FileServer(http.Dir(*webPath+"/static"))))
 	http.Handle("/river/", http.StripPrefix("/river", river.Handler(feeds)))
+
+	http.HandleFunc("/river", func(w http.ResponseWriter, r *http.Request) {
+		latest := feeds.Latest()
+
+		if err := templates.ExecuteTemplate(w, "index.gotmpl", latest); err != nil {
+			log.Println("/:", err)
+		}
+	})
+
 	http.HandleFunc("/garden", func(w http.ResponseWriter, r *http.Request) {
 		if strings.ToUpper(r.Method) != "GET" {
 			w.Header().Set("Accept", "GET")

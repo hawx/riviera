@@ -24,6 +24,8 @@ type River interface {
 	// a javascript callback function.
 	Encode(w io.Writer) error
 
+	Latest() riverjs.River
+
 	// Log returns a list of fetch events.
 	Log() []events.Event
 
@@ -76,6 +78,26 @@ func New(store Database, options Options) River {
 		store:        store,
 		cacheTimeout: options.Refresh,
 		mapping:      options.Mapping,
+	}
+}
+
+func (r *river) Latest() riverjs.River {
+	updatedFeeds := riverjs.Feeds{
+		UpdatedFeeds: r.confluence.Latest(),
+	}
+
+	now := time.Now()
+	metadata := riverjs.Metadata{
+		Docs:      docsPath,
+		WhenGMT:   riverjs.Time(now.UTC()),
+		WhenLocal: riverjs.Time(now),
+		Version:   "3",
+		Secs:      0,
+	}
+
+	return riverjs.River{
+		Metadata:     metadata,
+		UpdatedFeeds: updatedFeeds,
 	}
 }
 
