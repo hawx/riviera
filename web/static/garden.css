@@ -37,9 +37,23 @@ h2 {
     display: inline-block;
 }
 
+.toggle {
+    display: block;
+    position: absolute;
+    margin-top: .3rem;
+    margin-left: -.2rem;
+    transition: .1s;
+    user-select: none;
+    background: white;
+    padding: .2rem;
+}
+.open .toggle {
+    transform: rotate(90deg);
+}
+
 ol {
     display: flex;
-    padding-left: 0;
+    padding-left: 1.2rem;
     list-style: none;
     max-width: 100%;
     overflow-x: hidden;
@@ -56,12 +70,21 @@ ol:after {
     height: 100%;
 }
 
+li.open ol {
+    flex-direction: column;
+    margin-top: .3rem;
+}
+
 ol li {
     white-space: nowrap;
     margin: .5rem .5rem .5rem 0;
 }
 
-ol li:after {
+li.open ol li {
+    margin: .2rem .5rem .2rem 0;
+}
+
+li:not(.open) ol li:after {
     content: '/';
     color: #ddd;
 }

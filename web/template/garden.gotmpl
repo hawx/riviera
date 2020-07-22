@@ -14,9 +14,10 @@
     <main>
       <ul>
         {{ range .Feeds }}
-          <li>
+          <li data-toggled="{{ .WebsiteURL }}">
             <h2><a href="{{ .WebsiteURL }}">{{ .Title }}</a></h2>
             <time datetime="{{ .UpdatedAt }}">{{ ago .UpdatedAt }}</time>
+            <span class="toggle" data-toggle="{{ .WebsiteURL }}">∴</span>
             <ol>
               {{ range .Items }}
                 <li>
@@ -33,5 +34,7 @@
     <footer>
       <a href="http://hawx.me/code/riviera">riviera</a>
     </footer>
+
+    <script src="/public/garden.js"></script>
   </body>
 </html>
