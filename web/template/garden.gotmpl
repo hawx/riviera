@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Riviera</title>
+    <link rel="stylesheet" href="/public/garden.css" type="text/css" />
+  </head>
+  <body>
+    <header>
+      <h1>Riviera</h1>
+    </header>
+    
+    <main>
+      <ul>
+        {{ range .Feeds }}
+          <li>
+            <h2><a href="{{ .WebsiteURL }}">{{ .Title }}</a></h2>
+            <time datetime="{{ .UpdatedAt }}">{{ ago .UpdatedAt }}</time>
+            <ol>
+              {{ range .Items }}
+                <li>
+                  <h3><a href="{{ .PermaLink }}">{{ truncate .Title 40 }}</a></h3>
+                  <time datetime="{{ .PubDate }}">{{ ago .PubDate }}</time>
+                </li>
+              {{ end }}
+            </ol>
+          </li>
+        {{ end }}
+      </ul>
+    </main>
+    
+    <footer>
+      <a href="http://hawx.me/code/riviera">riviera</a>
+    </footer>
+  </body>
+</html>

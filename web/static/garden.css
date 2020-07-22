@@ -1,0 +1,95 @@
+html, body {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font: 1em/1.3 Verdana, Geneva, sans-serif;
+    color: #000;
+    background: #fff;
+}
+
+a, a:visited {
+    text-decoration: none;
+    color: #365da9;
+}
+a:hover, a:focus, a:active {
+    text-decoration: underline;
+    color: #2a6497;
+}
+
+header {
+    display: none;
+}
+
+main {
+    padding: 2rem;
+}
+
+ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+h2 {
+    font-size: 1rem;
+    margin: 0;
+    display: inline-block;
+}
+
+ol {
+    display: flex;
+    padding-left: 0;
+    list-style: none;
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
+ol:after {
+    content: "";
+    background-image: linear-gradient(90deg, transparent, white);
+    position: absolute;
+    z-index: 999;
+    top: 0;
+    right: 0;
+    width: 5vw;
+    height: 100%;
+}
+
+ol li {
+    white-space: nowrap;
+    margin: .5rem .5rem .5rem 0;
+}
+
+ol li:after {
+    content: '/';
+    color: #ddd;
+}
+
+h3 {
+    font-size: 1rem;
+    font-weight: normal;
+    margin: 0;
+    display: inline-block;
+}
+
+h3 a:visited {
+    color: #333;
+}
+
+time {
+    color: #888;
+    font-size: .8rem;
+}
+
+footer {
+    padding: 2rem;
+    padding-bottom: 3rem;
+    font-size: .6875rem;
+    color: #bbb;
+}
+footer a, footer a:hover, footer a:visited, footer a:focus, footer a:active {
+    color: #bbb;
+    text-decoration: underline;
+}
+

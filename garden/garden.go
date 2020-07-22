@@ -61,7 +61,7 @@ func New(store Database, options Options) *Garden {
 	}
 }
 
-func (g *Garden) Encode(w io.Writer) error {
+func (g *Garden) Latest() (gardenjs.Garden, error) {
 	garden := gardenjs.Garden{
 		Metadata: gardenjs.Metadata{
 			BuiltAt: time.Now(),
@@ -71,13 +71,12 @@ func (g *Garden) Encode(w io.Writer) error {
 	for uri, _ := range g.flowers {
 		feed, err := g.store.Read(uri)
 		if err != nil {
-			return err
+			return gardenjs.Garden{}, err
 		}
 
 		mapped := gardenjs.Feed{
 			WebsiteURL: feed.WebsiteURL,
 			Title:      feed.Title,
-			UpdatedAt:  feed.UpdatedAt,
 		}
 
 		for _, item := range feed.Items {
@@ -87,6 +86,9 @@ func (g *Garden) Encode(w io.Writer) error {
 				Title:     item.Title,
 				Link:      item.Link,
 			})
+			if item.PubDate.After(mapped.UpdatedAt) {
+				mapped.UpdatedAt = item.PubDate
+			}
 		}
 
 		garden.Feeds = append(garden.Feeds, mapped)
@@ -96,7 +98,16 @@ func (g *Garden) Encode(w io.Writer) error {
 		return garden.Feeds[i].UpdatedAt.Before(garden.Feeds[j].UpdatedAt)
 	})
 
-	return json.NewEncoder(w).Encode(garden)
+	return garden, nil
+}
+
+func (g *Garden) Encode(w io.Writer) error {
+	latest, err := g.Latest()
+	if err != nil {
+		return err
+	}
+
+	return json.NewEncoder(w).Encode(latest)
 }
 
 func (g *Garden) Add(uri string) error {

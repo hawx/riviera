@@ -7,6 +7,7 @@ import (
 	"html/template"
 	"io"
 	"log"
+	"math"
 	"net/http"
 	"strings"
 	"sync"
@@ -188,7 +189,45 @@ func main() {
 	}
 	defer waitFor("watcher", watcher.Close)
 
-	templates, err := template.ParseGlob(*webPath + "/template/*.gotmpl")
+	templates, err := template.New("").Funcs(map[string]interface{}{
+		"ago": func(t time.Time) string {
+			dur := time.Now().Sub(t)
+			if dur < time.Minute {
+				return fmt.Sprintf("%vs", math.Ceil(dur.Seconds()))
+			}
+			if dur < time.Hour {
+				return fmt.Sprintf("%vm", math.Ceil(dur.Minutes()))
+			}
+			if dur < 24*time.Hour {
+				return fmt.Sprintf("%vh", math.Ceil(dur.Hours()))
+			}
+			if dur < 31*24*time.Hour {
+				return fmt.Sprintf("%vd", math.Ceil(dur.Hours()/24))
+			}
+			if dur < 365*24*time.Hour {
+				return fmt.Sprintf("%vM", math.Ceil(dur.Hours()/24/31))
+			}
+
+			return fmt.Sprintf("%vY", math.Ceil(dur.Hours()/24/365))
+		},
+		"truncate": func(line string, length int) string {
+			if len(line) < length {
+				return line
+			}
+
+			words := strings.Fields(line)
+			line = ""
+			for _, word := range words {
+				if len(line+word) < length {
+					line += word + " "
+				} else {
+					break
+				}
+			}
+
+			return line[:len(line)-1] + "…"
+		},
+	}).ParseGlob(*webPath + "/template/*.gotmpl")
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -205,7 +244,7 @@ func main() {
 		}
 	})
 
-	http.HandleFunc("/garden", func(w http.ResponseWriter, r *http.Request) {
+	http.HandleFunc("/garden/", func(w http.ResponseWriter, r *http.Request) {
 		if strings.ToUpper(r.Method) != "GET" {
 			w.Header().Set("Accept", "GET")
 			w.WriteHeader(http.StatusMethodNotAllowed)
@@ -215,6 +254,19 @@ func main() {
 		w.Header().Set("Content-Type", "application/json")
 		if err := garden.Encode(w); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+	})
+
+	http.HandleFunc("/garden", func(w http.ResponseWriter, r *http.Request) {
+		latest, err := garden.Latest()
+		if err != nil {
+			log.Println("/garden:", err)
+			http.Error(w, "", http.StatusInternalServerError)
+			return
+		}
+
+		if err := templates.ExecuteTemplate(w, "garden.gotmpl", latest); err != nil {
+			log.Println("/garden:", err)
 		}
 	})
 
