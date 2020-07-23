@@ -7,33 +7,44 @@
     <link rel="stylesheet" href="/public/styles.css" />
   </head>
   <body>
+    <header>
+      <h1><a href="/">Riviera</a></h1>
+      <nav>
+        <ul>
+          <li>River</li>
+          <li><a href="/garden">Garden</a></li>
+          <li><a href="/sign-in">Sign-in</a></li>
+        </ul>
+      </nav>
+    </header>
+
     <div class="container">
 
       <ul class="blocks">
         {{range .UpdatedFeeds.UpdatedFeeds}}
           <li class="block">
-            <header class="block-title">
-              <h1>
+            <div class="block-title">
+              <h2>
                 <img class="icon" src="//www.google.com/s2/favicons?domain={{.WebsiteURL}}" alt="">
                 <a href="{{.WebsiteURL}}">{{.FeedTitle}}</a>
                 <span class="feed">(<a href="{{.FeedURL}}">Feed</a>)</span>
-              </h1>
+              </h2>
               {{.WhenLastUpdate.HtmlFormat}}
-            </header>
+            </div>
             <ul class="items">
               {{range .Items}}
                 <li class="item" id="{{.ID}}">
                   {{ if .Thumbnail }}
                     <details>
                       <summary>
-                        <h2><a rel="external" href="{{.Link}}">{{.Title}}</a></h2>
+                        <h3><a rel="external" href="{{.Link}}">{{.Title}}</a></h3>
                       </summary>
                       <img src="{{.Thumbnail.URL}}" />
                     </details>
                     <p>{{.FilteredBody}}</p>
                     <a class="timea" rel="external" href="{{.Link}}">{{.PubDate.HtmlFormat}}</a>
                   {{ else }}
-                    <h2><a rel="external" href="{{.Link}}">{{.Title}}</a></h2>
+                    <h3><a rel="external" href="{{.Link}}">{{.Title}}</a></h3>
                     <p>{{.FilteredBody}}</p>
                     <a class="timea" rel="external" href="{{.Link}}">{{.PubDate.HtmlFormat}}</a>
                   {{ end }}
