@@ -20,8 +20,6 @@ import (
 	"hawx.me/code/riviera/garden"
 	"hawx.me/code/riviera/river"
 	"hawx.me/code/riviera/river/mapping"
-	"hawx.me/code/riviera/subscriptions"
-	"hawx.me/code/riviera/subscriptions/opml"
 	"hawx.me/code/serve"
 )
 
@@ -141,8 +139,6 @@ func main() {
 	}
 	defer waitFor("db", db.Close)
 
-	opmlPath := flag.Arg(0)
-
 	duration, err := time.ParseDuration(*cutOff)
 	if err != nil {
 		log.Println(err)
@@ -155,57 +151,18 @@ func main() {
 		return
 	}
 
-	outline, err := opml.Load(opmlPath)
-	if err != nil {
-		log.Println(err)
-		return
-	}
-
+	riverSubs := db.Subscriptions("river")
 	feeds := river.New(db, river.Options{
 		Mapping:   mapping.DefaultMapping,
 		CutOff:    duration,
 		Refresh:   cacheTimeout,
 		LogLength: 500,
-	})
+	}, riverSubs)
 	defer waitFor("feeds", feeds.Close)
 
-	garden := garden.New(db, garden.Options{})
+	gardenSubs := db.Subscriptions("garden")
+	garden := garden.New(db, garden.Options{}, gardenSubs)
 	defer waitFor("garden", garden.Close)
-
-	subs := subscriptions.FromOpml(outline)
-	for _, sub := range subs.List() {
-		feeds.Add(sub.URI)
-		if err := garden.Add(sub.URI); err != nil {
-			log.Printf("add to garden failed: %s\n", err)
-		}
-	}
-
-	watcher, err := watchFile(opmlPath, func() {
-		log.Printf("reading %s\n", opmlPath)
-		outline, err := opml.Load(opmlPath)
-		if err != nil {
-			log.Printf("could not read %s: %s\n", opmlPath, err)
-			return
-		}
-
-		added, removed := subscriptions.Diff(subs, subscriptions.FromOpml(outline))
-		for _, uri := range added {
-			feeds.Add(uri)
-			if err := garden.Add(uri); err != nil {
-				log.Printf("add to garden failed: %s\n", err)
-			}
-			subs.Add(uri)
-		}
-		for _, uri := range removed {
-			feeds.Remove(uri)
-			garden.Remove(uri)
-			subs.Remove(uri)
-		}
-	})
-	if err != nil {
-		log.Printf("could not start watching %s: %v\n", opmlPath, err)
-	}
-	defer waitFor("watcher", watcher.Close)
 
 	templates, err := template.New("").Funcs(map[string]interface{}{
 		"ago": func(t time.Time) string {

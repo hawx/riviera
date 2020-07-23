@@ -45,7 +45,13 @@ type Database interface {
 	UpdateFeed(data.Feed) error
 }
 
-func New(store Database, options Options) *Garden {
+type Subs interface {
+	List() ([]string, error)
+	OnAdd(func(string))
+	OnRemove(func(string))
+}
+
+func New(store Database, options Options, subs Subs) *Garden {
 	if options.Size <= 0 {
 		options.Size = 10
 	}
@@ -53,12 +59,26 @@ func New(store Database, options Options) *Garden {
 		options.Refresh = time.Hour
 	}
 
-	return &Garden{
+	g := &Garden{
 		store:        store,
 		size:         options.Size,
 		cacheTimeout: options.Refresh,
 		flowers:      map[string]*Flower{},
 	}
+
+	list, _ := subs.List()
+	for _, uri := range list {
+		g.Add(uri)
+	}
+
+	subs.OnAdd(func(uri string) {
+		g.Add(uri)
+	})
+	subs.OnRemove(func(uri string) {
+		g.Remove(uri)
+	})
+
+	return g
 }
 
 func (g *Garden) Latest() (gardenjs.Garden, error) {

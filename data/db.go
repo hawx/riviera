@@ -3,16 +3,11 @@ package data
 
 import (
 	"database/sql"
-	"encoding/json"
 	"fmt"
 	"log"
-	"time"
 
 	// register sqlite3 for database/sql
 	_ "github.com/mattn/go-sqlite3"
-	"hawx.me/code/riviera/feed"
-	"hawx.me/code/riviera/river/confluence"
-	"hawx.me/code/riviera/river/riverjs"
 )
 
 type DB struct {
@@ -38,8 +33,10 @@ func (d *DB) migrate() error {
       PRIMARY KEY (Bucket, Key)
     );
 
-    CREATE TABLE IF NOT EXISTS gardenFeeds (
-      FeedURL    TEXT PRIMARY KEY
+    CREATE TABLE IF NOT EXISTS subscriptions (
+      FeedURL    TEXT,
+      Name       TEXT,
+      PRIMARY KEY (FeedURL, Name)
     );
 
     CREATE TABLE IF NOT EXISTS feeds (
@@ -214,85 +211,4 @@ func (d *DB) Contains(key string) bool {
 	}
 
 	return true
-}
-
-func (d *DB) Feed(uri string) (feed.Database, error) {
-	return &feedDB{db: d.db, feedURL: uri}, nil
-}
-
-type feedDB struct {
-	db      *sql.DB
-	feedURL string
-}
-
-func (d *feedDB) Contains(key string) bool {
-	log.Println("contains", key)
-	tx, err := d.db.Begin()
-	if err != nil {
-		log.Println("contains:", err)
-		return false
-	}
-	defer tx.Commit()
-
-	var v int
-	err = tx.QueryRow("SELECT 1 FROM keys WHERE Bucket = ? AND Key = ?", d.feedURL, key).Scan(&v)
-
-	if err == sql.ErrNoRows {
-		_, err = tx.Exec("INSERT INTO keys (Bucket, Key) VALUES (?, ?)", d.feedURL, key)
-		if err != nil {
-			log.Println("contains:", err)
-		}
-		return false
-	}
-
-	if err != nil {
-		log.Println("sql contains:", err)
-		return false
-	}
-
-	return true
-}
-
-func (d *DB) Confluence() confluence.Database {
-	return &confluenceDB{db: d.db}
-}
-
-type confluenceDB struct {
-	db *sql.DB
-}
-
-func (d *confluenceDB) Add(feed riverjs.Feed) {
-	data, _ := json.Marshal(feed)
-
-	d.db.Exec("INSERT INTO feedFetches (FeedURL, FetchedAt, Value) VALUES (?, ?, ?)",
-		feed.FeedURL,
-		feed.WhenLastUpdate.Add(0),
-		string(data))
-}
-
-func (d *confluenceDB) Truncate(cutoff time.Duration) {
-	d.db.Exec("DELETE FROM feedFetches WHERE FetchedAt < ?",
-		time.Now().Add(cutoff))
-}
-
-func (d *confluenceDB) Latest(cutoff time.Duration) (feeds []riverjs.Feed) {
-	rows, err := d.db.Query("SELECT Value FROM feedFetches WHERE FetchedAt > ? ORDER BY FetchedAt DESC, FeedURL DESC",
-		time.Now().Add(cutoff))
-	if err != nil {
-		log.Println("latest:", err)
-		return
-	}
-	defer rows.Close()
-
-	for rows.Next() {
-		var data string
-		rows.Scan(&data)
-
-		var feed riverjs.Feed
-		json.Unmarshal([]byte(data), &feed)
-
-		feeds = append(feeds, feed)
-	}
-
-	return feeds
 }

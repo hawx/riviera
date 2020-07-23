@@ -39,6 +39,12 @@ type River interface {
 	Close() error
 }
 
+type Subs interface {
+	List() ([]string, error)
+	OnAdd(func(string))
+	OnRemove(func(string))
+}
+
 // Database is a key-value store with data arranged in buckets.
 type Database interface {
 	// Feed returns a database for storing known items from a named feed.
@@ -61,7 +67,7 @@ type river struct {
 }
 
 // New creates an empty river.
-func New(store Database, options Options) River {
+func New(store Database, options Options, subs Subs) River {
 	if options.Mapping == nil {
 		options.Mapping = DefaultOptions.Mapping
 	}
@@ -73,12 +79,27 @@ func New(store Database, options Options) River {
 	}
 
 	confluenceStore := store.Confluence()
-	return &river{
+
+	g := &river{
 		confluence:   confluence.New(confluenceStore, options.CutOff, options.LogLength),
 		store:        store,
 		cacheTimeout: options.Refresh,
 		mapping:      options.Mapping,
 	}
+
+	list, _ := subs.List()
+	for _, uri := range list {
+		g.Add(uri)
+	}
+
+	subs.OnAdd(func(uri string) {
+		g.Add(uri)
+	})
+	subs.OnRemove(func(uri string) {
+		g.Remove(uri)
+	})
+
+	return g
 }
 
 func (r *river) Latest() riverjs.River {
