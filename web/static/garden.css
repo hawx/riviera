@@ -19,7 +19,30 @@ a:hover, a:focus, a:active {
 }
 
 header {
-    display: none;
+    text-transform: lowercase;
+    display: flex;
+    justify-content: space-between;
+    padding: 1rem 5vw;
+}
+
+h1 {
+    font-size: 1rem;
+    margin: 0;
+    font-weight: normal;
+}
+
+h1 a, h1 a:visited {
+    color: #aaa;
+}
+
+nav ul {
+    display: flex;
+    margin: 0;
+}
+
+nav ul li {
+    color: #aaa;
+    margin: 0 0 0 1rem;
 }
 
 main {
