@@ -13,7 +13,12 @@
         <ul>
           <li><a href="/river">River</a></li>
           <li>Garden</li>
-          <li><a href="/sign-in">Sign-in</a></li>
+          {{ if .SignedIn }}
+            <li><a href="/admin">admin</a></li>
+            <li><a href="/sign-out">Sign-out</a></li>
+          {{ else }}
+            <li><a href="/sign-in">Sign-in</a></li>
+          {{ end }}
         </ul>
       </nav>
     </header>

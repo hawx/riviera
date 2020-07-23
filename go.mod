@@ -17,6 +17,7 @@ require (
 	golang.org/x/tools/gopls v0.4.1 // indirect
 	gopkg.in/fsnotify.v1 v1.4.7
 	hawx.me/code/assert v0.0.0-20200428180912-91e855e32e7d
+	hawx.me/code/indieauth v1.0.1 // indirect
 	hawx.me/code/serve v0.0.0-20190207181551-eb94630184cf
 	willnorris.com/go/microformats v1.0.0
 )

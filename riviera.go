@@ -14,6 +14,8 @@ import (
 	"time"
 
 	fsnotify "gopkg.in/fsnotify.v1"
+	"hawx.me/code/indieauth"
+	"hawx.me/code/indieauth/sessions"
 	data2 "hawx.me/code/riviera/data"
 	"hawx.me/code/riviera/garden"
 	"hawx.me/code/riviera/river"
@@ -66,6 +68,10 @@ var (
 	boltdbPath = flag.String("boltdb", "", "")
 	dbPath     = flag.String("db", "", "")
 
+	url    = flag.String("url", "http://localhost:8080", "")
+	secret = flag.String("secret", "GpgGqpnfFkpjgXj7u3RCdKkoOf/tQqbHkOuuys90Ds4=", "")
+	me     = flag.String("me", "", "")
+
 	webPath = flag.String("web", "web", "")
 	port    = flag.String("port", "8080", "")
 	socket  = flag.String("socket", "", "")
@@ -101,6 +107,18 @@ func main() {
 
 	if flag.NArg() == 0 {
 		printHelp()
+		return
+	}
+
+	auth, err := indieauth.Authentication(*url, *url+"/callback")
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	session, err := sessions.New(*me, *secret, auth)
+	if err != nil {
+		log.Println(err)
 		return
 	}
 
@@ -233,6 +251,8 @@ func main() {
 		return
 	}
 
+	http.Handle("/", http.RedirectHandler("/river", http.StatusFound))
+
 	http.Handle("/public/", http.StripPrefix("/public", http.FileServer(http.Dir(*webPath+"/static"))))
 	http.Handle("/river/", http.StripPrefix("/river", river.Handler(feeds)))
 
@@ -257,18 +277,17 @@ func main() {
 		}
 	})
 
-	http.HandleFunc("/garden", func(w http.ResponseWriter, r *http.Request) {
-		latest, err := garden.Latest()
-		if err != nil {
-			log.Println("/garden:", err)
-			http.Error(w, "", http.StatusInternalServerError)
-			return
-		}
+	http.HandleFunc("/garden", session.Choose(
+		garden.Handler(templates, true),
+		garden.Handler(templates, false)))
 
-		if err := templates.ExecuteTemplate(w, "garden.gotmpl", latest); err != nil {
-			log.Println("/garden:", err)
-		}
+	http.HandleFunc("/admin", func(w http.ResponseWriter, r *http.Request) {
+
 	})
+
+	http.HandleFunc("/sign-in", session.SignIn())
+	http.HandleFunc("/callback", session.Callback())
+	http.HandleFunc("/sign-out", session.SignOut())
 
 	serve.Serve(*port, *socket, http.DefaultServeMux)
 	wg.Wait()
