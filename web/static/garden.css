@@ -139,3 +139,29 @@ footer a, footer a:hover, footer a:visited, footer a:focus, footer a:active {
     text-decoration: underline;
 }
 
+form {
+    margin: 1.5rem auto 0;
+    border: 1px solid #ddd;
+    padding: 2rem;
+    max-width: 21rem;
+}
+
+form h2 {
+    margin-bottom: 1.5rem;
+}
+
+form p {
+    margin-top: 1.5rem;
+    margin-bottom: .5rem;
+}
+
+input[type=text] {
+    display: block;
+    margin-top: .5rem;
+    max-width: 20rem;
+    width: 100%;
+}
+
+button {
+    margin-top: 1.5rem;
+}

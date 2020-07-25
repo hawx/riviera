@@ -20,6 +20,7 @@ import (
 	"hawx.me/code/riviera/garden"
 	"hawx.me/code/riviera/river"
 	"hawx.me/code/riviera/river/mapping"
+	"hawx.me/code/riviera/subscriptions"
 	"hawx.me/code/serve"
 )
 
@@ -238,9 +239,12 @@ func main() {
 		garden.Handler(templates, true),
 		garden.Handler(templates, false)))
 
-	http.HandleFunc("/admin", func(w http.ResponseWriter, r *http.Request) {
-
-	})
+	http.HandleFunc("/admin", session.Shield(
+		subscriptions.Handler(templates, subscriptions.Map{
+			"river":  riverSubs,
+			"garden": gardenSubs,
+		}),
+	))
 
 	http.HandleFunc("/sign-in", session.SignIn())
 	http.HandleFunc("/callback", session.Callback())

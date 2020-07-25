@@ -26,7 +26,7 @@ func (d *subscriptionsDB) Add(uri string) error {
 	_, err := d.db.Exec("INSERT INTO subscriptions (FeedURL, Name) VALUES (?, ?)",
 		uri,
 		d.name)
-	if err != nil && d.onAdd != nil {
+	if err == nil && d.onAdd != nil {
 		d.onAdd(uri)
 	}
 
@@ -37,7 +37,7 @@ func (d *subscriptionsDB) Remove(uri string) error {
 	_, err := d.db.Exec("DELETE FROM subscriptions WHERE FeedURL = ? AND Name = ?",
 		uri,
 		d.name)
-	if err != nil && d.onRemove != nil {
+	if err == nil && d.onRemove != nil {
 		d.onRemove(uri)
 	}
 
