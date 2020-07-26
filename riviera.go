@@ -20,7 +20,6 @@ import (
 	"hawx.me/code/riviera/garden"
 	"hawx.me/code/riviera/river"
 	"hawx.me/code/riviera/river/mapping"
-	"hawx.me/code/riviera/river/riverjs"
 	"hawx.me/code/riviera/subscriptions"
 	"hawx.me/code/serve"
 )
@@ -212,48 +211,16 @@ func main() {
 
 	http.Handle("/", http.RedirectHandler("/river", http.StatusFound))
 
-	http.Handle("/public/", http.StripPrefix("/public", http.FileServer(http.Dir(*webPath+"/static"))))
-	http.Handle("/river/", http.StripPrefix("/river", river.Handler(feeds)))
+	http.Handle("/public/", http.StripPrefix("/public",
+		http.FileServer(http.Dir(*webPath+"/static"))))
 
-	http.HandleFunc("/river", func(w http.ResponseWriter, r *http.Request) {
-		latest := feeds.Latest()
-
-		if err := templates.ExecuteTemplate(w, "river.gotmpl", struct {
-			UpdatedFeeds riverjs.Feeds
-			Page         string
-			SignedIn     bool
-		}{
-			UpdatedFeeds: latest.UpdatedFeeds,
-			Page:         "river",
-			SignedIn:     true,
-		}); err != nil {
-			log.Println("/:", err)
-		}
-	})
-
-	http.HandleFunc("/garden/", func(w http.ResponseWriter, r *http.Request) {
-		if strings.ToUpper(r.Method) != "GET" {
-			w.Header().Set("Accept", "GET")
-			w.WriteHeader(http.StatusMethodNotAllowed)
-			return
-		}
-
-		w.Header().Set("Content-Type", "application/json")
-		if err := garden.Encode(w); err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-		}
-	})
+	http.HandleFunc("/river", session.Choose(
+		feeds.Handler(templates, true),
+		feeds.Handler(templates, false)))
 
 	http.HandleFunc("/garden", session.Choose(
 		garden.Handler(templates, true),
 		garden.Handler(templates, false)))
-
-	http.HandleFunc("/admin", session.Shield(
-		subscriptions.Handler(templates, subscriptions.Map{
-			"river":  riverSubs,
-			"garden": gardenSubs,
-		}),
-	))
 
 	http.HandleFunc("/remove", session.Shield(
 		subscriptions.RemoveHandler(subscriptions.Map{

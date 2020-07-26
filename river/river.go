@@ -67,7 +67,7 @@ type river struct {
 }
 
 // New creates an empty river.
-func New(store Database, options Options, subs Subs) River {
+func New(store Database, options Options, subs Subs) *river {
 	if options.Mapping == nil {
 		options.Mapping = DefaultOptions.Mapping
 	}
