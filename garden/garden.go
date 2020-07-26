@@ -95,6 +95,7 @@ func (g *Garden) Latest() (gardenjs.Garden, error) {
 		}
 
 		mapped := gardenjs.Feed{
+			URL:        uri,
 			WebsiteURL: feed.WebsiteURL,
 			Title:      feed.Title,
 		}

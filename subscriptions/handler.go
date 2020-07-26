@@ -59,3 +59,43 @@ func Handler(templates ExecuteTemplate, subsMap Map) http.HandlerFunc {
 		}
 	}
 }
+
+func RemoveHandler(subsMap Map) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		where := r.FormValue("where")
+		uri := r.FormValue("url")
+
+		subs, ok := subsMap[where]
+		if !ok {
+			return
+		}
+
+		if err := subs.Remove(uri); err != nil {
+			log.Println(err)
+		}
+		log.Println("unsubscribed from", uri, "for", where)
+
+		http.Redirect(w, r, "/"+where, http.StatusFound)
+		return
+	}
+}
+
+func AddHandler(subsMap Map) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		where := r.FormValue("where")
+		uri := r.FormValue("url")
+
+		subs, ok := subsMap[where]
+		if !ok {
+			return
+		}
+
+		if err := subs.Add(uri); err != nil {
+			log.Println(err)
+		}
+		log.Println("subscribed to", uri, "for", where)
+
+		http.Redirect(w, r, "/"+where, http.StatusFound)
+		return
+	}
+}

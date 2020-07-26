@@ -20,6 +20,7 @@ import (
 	"hawx.me/code/riviera/garden"
 	"hawx.me/code/riviera/river"
 	"hawx.me/code/riviera/river/mapping"
+	"hawx.me/code/riviera/river/riverjs"
 	"hawx.me/code/riviera/subscriptions"
 	"hawx.me/code/serve"
 )
@@ -217,7 +218,15 @@ func main() {
 	http.HandleFunc("/river", func(w http.ResponseWriter, r *http.Request) {
 		latest := feeds.Latest()
 
-		if err := templates.ExecuteTemplate(w, "index.gotmpl", latest); err != nil {
+		if err := templates.ExecuteTemplate(w, "river.gotmpl", struct {
+			UpdatedFeeds riverjs.Feeds
+			Page         string
+			SignedIn     bool
+		}{
+			UpdatedFeeds: latest.UpdatedFeeds,
+			Page:         "river",
+			SignedIn:     true,
+		}); err != nil {
 			log.Println("/:", err)
 		}
 	})
@@ -241,6 +250,20 @@ func main() {
 
 	http.HandleFunc("/admin", session.Shield(
 		subscriptions.Handler(templates, subscriptions.Map{
+			"river":  riverSubs,
+			"garden": gardenSubs,
+		}),
+	))
+
+	http.HandleFunc("/remove", session.Shield(
+		subscriptions.RemoveHandler(subscriptions.Map{
+			"river":  riverSubs,
+			"garden": gardenSubs,
+		}),
+	))
+
+	http.HandleFunc("/add", session.Shield(
+		subscriptions.AddHandler(subscriptions.Map{
 			"river":  riverSubs,
 			"garden": gardenSubs,
 		}),

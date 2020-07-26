@@ -23,11 +23,13 @@ func (garden *Garden) Handler(templates ExecuteTemplate, signedIn bool) http.Han
 
 		type gardenCtx struct {
 			Feeds    []gardenjs.Feed
+			Page     string
 			SignedIn bool
 		}
 
 		if err := templates.ExecuteTemplate(w, "garden.gotmpl", gardenCtx{
 			Feeds:    latest.Feeds,
+			Page:     "garden",
 			SignedIn: signedIn,
 		}); err != nil {
 			log.Println("/garden:", err)

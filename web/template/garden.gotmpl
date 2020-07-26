@@ -4,32 +4,19 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Riviera</title>
-    <link rel="stylesheet" href="/public/garden.css" type="text/css" />
+    <link rel="stylesheet" href="/public/styles.css" type="text/css" />
   </head>
   <body>
-    <header>
-      <h1><a href="/">Riviera</a></h1>
-      <nav>
-        <ul>
-          <li><a href="/river">River</a></li>
-          <li>Garden</li>
-          {{ if .SignedIn }}
-            <li><a href="/admin">admin</a></li>
-            <li><a href="/sign-out">Sign-out</a></li>
-          {{ else }}
-            <li><a href="/sign-in">Sign-in</a></li>
-          {{ end }}
-        </ul>
-      </nav>
-    </header>
+    {{ template "header.gotmpl" . }}
     
-    <main>
+    <main class="garden">
       <ul>
         {{ range .Feeds }}
           <li data-toggled="{{ .WebsiteURL }}">
             <h2><a href="{{ .WebsiteURL }}">{{ .Title }}</a></h2>
             <time datetime="{{ .UpdatedAt }}">{{ ago .UpdatedAt }}</time>
             <span class="toggle" data-toggle="{{ .WebsiteURL }}">∴</span>
+            <a data-toggled="edit" href="/remove?where=garden&url={{ .URL }}" class="remove">🞪</a>
             <ol>
               {{ range .Items }}
                 <li>
@@ -43,6 +30,6 @@
       </ul>
     </main>
     
-    <script src="/public/garden.js"></script>
+    <script src="/public/toggle.js"></script>
   </body>
 </html>

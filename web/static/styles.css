@@ -18,6 +18,14 @@ a:hover, a:focus, a:active {
     color: #2a6497;
 }
 
+ul, ol {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+/* Header */
+
 header {
     text-transform: lowercase;
     display: flex;
@@ -28,65 +36,61 @@ header {
 h1 {
     font-size: 1rem;
     margin: 0;
-    font-weight: normal;
+    font-weight: bold;
+    display: inline;
 }
 
 h1 a, h1 a:visited {
     color: #aaa;
 }
 
-nav ul {
-    display: flex;
-    margin: 0;
+nav {
+    display: inline;
 }
 
-nav ul li {
+header ul {
+    display: inline-flex;
+}
+
+header ul li {
     color: #aaa;
     margin: 0 0 0 1rem;
 }
 
-.container {
+nav span {
+    text-decoration: underline;
+}
+
+/* River */
+
+.river {
     max-width: 40em;
     margin: 0 auto;
     padding: 0 1em;
 }
-.container:before, .container:after {
-    clear: both;
-    content: " ";
-    display: table;
-}
 
-.page-title {
-    background: #eee;
-    border-bottom: 1px solid #ddd;
-    padding: 0;
-    margin: 0;
-}
-.page-title h2 {
-    font-size: 1.5em;
+.river h2 {
+    font-size: 1.5rem;
     padding: 1.3rem;
     margin: 0;
     height: 1.3rem;
-    line-height: 1.3rem;
     display: inline-block;
     padding-left: 0;
     font-weight: bold;
 }
 
-ul { list-style: none; padding: 0; }
-
-.blocks {
+.river > ul {
     width: auto;
     margin: 2.6rem 0;
 }
 
-.block {
+.river > ul > li {
     clear: both;
     padding: .5rem 0 0;
     border-top: 1px solid #ddd;
     margin: 1.1rem 0 0;
 }
-.block-title h2, .block-title time {
+.river h2, .river > ul > li > div > time {
     float: left;
     padding: 0 .5rem 0 0;
     margin: -1.1rem 0 0;
@@ -94,68 +98,180 @@ ul { list-style: none; padding: 0; }
     font-weight: normal;
     background: #fff;
 }
-.block-title .icon {
-    position: relative;
-    float: left;
-    margin: 0 .5rem 0 -1.5rem;
-    border: 0 none;
-    vertical-align: middle;
-}
-.block-title time {
+
+.river > ul > li > div > time {
     float: right;
     padding: 0 0 0 .5rem;
     color: #777;
 }
 
-.item {
+.river ol li {
     clear: both;
     position: relative;
     padding: 1rem 0;
     margin: 0;
 }
-.item header {
-    margin: 0 0 .3rem;
-}
-.item h3 {
+.river h3 {
     font-size: 1rem;
     margin: 0;
 }
-.item summary h3 {
+.river summary h3 {
     display: inline-block;
 }
-.item p {
+.river p {
     font-size: 0.875rem;
     margin: .2rem 0;
 }
-.item .timea {
+.river .timea {
     clear: both;
     margin: 0 1.5rem 0 0;
     font-size: .6875rem;
     color: #666;
 }
-.item img {
+.river img {
     max-width: 100%;
 }
-.item .code {
-    float: right;
-}
-.item .code.ok       { color: silver; }
-.item .code.redirect { color: yellow; }
-.item .code.error    { color: red; }
-.item .code.fault    { color: orange; }
-.item .code.unknown  { color: black; }
 
-footer {
+/* Forms */
+
+form[data-toggled] {
+    display: none;
+}
+
+form[data-toggled].open {
+    display: block;
+}
+
+form {
+    margin: 1.5rem auto 0;
+    border: 1px solid #ddd;
+    padding: 2rem;
+    max-width: 21rem;
+}
+
+form h2 {
+    margin-bottom: 1.5rem;
+}
+
+form p {
+    margin-top: 1.5rem;
+    margin-bottom: .5rem;
+}
+
+input[type=text] {
+    display: block;
+    margin-top: .5rem;
+    max-width: 20rem;
+    width: 100%;
+}
+
+button {
+    margin-top: 1.5rem;
+}
+
+/** Garden */
+
+.garden {
+    padding: 2rem;
+}
+
+.garden h2 {
+    font-size: 1rem;
+    margin: 0;
+    margin-left: 1.2rem;
+    display: inline-block;
+}
+
+.garden .toggle {
+    display: block;
+    position: absolute;
+    margin-top: .3rem;
+    width: 1rem;
+    margin-left: -.2rem;
+    transition: .1s;
+    user-select: none;
+    background: white;
+    padding: .2rem;
+}
+
+.garden .open .toggle {
+    transform: rotate(90deg);
+}
+
+.garden ul > li .remove {
+    display: none;
+    background: pink;
+    color: white;
+    font-size: .8rem;
+    border-radius: 10em;
+    padding: .3em;
     text-align: center;
-    padding-bottom: 3rem;
-    font-size: .6875rem;
-    color: #bbb;
-}
-footer a, footer a:hover, footer a:visited, footer a:focus, footer a:active {
-    color: #bbb;
-    text-decoration: underline;
+    line-height: .8em;
+    height: 1em;
+    width: 1em;
+    position: absolute;
+    margin-left: .5rem;
 }
 
-@media screen and (max-width: 40rem) {
-    .block-title .icon, .block-title .feed { display: none; }
+.garden .remove.open {
+    display: inline-block;
+}
+
+.garden ul > li:hover .remove:hover, ul > li:hover .remove:active {
+    text-decoration: none;
+    background: red;
+}
+
+.garden ol {
+    display: flex;
+    padding-left: 1.2rem;
+    list-style: none;
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
+.garden ol:after {
+    content: "";
+    background-image: linear-gradient(90deg, transparent, white);
+    position: absolute;
+    z-index: 999;
+    top: 0;
+    right: 0;
+    width: 5vw;
+    height: 100%;
+}
+
+.garden li.open ol {
+    flex-direction: column;
+    margin-top: .3rem;
+}
+
+.garden ol li {
+    white-space: nowrap;
+    margin: .5rem .5rem .5rem 0;
+}
+
+.garden li.open ol li {
+    margin: .2rem .5rem .2rem 0;
+}
+
+.garden li:not(.open) ol li:after {
+    content: '/';
+    color: #ddd;
+}
+
+.garden h3 {
+    font-size: 1rem;
+    font-weight: normal;
+    margin: 0;
+    display: inline-block;
+}
+
+.garden h3 a:visited {
+    color: #333;
+}
+
+.garden time {
+    color: #888;
+    font-size: .8rem;
 }

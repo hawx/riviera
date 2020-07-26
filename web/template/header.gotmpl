@@ -1,0 +1,37 @@
+<header>
+  <div>
+    <h1><a href="/">Riviera</a></h1>
+    <nav>
+      <ul>
+        {{ if eq .Page "river" }}
+          <li><span>River</span></li>
+          <li><a href="/garden">Garden</a></li>
+        {{ else }}
+          <li><a href="/river">River</a></li>
+          <li><span>Garden</span></li>
+        {{ end }}
+      </ul>
+    </nav>
+  </div>
+
+  <ul class="actions">
+    {{ if .SignedIn }}
+      <li><a data-toggle="add" href="#">add</a></li>
+      <li><a data-toggle="edit" href="#">edit</a></li>
+      <li><a href="/sign-out">Sign-out</a></li>
+    {{ else }}
+      <li><a href="/sign-in">Sign-in</a></li>
+    {{ end }}
+  </ul>
+</header>
+
+<form action="/add" method="post" data-toggled="add">
+  <input name="where" type="hidden" value="{{ .Page }}" />
+
+  <div>
+    <label for="url">URL</label>
+    <input name="url" id="url" type="text" />
+  </div>
+
+  <button type="submit">Add</button>
+</form>

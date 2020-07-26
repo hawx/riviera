@@ -7,33 +7,19 @@
     <link rel="stylesheet" href="/public/styles.css" />
   </head>
   <body>
-    <header>
-      <h1><a href="/">Riviera</a></h1>
-      <nav>
-        <ul>
-          <li>River</li>
-          <li><a href="/garden">Garden</a></li>
-          <li><a href="/sign-in">Sign-in</a></li>
-        </ul>
-      </nav>
-    </header>
+    {{ template "header.gotmpl" . }}
 
-    <div class="container">
-
-      <ul class="blocks">
+    <main class="river">
+      <ul>
         {{range .UpdatedFeeds.UpdatedFeeds}}
-          <li class="block">
-            <div class="block-title">
-              <h2>
-                <img class="icon" src="//www.google.com/s2/favicons?domain={{.WebsiteURL}}" alt="">
-                <a href="{{.WebsiteURL}}">{{.FeedTitle}}</a>
-                <span class="feed">(<a href="{{.FeedURL}}">Feed</a>)</span>
-              </h2>
+          <li>
+            <div>
+              <h2><a href="{{.WebsiteURL}}">{{.FeedTitle}}</a></h2>
               {{.WhenLastUpdate.HtmlFormat}}
             </div>
-            <ul class="items">
+            <ol>
               {{range .Items}}
-                <li class="item" id="{{.ID}}">
+                <li>
                   {{ if .Thumbnail }}
                     <details>
                       <summary>
@@ -50,14 +36,12 @@
                   {{ end }}
                 </li>
               {{end}}
-            </ul>
+            </ol>
           </li>
         {{end}}
       </ul>
-
-      <footer>
-        <a href="http://hawx.me/code/riviera">riviera</a>
-      </footer>
     </div>
+
+    <script src="/public/toggle.js"></script>
   </body>
 </html>
