@@ -39,12 +39,6 @@ type River interface {
 	Close() error
 }
 
-type Subs interface {
-	List() ([]string, error)
-	OnAdd(func(string))
-	OnRemove(func(string))
-}
-
 // Database is a key-value store with data arranged in buckets.
 type Database interface {
 	// Feed returns a database for storing known items from a named feed.
@@ -67,7 +61,7 @@ type river struct {
 }
 
 // New creates an empty river.
-func New(store Database, options Options, subs Subs) *river {
+func New(store Database, options Options) *river {
 	if options.Mapping == nil {
 		options.Mapping = DefaultOptions.Mapping
 	}
@@ -86,18 +80,6 @@ func New(store Database, options Options, subs Subs) *river {
 		cacheTimeout: options.Refresh,
 		mapping:      options.Mapping,
 	}
-
-	list, _ := subs.List()
-	for _, uri := range list {
-		g.Add(uri)
-	}
-
-	subs.OnAdd(func(uri string) {
-		g.Add(uri)
-	})
-	subs.OnRemove(func(uri string) {
-		g.Remove(uri)
-	})
 
 	return g
 }
@@ -142,16 +124,18 @@ func (r *river) Encode(w io.Writer) error {
 	})
 }
 
-func (r *river) Add(uri string) {
+func (r *river) Add(uri string) error {
 	feedStore, _ := r.store.Feed(uri)
 	tributary := tributary.New(feedStore, uri, r.cacheTimeout, r.mapping)
 	r.confluence.Add(tributary)
 
 	tributary.Start()
+	return nil
 }
 
-func (r *river) Remove(uri string) {
+func (r *river) Remove(uri string) error {
 	r.confluence.Remove(uri)
+	return nil
 }
 
 func (r *river) Log() []events.Event {

@@ -11,7 +11,7 @@ type ExecuteTemplate interface {
 	ExecuteTemplate(io.Writer, string, interface{}) error
 }
 
-type Map map[string]interface {
+type Map map[string][]interface {
 	Add(string) error
 	Remove(string) error
 }
@@ -29,13 +29,17 @@ func Handler(templates ExecuteTemplate, subsMap Map) http.HandlerFunc {
 			}
 
 			if action == "add" {
-				if err := subs.Add(uri); err != nil {
-					log.Println(err)
+				for _, sub := range subs {
+					if err := sub.Add(uri); err != nil {
+						log.Println(err)
+					}
 				}
 				log.Println("subscribed to", uri, "for", where)
 			} else if action == "remove" {
-				if err := subs.Remove(uri); err != nil {
-					log.Println(err)
+				for _, sub := range subs {
+					if err := sub.Remove(uri); err != nil {
+						log.Println(err)
+					}
 				}
 				log.Println("unsubscribed from", uri, "for", where)
 			}
@@ -70,8 +74,10 @@ func RemoveHandler(subsMap Map) http.HandlerFunc {
 			return
 		}
 
-		if err := subs.Remove(uri); err != nil {
-			log.Println(err)
+		for _, sub := range subs {
+			if err := sub.Remove(uri); err != nil {
+				log.Println(err)
+			}
 		}
 		log.Println("unsubscribed from", uri, "for", where)
 
@@ -90,8 +96,10 @@ func AddHandler(subsMap Map) http.HandlerFunc {
 			return
 		}
 
-		if err := subs.Add(uri); err != nil {
-			log.Println(err)
+		for _, sub := range subs {
+			if err := sub.Add(uri); err != nil {
+				log.Println(err)
+			}
 		}
 		log.Println("subscribed to", uri, "for", where)
 

@@ -45,13 +45,7 @@ type Database interface {
 	UpdateFeed(data.Feed) error
 }
 
-type Subs interface {
-	List() ([]string, error)
-	OnAdd(func(string))
-	OnRemove(func(string))
-}
-
-func New(store Database, options Options, subs Subs) *Garden {
+func New(store Database, options Options) *Garden {
 	if options.Size <= 0 {
 		options.Size = 10
 	}
@@ -65,18 +59,6 @@ func New(store Database, options Options, subs Subs) *Garden {
 		cacheTimeout: options.Refresh,
 		flowers:      map[string]*Flower{},
 	}
-
-	list, _ := subs.List()
-	for _, uri := range list {
-		g.Add(uri)
-	}
-
-	subs.OnAdd(func(uri string) {
-		g.Add(uri)
-	})
-	subs.OnRemove(func(uri string) {
-		g.Remove(uri)
-	})
 
 	return g
 }
@@ -149,17 +131,16 @@ func (g *Garden) Add(uri string) error {
 	return nil
 }
 
-func (g *Garden) Remove(uri string) bool {
+func (g *Garden) Remove(uri string) error {
 	g.mu.Lock()
 	defer g.mu.Unlock()
 
 	if flower, exists := g.flowers[uri]; exists {
 		flower.Stop()
 		delete(g.flowers, uri)
-		return true
 	}
 
-	return false
+	return nil
 }
 
 func (g *Garden) Close() error {

@@ -5,7 +5,6 @@ import (
 	"flag"
 	"fmt"
 	"html/template"
-	"io"
 	"log"
 	"math"
 	"net/http"
@@ -13,10 +12,9 @@ import (
 	"sync"
 	"time"
 
-	fsnotify "gopkg.in/fsnotify.v1"
 	"hawx.me/code/indieauth"
 	"hawx.me/code/indieauth/sessions"
-	data2 "hawx.me/code/riviera/data"
+	"hawx.me/code/riviera/data"
 	"hawx.me/code/riviera/garden"
 	"hawx.me/code/riviera/river"
 	"hawx.me/code/riviera/river/mapping"
@@ -64,8 +62,7 @@ var (
 	cutOff  = flag.String("cutoff", "-24h", "")
 	refresh = flag.String("refresh", "15m", "")
 
-	boltdbPath = flag.String("boltdb", "", "")
-	dbPath     = flag.String("db", "", "")
+	dbPath = flag.String("db", "", "")
 
 	url    = flag.String("url", "http://localhost:8080", "")
 	secret = flag.String("secret", "GpgGqpnfFkpjgXj7u3RCdKkoOf/tQqbHkOuuys90Ds4=", "")
@@ -76,28 +73,18 @@ var (
 	socket  = flag.String("socket", "", "")
 )
 
-func watchFile(path string, f func()) (io.Closer, error) {
-	watcher, err := fsnotify.NewWatcher()
+func addSubs(from interface{ List() ([]string, error) }, to interface{ Add(string) error }) error {
+	subs, err := from.List()
 	if err != nil {
-		return watcher, err
+		return err
 	}
 
-	go func() {
-		for {
-			select {
-			case event := <-watcher.Events:
-				if event.Op&fsnotify.Write == fsnotify.Write {
-					f()
-				}
-			case err := <-watcher.Errors:
-				if err != nil {
-					log.Printf("error watching %s: %v", path, err)
-				}
-			}
+	for _, sub := range subs {
+		if err := to.Add(sub); err != nil {
+			log.Println(err)
 		}
-	}()
-
-	return watcher, watcher.Add(path)
+	}
+	return nil
 }
 
 func main() {
@@ -133,7 +120,7 @@ func main() {
 	}
 
 	log.Println("opening db at", *dbPath)
-	db, err := data2.Open(*dbPath)
+	db, err := data.Open(*dbPath)
 	if err != nil {
 		log.Println(err)
 		return
@@ -152,18 +139,28 @@ func main() {
 		return
 	}
 
-	riverSubs := db.Subscriptions("river")
 	feeds := river.New(db, river.Options{
 		Mapping:   mapping.DefaultMapping,
 		CutOff:    duration,
 		Refresh:   cacheTimeout,
 		LogLength: 500,
-	}, riverSubs)
+	})
 	defer waitFor("feeds", feeds.Close)
 
-	gardenSubs := db.Subscriptions("garden")
-	garden := garden.New(db, garden.Options{}, gardenSubs)
+	riverSubs := db.Subscriptions("river")
+	if err = addSubs(riverSubs, feeds); err != nil {
+		log.Println(err)
+		return
+	}
+
+	garden := garden.New(db, garden.Options{})
 	defer waitFor("garden", garden.Close)
+
+	gardenSubs := db.Subscriptions("garden")
+	if err = addSubs(gardenSubs, garden); err != nil {
+		log.Println(err)
+		return
+	}
 
 	templates, err := template.New("").Funcs(map[string]interface{}{
 		"ago": func(t time.Time) string {
@@ -224,15 +221,15 @@ func main() {
 
 	http.HandleFunc("/remove", session.Shield(
 		subscriptions.RemoveHandler(subscriptions.Map{
-			"river":  riverSubs,
-			"garden": gardenSubs,
+			"river":  {riverSubs, feeds},
+			"garden": {gardenSubs, garden},
 		}),
 	))
 
 	http.HandleFunc("/add", session.Shield(
 		subscriptions.AddHandler(subscriptions.Map{
-			"river":  riverSubs,
-			"garden": gardenSubs,
+			"river":  {riverSubs, feeds},
+			"garden": {gardenSubs, garden},
 		}),
 	))
 
