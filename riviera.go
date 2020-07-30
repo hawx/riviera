@@ -9,7 +9,6 @@ import (
 	"math"
 	"net/http"
 	"strings"
-	"sync"
 	"time"
 
 	"hawx.me/code/indieauth"
@@ -47,8 +46,8 @@ func printHelp() {
  DATA
    By default riviera runs with an in memory database.
 
-   --boltdb PATH
-      Use the boltdb file at the given path.
+   --db PATH
+      Use the sqlitedb file at the given path.
 
  SERVE
    --port PORT='8080'
@@ -62,7 +61,7 @@ var (
 	cutOff  = flag.String("cutoff", "-24h", "")
 	refresh = flag.String("refresh", "15m", "")
 
-	dbPath = flag.String("db", "", "")
+	dbPath = flag.String("db", ":memory:", "")
 
 	url    = flag.String("url", "http://localhost:8080", "")
 	secret = flag.String("secret", "GpgGqpnfFkpjgXj7u3RCdKkoOf/tQqbHkOuuys90Ds4=", "")
@@ -87,82 +86,8 @@ func addSubs(from interface{ List() ([]string, error) }, to interface{ Add(strin
 	return nil
 }
 
-func main() {
-	flag.Usage = func() { printHelp() }
-	flag.Parse()
-
-	if flag.NArg() == 0 {
-		printHelp()
-		return
-	}
-
-	auth, err := indieauth.Authentication(*url, *url+"/callback")
-	if err != nil {
-		log.Println(err)
-		return
-	}
-
-	session, err := sessions.New(*me, *secret, auth)
-	if err != nil {
-		log.Println(err)
-		return
-	}
-
-	var wg sync.WaitGroup
-	waitFor := func(name string, f func() error) {
-		log.Println(name, "waiting to close")
-		wg.Add(1)
-		if err := f(); err != nil {
-			log.Println("waitFor:", err)
-		}
-		wg.Done()
-		log.Println(name, "closed")
-	}
-
-	log.Println("opening db at", *dbPath)
-	db, err := data.Open(*dbPath)
-	if err != nil {
-		log.Println(err)
-		return
-	}
-	defer waitFor("db", db.Close)
-
-	duration, err := time.ParseDuration(*cutOff)
-	if err != nil {
-		log.Println(err)
-		return
-	}
-
-	cacheTimeout, err := time.ParseDuration(*refresh)
-	if err != nil {
-		log.Println(err)
-		return
-	}
-
-	feeds := river.New(db, river.Options{
-		Mapping:   mapping.DefaultMapping,
-		CutOff:    duration,
-		Refresh:   cacheTimeout,
-		LogLength: 500,
-	})
-	defer waitFor("feeds", feeds.Close)
-
-	riverSubs := db.Subscriptions("river")
-	if err = addSubs(riverSubs, feeds); err != nil {
-		log.Println(err)
-		return
-	}
-
-	garden := garden.New(db, garden.Options{})
-	defer waitFor("garden", garden.Close)
-
-	gardenSubs := db.Subscriptions("garden")
-	if err = addSubs(gardenSubs, garden); err != nil {
-		log.Println(err)
-		return
-	}
-
-	templates, err := template.New("").Funcs(map[string]interface{}{
+func parseTemplates() (*template.Template, error) {
+	return template.New("").Funcs(map[string]interface{}{
 		"ago": func(t time.Time) string {
 			dur := time.Now().Sub(t)
 			if dur < time.Minute {
@@ -201,6 +126,68 @@ func main() {
 			return line[:len(line)-1] + "…"
 		},
 	}).ParseGlob(*webPath + "/template/*.gotmpl")
+}
+
+func main() {
+	flag.Usage = func() { printHelp() }
+	flag.Parse()
+
+	auth, err := indieauth.Authentication(*url, *url+"/callback")
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	session, err := sessions.New(*me, *secret, auth)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	duration, err := time.ParseDuration(*cutOff)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	cacheTimeout, err := time.ParseDuration(*refresh)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	log.Println("opening db at", *dbPath)
+	db, err := data.Open(*dbPath)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	defer db.Close()
+
+	feeds := river.New(db, river.Options{
+		Mapping:   mapping.DefaultMapping,
+		CutOff:    duration,
+		Refresh:   cacheTimeout,
+		LogLength: 500,
+	})
+	defer feeds.Close()
+
+	riverSubs := db.Subscriptions("river")
+	if err = addSubs(riverSubs, feeds); err != nil {
+		log.Println(err)
+		return
+	}
+
+	garden := garden.New(db, garden.Options{})
+	defer garden.Close()
+
+	gardenSubs := db.Subscriptions("garden")
+	if err = addSubs(gardenSubs, garden); err != nil {
+		log.Println(err)
+		return
+	}
+
+	templates, err := parseTemplates()
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -238,5 +225,4 @@ func main() {
 	http.HandleFunc("/sign-out", session.SignOut())
 
 	serve.Serve(*port, *socket, http.DefaultServeMux)
-	wg.Wait()
 }
