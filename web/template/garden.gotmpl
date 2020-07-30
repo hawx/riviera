@@ -12,11 +12,12 @@
     <main class="garden">
       <ul>
         {{ range .Feeds }}
-          <li data-toggled="{{ .WebsiteURL }}">
+          <li data-toggled="{{ .URL }}">
+            <a data-toggled="edit" href="/remove?where=garden&url={{ .URL }}" class="remove">🞪</a>
             <h2><a href="{{ .WebsiteURL }}">{{ .Title }}</a></h2>
             <time datetime="{{ .UpdatedAt }}">{{ ago .UpdatedAt }}</time>
-            <span class="toggle" data-toggle="{{ .WebsiteURL }}">∴</span>
-            <a data-toggled="edit" href="/remove?where=garden&url={{ .URL }}" class="remove">🞪</a>
+            <code data-toggled="edit">&lt;{{ .URL }}&gt;</code>
+            <span class="toggle" data-toggle="{{ .URL }}">∴</span>
             <ol>
               {{ range .Items }}
                 <li>

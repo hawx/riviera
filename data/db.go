@@ -46,10 +46,9 @@ func (d *DB) migrate() error {
       Description TEXT,
       UpdatedAt   DATETIME
     );
-    CREATE UNIQUE INDEX IF NOT EXISTS idx_feeds_feedurl ON feeds (FeedURL);
 
     CREATE TABLE IF NOT EXISTS feedItems (
-      Key       TEXT PRIMARY KEY,
+      Key       TEXT,
       FeedURL   TEXT,
       PermaLink TEXT,
       PubDate   DATETIME,
@@ -57,7 +56,8 @@ func (d *DB) migrate() error {
       Link      TEXT,
       Body      TEXT,
       ID        TEXT,
-      Comments  TEXT
+      Comments  TEXT,
+      PRIMARY KEY (Key, FeedURL)
     );
 
     CREATE TABLE IF NOT EXISTS enclosures (
@@ -74,10 +74,6 @@ func (d *DB) migrate() error {
       URL     TEXT,
       Height  INTEGER,
       Width   INTEGER
-    );
-
-    CREATE TABLE IF NOT EXISTS riverFeeds (
-      FeedURL     TEXT PRIMARY KEY
     );
 
     CREATE TABLE IF NOT EXISTS feedFetches (
@@ -102,6 +98,9 @@ func (d *DB) Read(uri string) (feed Feed, err error) {
 
 	feed.FeedURL = uri
 	if err = row.Scan(&feed.WebsiteURL, &feed.Title, &feed.Description, &feed.UpdatedAt); err != nil {
+		if err == sql.ErrNoRows {
+			return feed, nil
+		}
 		return feed, fmt.Errorf("scanning feed row: %w", err)
 	}
 
@@ -199,9 +198,9 @@ func (d *DB) UpdateFeed(feed Feed) (err error) {
 	return nil
 }
 
-func (d *DB) Contains(key string) bool {
+func (d *DB) Contains(uri, key string) bool {
 	var v int
-	err := d.db.QueryRow("SELECT 1 FROM feedItems WHERE Key = ?", key).Scan(&v)
+	err := d.db.QueryRow("SELECT 1 FROM feedItems WHERE FeedURL = ? AND Key = ?", uri, key).Scan(&v)
 
 	if err != nil {
 		if err != sql.ErrNoRows {

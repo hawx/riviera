@@ -25,6 +25,15 @@ type Flower struct {
 	items gardenjs.Feed
 }
 
+type dbWrapper struct {
+	db  Database
+	uri string
+}
+
+func (d *dbWrapper) Contains(key string) bool {
+	return d.db.Contains(d.uri, key)
+}
+
 func NewFlower(db Database, cacheTimeout time.Duration, uri string, size int) (*Flower, error) {
 	parsedURI, err := url.Parse(uri)
 	if err != nil {
@@ -39,7 +48,7 @@ func NewFlower(db Database, cacheTimeout time.Duration, uri string, size int) (*
 		db:     db,
 	}
 
-	f.feed = feed.New(cacheTimeout, f.itemHandler, db)
+	f.feed = feed.New(cacheTimeout, f.itemHandler, &dbWrapper{db: db, uri: uri})
 
 	return f, nil
 }

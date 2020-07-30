@@ -173,6 +173,19 @@ button {
 
 .garden {
     padding: 2rem;
+    font-size: .8rem;
+}
+
+.garden code {
+    display: none;
+    margin: 0 1rem;
+    color: firebrick;
+    float: right;
+    margin-right: 5vw;
+}
+
+.garden code.open {
+    display: inline-block;
 }
 
 .garden h2 {
@@ -198,6 +211,10 @@ button {
     transform: rotate(90deg);
 }
 
+.garden ul > li {
+    margin: 1rem 0;
+}
+
 .garden ul > li .remove {
     display: none;
     background: pink;
@@ -206,11 +223,11 @@ button {
     border-radius: 10em;
     padding: .3em;
     text-align: center;
-    line-height: .8em;
+    line-height: .8rem;
     height: 1em;
     width: 1em;
+    margin-left: -.5rem;
     position: absolute;
-    margin-left: .5rem;
 }
 
 .garden .remove.open {

@@ -4,8 +4,8 @@ for (let toggle of toggles) {
     const attr = toggle.getAttribute('data-toggle');
     
     toggle.addEventListener('click', () => {
-        const el = document.querySelector("[data-toggled='" + attr + "']");
+        const els = document.querySelectorAll("[data-toggled='" + attr + "']");
 
-        el.classList.toggle('open');
+        els.forEach(el => el.classList.toggle('open'));
     });
 }

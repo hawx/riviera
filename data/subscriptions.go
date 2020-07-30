@@ -12,7 +12,7 @@ func (d *DB) Subscriptions(name string) *subscriptionsDB {
 }
 
 func (d *subscriptionsDB) Add(uri string) error {
-	_, err := d.db.Exec("INSERT INTO subscriptions (FeedURL, Name) VALUES (?, ?)",
+	_, err := d.db.Exec("INSERT OR IGNORE INTO subscriptions (FeedURL, Name) VALUES (?, ?)",
 		uri,
 		d.name)
 

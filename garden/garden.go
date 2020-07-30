@@ -40,7 +40,7 @@ type Garden struct {
 }
 
 type Database interface {
-	Contains(key string) bool
+	Contains(uri, key string) bool
 	Read(uri string) (data.Feed, error)
 	UpdateFeed(data.Feed) error
 }
