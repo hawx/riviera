@@ -198,7 +198,7 @@ button {
 .garden .toggle {
     display: block;
     position: absolute;
-    margin-top: .3rem;
+    margin-top: .5rem;
     width: 1rem;
     margin-left: -.2rem;
     transition: .1s;
@@ -227,7 +227,9 @@ button {
     height: 1em;
     width: 1em;
     margin-left: -.5rem;
+    margin-top: -3px;
     position: absolute;
+    right: 5rem;
 }
 
 .garden .remove.open {
