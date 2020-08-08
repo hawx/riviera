@@ -9,3 +9,5 @@ for (let toggle of toggles) {
         els.forEach(el => el.classList.toggle('open'));
     });
 }
+
+document.body.classList.add('script');

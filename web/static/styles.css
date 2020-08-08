@@ -306,3 +306,8 @@ w}
     color: #888;
     font-size: .8rem;
 }
+
+/* Noscript */
+body:not(.script) .actions {
+    display: none;
+}
