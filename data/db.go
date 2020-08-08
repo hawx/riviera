@@ -117,9 +117,7 @@ func (d *DB) Read(uri string) (feed Feed, err error) {
 			return feed, fmt.Errorf("scanning feedItems row: %w", err)
 		}
 
-		// and enclosures
-		// and thumbnails
-
+		// TODO: enclosures and thumbnails
 		feed.Items = append(feed.Items, item)
 	}
 

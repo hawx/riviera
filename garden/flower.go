@@ -115,14 +115,9 @@ func (f *Flower) itemHandler(feed *feed.Feed, ch *common.Channel, newitems []*co
 	feedURL := f.uri.String()
 	websiteURL := ""
 	for _, link := range ch.Links {
-		if feedURL != "" && websiteURL != "" {
-			break
-		}
-
-		if link.Rel == "self" {
-			feedURL = maybeResolvedLink(f.uri, link.Href)
-		} else {
+		if link.Rel != "self" {
 			websiteURL = maybeResolvedLink(f.uri, link.Href)
+			break
 		}
 	}
 
