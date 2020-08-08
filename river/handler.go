@@ -1,52 +1,33 @@
 package river
 
 import (
-	"encoding/json"
-	"fmt"
+	"io"
 	"log"
 	"net/http"
-	"strings"
+
+	"hawx.me/code/riviera/river/riverjs"
 )
 
-// DefaultCallback is the name of the callback to use in the jsonp response.
-const DefaultCallback = "onGetRiverStream"
-
-type riverHandler struct {
-	River
+type ExecuteTemplate interface {
+	ExecuteTemplate(io.Writer, string, interface{}) error
 }
 
-// Handler returns a http.Handler that serves the river.
-//
-//   /        the riverjs feed wrapped in the DefaultCallback
-//   /log     the event log from fetching feeds
-func Handler(feeds River) http.Handler {
-	return riverHandler{feeds}
-}
+func (river *river) Handler(templates ExecuteTemplate, signedIn bool) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		latest := river.Latest()
 
-// ServeHTTP satisfies the http.Handler interface.
-func (h riverHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	if strings.ToUpper(r.Method) != "GET" {
-		w.Header().Set("Accept", "GET")
-		w.WriteHeader(http.StatusMethodNotAllowed)
-		return
-	}
-
-	switch r.URL.Path {
-	case "/":
-		w.Header().Set("Content-Type", "application/javascript")
-		fmt.Fprintf(w, "%s(", DefaultCallback)
-		if err := h.Encode(w); err != nil {
-			log.Println("/:", err)
-		}
-		fmt.Fprintf(w, ")")
-
-	case "/log":
-		w.Header().Set("Content-Type", "application/json")
-		if err := json.NewEncoder(w).Encode(h.Log()); err != nil {
-			log.Println("/log:", err)
+		type riverCtx struct {
+			UpdatedFeeds riverjs.Feeds
+			Page         string
+			SignedIn     bool
 		}
 
-	default:
-		http.NotFound(w, r)
+		if err := templates.ExecuteTemplate(w, "river.gotmpl", riverCtx{
+			UpdatedFeeds: latest.UpdatedFeeds,
+			Page:         "river",
+			SignedIn:     signedIn,
+		}); err != nil {
+			log.Println("/river:", err)
+		}
 	}
 }

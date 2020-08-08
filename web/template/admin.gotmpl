@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title></title>
+    <link rel="stylesheet" href="/public/garden.css" type="text/css" />
+  </head>
+  <body>
+    <header>
+      <h1><a href="/">Riviera</a></h1>
+      <nav>
+        <ul>
+          <li><a href="/river">River</a></li>
+          <li><a href="/garden">Garden</a></li>
+          <li>Add</li>
+          <li><a href="/sign-out">Sign-out</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <main>
+      <form method="post" action="/admin">
+        <h2>Add a new feed</h2>
+      
+        <input name="action" type="hidden" value="add"/>
+
+        <div>
+          <label for="url">URL</label>
+          <input name="url" id="url" type="text" />
+        </div>
+
+        <p>Display on</p>
+        {{ range .Places }}
+          <div>
+            <input type="radio" name="where" id="{{ . }}" value="{{ . }}" />
+            <label for="{{ . }}">{{ . }}</label>
+          </div>
+        {{ end }}
+
+        <button type="submit">Add</button>
+      </form>
+    </main>
+  </body>
+</html>

@@ -1,6 +1,9 @@
 package riverjs
 
-import "time"
+import (
+	"html/template"
+	"time"
+)
 
 func Time(t time.Time) RssTime {
 	return RssTime{t}
@@ -36,4 +39,10 @@ func (t *RssTime) UnmarshalJSON(data []byte) error {
 	}
 	*t = RssTime{g}
 	return nil
+}
+
+func (t *RssTime) HtmlFormat() template.HTML {
+	return template.HTML("<time pubdate=\"" + t.Format(time.RFC3339) + "\">" +
+		t.Format("02 Jan; 15:04 PM") +
+		"</time>")
 }

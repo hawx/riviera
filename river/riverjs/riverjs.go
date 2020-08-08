@@ -3,6 +3,8 @@
 // Commentary for the types in this package is copied from http://riverjs.org.
 package riverjs
 
+import "strings"
+
 type River struct {
 	UpdatedFeeds Feeds    `json:"updatedFeeds"`
 	Metadata     Metadata `json:"metadata"`
@@ -55,6 +57,17 @@ type Item struct {
 	// Thumbnail has three sub-elements, url that points to the full image, and
 	// width and height which give the size of the thumbnail.
 	Thumbnail *Thumbnail `json:"thumbnail,omitempty"`
+}
+
+func (r Item) FilteredBody() string {
+	r.Body = strings.TrimSpace(r.Body)
+
+	if strings.HasPrefix(r.Body, "&amp;lt;") ||
+		strings.HasPrefix(r.Body, "var gaJsHost") {
+		return ""
+	}
+
+	return r.Body
 }
 
 type Enclosure struct {

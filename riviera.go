@@ -4,17 +4,17 @@ package main
 import (
 	"flag"
 	"fmt"
-	"io"
+	"html/template"
 	"log"
+	"math"
 	"net/http"
-	"sync"
 	"time"
 
-	fsnotify "gopkg.in/fsnotify.v1"
+	"hawx.me/code/indieauth"
+	"hawx.me/code/indieauth/sessions"
+	"hawx.me/code/riviera/data"
+	"hawx.me/code/riviera/garden"
 	"hawx.me/code/riviera/river"
-	"hawx.me/code/riviera/river/data"
-	"hawx.me/code/riviera/river/data/boltdata"
-	"hawx.me/code/riviera/river/data/memdata"
 	"hawx.me/code/riviera/river/mapping"
 	"hawx.me/code/riviera/subscriptions"
 	"hawx.me/code/riviera/subscriptions/opml"
@@ -46,8 +46,8 @@ func printHelp() {
  DATA
    By default riviera runs with an in memory database.
 
-   --boltdb PATH
-      Use the boltdb file at the given path.
+   --db PATH
+      Use the sqlitedb file at the given path.
 
  SERVE
    --port PORT='8080'
@@ -61,65 +61,110 @@ var (
 	cutOff  = flag.String("cutoff", "-24h", "")
 	refresh = flag.String("refresh", "15m", "")
 
-	boltdbPath = flag.String("boltdb", "", "")
+	dbPath = flag.String("db", ":memory:", "")
 
-	port   = flag.String("port", "8080", "")
-	socket = flag.String("socket", "", "")
+	url    = flag.String("url", "http://localhost:8080", "")
+	secret = flag.String("secret", "GpgGqpnfFkpjgXj7u3RCdKkoOf/tQqbHkOuuys90Ds4=", "")
+	me     = flag.String("me", "", "")
+
+	webPath = flag.String("web", "web", "")
+	port    = flag.String("port", "8080", "")
+	socket  = flag.String("socket", "", "")
 )
 
-func loadDatastore() (data.Database, error) {
-	if *boltdbPath != "" {
-		return boltdata.Open(*boltdbPath)
+func addSubs(from interface{ List() ([]string, error) }, to interface{ Add(string) error }) error {
+	subs, err := from.List()
+	if err != nil {
+		return err
 	}
 
-	return memdata.Open(), nil
+	for _, sub := range subs {
+		if err := to.Add(sub); err != nil {
+			log.Println(err)
+		}
+	}
+	return nil
 }
 
-func watchFile(path string, f func()) (io.Closer, error) {
-	watcher, err := fsnotify.NewWatcher()
+func parseTemplates() (*template.Template, error) {
+	return template.New("").Funcs(map[string]interface{}{
+		"ago": func(t time.Time) string {
+			dur := time.Now().Sub(t)
+			if dur < time.Minute {
+				return fmt.Sprintf("%vs", math.Ceil(dur.Seconds()))
+			}
+			if dur < time.Hour {
+				return fmt.Sprintf("%vm", math.Ceil(dur.Minutes()))
+			}
+			if dur < 24*time.Hour {
+				return fmt.Sprintf("%vh", math.Ceil(dur.Hours()))
+			}
+			if dur < 31*24*time.Hour {
+				return fmt.Sprintf("%vd", math.Ceil(dur.Hours()/24))
+			}
+			if dur < 365*24*time.Hour {
+				return fmt.Sprintf("%vM", math.Ceil(dur.Hours()/24/31))
+			}
+
+			return fmt.Sprintf("%vY", math.Ceil(dur.Hours()/24/365))
+		},
+	}).ParseGlob(*webPath + "/template/*.gotmpl")
+}
+
+func importOpml(path string) (int, error) {
+	doc, err := opml.Load(path)
 	if err != nil {
-		return watcher, err
+		return 0, err
 	}
 
-	go func() {
-		for {
-			select {
-			case event := <-watcher.Events:
-				if event.Op&fsnotify.Write == fsnotify.Write {
-					f()
-				}
-			case err := <-watcher.Errors:
-				if err != nil {
-					log.Printf("error watching %s: %v", path, err)
-				}
-			}
-		}
-	}()
+	log.Println("opening db at", *dbPath)
+	db, err := data.Open(*dbPath)
+	if err != nil {
+		return 0, err
+	}
+	defer db.Close()
 
-	return watcher, watcher.Add(path)
+	riverSubs := db.Subscriptions("river")
+	oks := 0
+	for _, item := range doc.Body.Outline {
+		if err := riverSubs.Add(item.XMLURL); err != nil {
+			log.Printf("error adding %s: %v\n", item.XMLURL, err)
+		} else {
+			oks++
+		}
+	}
+
+	return oks, nil
 }
 
 func main() {
 	flag.Usage = func() { printHelp() }
 	flag.Parse()
 
-	if flag.NArg() == 0 {
-		printHelp()
+	if flag.Arg(0) == "import" {
+		file := flag.Arg(1)
+		fmt.Println("importing ", file)
+
+		n, err := importOpml(file)
+		if err != nil {
+			log.Println(err)
+		} else {
+			log.Println("added", n)
+		}
 		return
 	}
 
-	var wg sync.WaitGroup
-	waitFor := func(name string, f func() error) {
-		log.Println(name, "waiting to close")
-		wg.Add(1)
-		if err := f(); err != nil {
-			log.Println("waitFor:", err)
-		}
-		wg.Done()
-		log.Println(name, "closed")
+	auth, err := indieauth.Authentication(*url, *url+"/callback")
+	if err != nil {
+		log.Println(err)
+		return
 	}
 
-	opmlPath := flag.Arg(0)
+	session, err := sessions.New(*me, *secret, auth)
+	if err != nil {
+		log.Println(err)
+		return
+	}
 
 	duration, err := time.ParseDuration(*cutOff)
 	if err != nil {
@@ -133,57 +178,73 @@ func main() {
 		return
 	}
 
-	store, err := loadDatastore()
+	log.Println("opening db at", *dbPath)
+	db, err := data.Open(*dbPath)
 	if err != nil {
 		log.Println(err)
 		return
 	}
-	defer waitFor("datastore", store.Close)
+	defer db.Close()
 
-	outline, err := opml.Load(opmlPath)
-	if err != nil {
-		log.Println(err)
-		return
-	}
-
-	feeds := river.New(store, river.Options{
+	feeds := river.New(db, river.Options{
 		Mapping:   mapping.DefaultMapping,
 		CutOff:    duration,
 		Refresh:   cacheTimeout,
 		LogLength: 500,
 	})
-	defer waitFor("feeds", feeds.Close)
+	defer feeds.Close()
 
-	subs := subscriptions.FromOpml(outline)
-	for _, sub := range subs.List() {
-		feeds.Add(sub.URI)
+	riverSubs := db.Subscriptions("river")
+	if err = addSubs(riverSubs, feeds); err != nil {
+		log.Println(err)
+		return
 	}
 
-	watcher, err := watchFile(opmlPath, func() {
-		log.Printf("reading %s\n", opmlPath)
-		outline, err := opml.Load(opmlPath)
-		if err != nil {
-			log.Printf("could not read %s: %s\n", opmlPath, err)
-			return
-		}
+	garden := garden.New(db, garden.Options{})
+	defer garden.Close()
 
-		added, removed := subscriptions.Diff(subs, subscriptions.FromOpml(outline))
-		for _, uri := range added {
-			feeds.Add(uri)
-			subs.Add(uri)
-		}
-		for _, uri := range removed {
-			feeds.Remove(uri)
-			subs.Remove(uri)
-		}
-	})
+	gardenSubs := db.Subscriptions("garden")
+	if err = addSubs(gardenSubs, garden); err != nil {
+		log.Println(err)
+		return
+	}
+
+	templates, err := parseTemplates()
 	if err != nil {
-		log.Printf("could not start watching %s: %v\n", opmlPath, err)
+		fmt.Println(err)
+		return
 	}
-	defer waitFor("watcher", watcher.Close)
 
-	http.Handle("/river/", http.StripPrefix("/river", river.Handler(feeds)))
+	http.Handle("/", http.RedirectHandler("/river", http.StatusFound))
+
+	http.Handle("/public/", http.StripPrefix("/public",
+		http.FileServer(http.Dir(*webPath+"/static"))))
+
+	http.HandleFunc("/river", session.Choose(
+		feeds.Handler(templates, true),
+		feeds.Handler(templates, false)))
+
+	http.HandleFunc("/garden", session.Choose(
+		garden.Handler(templates, true),
+		garden.Handler(templates, false)))
+
+	http.HandleFunc("/remove", session.Shield(
+		subscriptions.RemoveHandler(subscriptions.Map{
+			"river":  {riverSubs, feeds},
+			"garden": {gardenSubs, garden},
+		}),
+	))
+
+	http.HandleFunc("/add", session.Shield(
+		subscriptions.AddHandler(subscriptions.Map{
+			"river":  {riverSubs, feeds},
+			"garden": {gardenSubs, garden},
+		}),
+	))
+
+	http.HandleFunc("/sign-in", session.SignIn())
+	http.HandleFunc("/callback", session.Callback())
+	http.HandleFunc("/sign-out", session.SignOut())
 
 	serve.Serve(*port, *socket, http.DefaultServeMux)
-	wg.Wait()
 }

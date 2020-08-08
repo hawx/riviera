@@ -87,7 +87,9 @@ func (f *Feed) Fetch(uri string, client *http.Client, charset func(charset strin
 	}
 
 	req.Header.Set("User-Agent", userAgent)
-	req.Header.Set("If-Modified-Since", f.lastupdate.Format(time.RFC1123))
+	if !f.lastupdate.IsZero() {
+		req.Header.Set("If-Modified-Since", f.lastupdate.Format(time.RFC1123))
+	}
 	if f.eTag != "" {
 		req.Header.Set("If-None-Match", f.eTag)
 	}

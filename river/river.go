@@ -8,8 +8,8 @@ import (
 	"io"
 	"time"
 
+	"hawx.me/code/riviera/feed"
 	"hawx.me/code/riviera/river/confluence"
-	"hawx.me/code/riviera/river/data"
 	"hawx.me/code/riviera/river/events"
 	"hawx.me/code/riviera/river/mapping"
 	"hawx.me/code/riviera/river/riverjs"
@@ -24,6 +24,8 @@ type River interface {
 	// a javascript callback function.
 	Encode(w io.Writer) error
 
+	Latest() riverjs.River
+
 	// Log returns a list of fetch events.
 	Log() []events.Event
 
@@ -37,17 +39,29 @@ type River interface {
 	Close() error
 }
 
+// Database is a key-value store with data arranged in buckets.
+type Database interface {
+	// Feed returns a database for storing known items from a named feed.
+	Feed(name string) (feed.Database, error)
+
+	// Confluence returns a database for storing past rivers.
+	Confluence() confluence.Database
+
+	// Close releases all database resources.
+	Close() error
+}
+
 // river acts as the top-level factory. It manages the creation of the initial
 // confluence and creating new tributaries to add to it.
 type river struct {
 	confluence   confluence.Confluence
-	store        data.Database
+	store        Database
 	cacheTimeout time.Duration
 	mapping      mapping.Mapping
 }
 
 // New creates an empty river.
-func New(store data.Database, options Options) River {
+func New(store Database, options Options) *river {
 	if options.Mapping == nil {
 		options.Mapping = DefaultOptions.Mapping
 	}
@@ -58,12 +72,35 @@ func New(store data.Database, options Options) River {
 		options.Refresh = DefaultOptions.Refresh
 	}
 
-	confluenceStore, _ := store.Confluence()
-	return &river{
+	confluenceStore := store.Confluence()
+
+	g := &river{
 		confluence:   confluence.New(confluenceStore, options.CutOff, options.LogLength),
 		store:        store,
 		cacheTimeout: options.Refresh,
 		mapping:      options.Mapping,
+	}
+
+	return g
+}
+
+func (r *river) Latest() riverjs.River {
+	updatedFeeds := riverjs.Feeds{
+		UpdatedFeeds: r.confluence.Latest(),
+	}
+
+	now := time.Now()
+	metadata := riverjs.Metadata{
+		Docs:      docsPath,
+		WhenGMT:   riverjs.Time(now.UTC()),
+		WhenLocal: riverjs.Time(now),
+		Version:   "3",
+		Secs:      0,
+	}
+
+	return riverjs.River{
+		Metadata:     metadata,
+		UpdatedFeeds: updatedFeeds,
 	}
 }
 
@@ -87,16 +124,18 @@ func (r *river) Encode(w io.Writer) error {
 	})
 }
 
-func (r *river) Add(uri string) {
+func (r *river) Add(uri string) error {
 	feedStore, _ := r.store.Feed(uri)
 	tributary := tributary.New(feedStore, uri, r.cacheTimeout, r.mapping)
 	r.confluence.Add(tributary)
 
 	tributary.Start()
+	return nil
 }
 
-func (r *river) Remove(uri string) {
+func (r *river) Remove(uri string) error {
 	r.confluence.Remove(uri)
+	return nil
 }
 
 func (r *river) Log() []events.Event {

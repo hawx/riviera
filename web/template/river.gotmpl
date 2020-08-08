@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Riviera</title>
+    <link rel="stylesheet" href="/public/styles.css" />
+  </head>
+  <body>
+    {{ template "header.gotmpl" . }}
+
+    <main class="river">
+      <ul>
+        {{range .UpdatedFeeds.UpdatedFeeds}}
+          <li>
+            <div>
+              <h2><a href="{{.WebsiteURL}}">{{.FeedTitle}}</a></h2>
+              {{.WhenLastUpdate.HtmlFormat}}
+            </div>
+            <ol>
+              {{range .Items}}
+                <li>
+                  {{ if .Thumbnail }}
+                    <details>
+                      <summary>
+                        <h3><a rel="external" href="{{.Link}}">{{.Title}}</a></h3>
+                      </summary>
+                      <img src="{{.Thumbnail.URL}}" />
+                    </details>
+                    <p>{{.FilteredBody}}</p>
+                    <a class="timea" rel="external" href="{{.Link}}">{{.PubDate.HtmlFormat}}</a>
+                  {{ else }}
+                    <h3><a rel="external" href="{{.Link}}">{{.Title}}</a></h3>
+                    <p>{{.FilteredBody}}</p>
+                    <a class="timea" rel="external" href="{{.Link}}">{{.PubDate.HtmlFormat}}</a>
+                  {{ end }}
+                </li>
+              {{end}}
+            </ol>
+          </li>
+        {{end}}
+      </ul>
+    </div>
+
+    <script src="/public/toggle.js"></script>
+  </body>
+</html>

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Riviera</title>
+    <link rel="stylesheet" href="/public/styles.css" type="text/css" />
+  </head>
+  <body>
+    {{ template "header.gotmpl" . }}
+    
+    <main class="garden">
+      <ul>
+        {{ range .Feeds }}
+          <li data-toggled="{{ .URL }}">
+            <a data-toggled="edit" href="/remove?where=garden&url={{ .URL }}" class="remove">🞪</a>
+            <h2><a href="{{ .WebsiteURL }}">{{ .Title }}</a></h2>
+            <time datetime="{{ .UpdatedAt }}">{{ ago .UpdatedAt }}</time>
+            <code data-toggled="edit">&lt;{{ .URL }}&gt;</code>
+            <span class="toggle" data-toggle="{{ .URL }}">∴</span>
+            <ol>
+              {{ range .Items }}
+                <li>
+                  <h3><a href="{{ .PermaLink }}">{{ .Title }}</a></h3>
+                  <time datetime="{{ .PubDate }}">{{ ago .PubDate }}</time>
+                </li>
+              {{ end }}
+            </ol>
+          </li>
+        {{ end }}
+      </ul>
+    </main>
+    
+    <script src="/public/toggle.js"></script>
+  </body>
+</html>
