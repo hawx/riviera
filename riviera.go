@@ -8,7 +8,6 @@ import (
 	"log"
 	"math"
 	"net/http"
-	"strings"
 	"time"
 
 	"hawx.me/code/indieauth"
@@ -107,23 +106,6 @@ func parseTemplates() (*template.Template, error) {
 			}
 
 			return fmt.Sprintf("%vY", math.Ceil(dur.Hours()/24/365))
-		},
-		"truncate": func(line string, length int) string {
-			if len(line) < length {
-				return line
-			}
-
-			words := strings.Fields(line)
-			line = ""
-			for _, word := range words {
-				if len(line+word) < length {
-					line += word + " "
-				} else {
-					break
-				}
-			}
-
-			return line[:len(line)-1] + "…"
 		},
 	}).ParseGlob(*webPath + "/template/*.gotmpl")
 }

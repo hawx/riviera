@@ -104,7 +104,11 @@ func (d *DB) Read(uri string) (feed Feed, err error) {
 		return feed, fmt.Errorf("scanning feed row: %w", err)
 	}
 
-	rows, err := d.db.Query("SELECT Key, PermaLink, PubDate, Title, Link, Body, ID, Comments FROM feedItems WHERE FeedURL = ?",
+	rows, err := d.db.Query(`SELECT Key, PermaLink, PubDate, Title, Link, Body, ID, Comments
+                           FROM feedItems
+                           WHERE FeedURL = ?
+                           ORDER BY PubDate DESC
+                           LIMIT 7`,
 		uri)
 	if err != nil {
 		return feed, fmt.Errorf("selecting feedItems: %w", err)

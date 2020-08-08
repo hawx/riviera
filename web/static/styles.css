@@ -268,7 +268,12 @@ button {
 .garden ol li {
     white-space: nowrap;
     margin: .5rem .5rem .5rem 0;
+    display: flex;
 }
+
+.garden ol li time {
+    margin: .2rem .5rem 0 .3rem;
+w}
 
 .garden li.open ol li {
     margin: .2rem .5rem .2rem 0;
@@ -277,6 +282,7 @@ button {
 .garden li:not(.open) ol li:after {
     content: '/';
     color: #ddd;
+    margin-top: .1rem;
 }
 
 .garden h3 {
@@ -284,6 +290,12 @@ button {
     font-weight: normal;
     margin: 0;
     display: inline-block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.garden li:not(.open) ol h3 {
+    max-width: 22rem;
 }
 
 .garden h3 a:visited {

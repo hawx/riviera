@@ -21,7 +21,7 @@
             <ol>
               {{ range .Items }}
                 <li>
-                  <h3><a href="{{ .PermaLink }}">{{ truncate .Title 40 }}</a></h3>
+                  <h3><a href="{{ .PermaLink }}">{{ .Title }}</a></h3>
                   <time datetime="{{ .PubDate }}">{{ ago .PubDate }}</time>
                 </li>
               {{ end }}
