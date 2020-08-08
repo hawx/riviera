@@ -17,7 +17,6 @@ type feedDB struct {
 }
 
 func (d *feedDB) Contains(key string) bool {
-	log.Println("contains", key)
 	tx, err := d.db.Begin()
 	if err != nil {
 		log.Println("contains:", err)

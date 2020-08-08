@@ -17,6 +17,7 @@ import (
 	"hawx.me/code/riviera/river"
 	"hawx.me/code/riviera/river/mapping"
 	"hawx.me/code/riviera/subscriptions"
+	"hawx.me/code/riviera/subscriptions/opml"
 	"hawx.me/code/serve"
 )
 
@@ -110,9 +111,48 @@ func parseTemplates() (*template.Template, error) {
 	}).ParseGlob(*webPath + "/template/*.gotmpl")
 }
 
+func importOpml(path string) (int, error) {
+	doc, err := opml.Load(path)
+	if err != nil {
+		return 0, err
+	}
+
+	log.Println("opening db at", *dbPath)
+	db, err := data.Open(*dbPath)
+	if err != nil {
+		return 0, err
+	}
+	defer db.Close()
+
+	riverSubs := db.Subscriptions("river")
+	oks := 0
+	for _, item := range doc.Body.Outline {
+		if err := riverSubs.Add(item.XMLURL); err != nil {
+			log.Printf("error adding %s: %v\n", item.XMLURL, err)
+		} else {
+			oks++
+		}
+	}
+
+	return oks, nil
+}
+
 func main() {
 	flag.Usage = func() { printHelp() }
 	flag.Parse()
+
+	if flag.Arg(0) == "import" {
+		file := flag.Arg(1)
+		fmt.Println("importing ", file)
+
+		n, err := importOpml(file)
+		if err != nil {
+			log.Println(err)
+		} else {
+			log.Println("added", n)
+		}
+		return
+	}
 
 	auth, err := indieauth.Authentication(*url, *url+"/callback")
 	if err != nil {
