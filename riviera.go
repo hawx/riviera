@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"sync"
+	"html/template"
 	"time"
 
 	fsnotify "gopkg.in/fsnotify.v1"
@@ -62,6 +63,7 @@ var (
 	refresh = flag.String("refresh", "15m", "")
 
 	boltdbPath = flag.String("boltdb", "", "")
+	webPath    = flag.String("web", "web", "")
 
 	port   = flag.String("port", "8080", "")
 	socket = flag.String("socket", "", "")
@@ -99,12 +101,22 @@ func watchFile(path string, f func()) (io.Closer, error) {
 	return watcher, watcher.Add(path)
 }
 
+func parseTemplates(path string) (*template.Template, error) {
+	return template.New("").Funcs(map[string]interface{}{}).ParseGlob(path + "/template/*.gotmpl")
+}
+
 func main() {
 	flag.Usage = func() { printHelp() }
 	flag.Parse()
 
 	if flag.NArg() == 0 {
 		printHelp()
+		return
+	}
+
+	templates, err := parseTemplates(*webPath)
+	if err != nil {
+		log.Println(err)
 		return
 	}
 
@@ -182,7 +194,10 @@ func main() {
 	}
 	defer waitFor("watcher", watcher.Close)
 
-	http.Handle("/river/", http.StripPrefix("/river", river.Handler(feeds)))
+	http.Handle("/", river.List(feeds, templates))
+	http.Handle("/log", river.Log(feeds, templates))
+
+	http.Handle("/public/", http.StripPrefix("/public", http.FileServer(http.Dir(*webPath+"/static"))))
 
 	serve.Serve(*port, *socket, http.DefaultServeMux)
 	wg.Wait()

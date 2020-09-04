@@ -3,6 +3,10 @@
 // Commentary for the types in this package is copied from http://riverjs.org.
 package riverjs
 
+import (
+	"strings"
+)
+
 type River struct {
 	UpdatedFeeds Feeds    `json:"updatedFeeds"`
 	Metadata     Metadata `json:"metadata"`
@@ -84,4 +88,15 @@ type Metadata struct {
 
 	// Secs is the number of seconds it took to build the file.
 	Secs float64 `json:"secs,string"`
+}
+
+func (r Item) FilteredBody() string {
+	r.Body = strings.TrimSpace(r.Body)
+
+	if strings.HasPrefix(r.Body, "&amp;lt;") ||
+		strings.HasPrefix(r.Body, "var gaJsHost") {
+		return ""
+	}
+
+	return r.Body
 }
