@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Rivelin</title>
+    <link rel="stylesheet" href="/public/styles.css" />
+  </head>
+  <body>
+    <div class="container">
+
+      <ul class="blocks">
+        {{range .UpdatedFeeds.UpdatedFeeds}}
+          <li class="block">
+            <header class="block-title">
+              <h1>
+                <img class="icon" src="//www.google.com/s2/favicons?domain={{.WebsiteURL}}" alt="">
+                <a href="{{.WebsiteURL}}">{{.FeedTitle}}</a>
+                <span class="feed">(<a href="{{.FeedURL}}">Feed</a>)</span>
+              </h1>
+              {{.WhenLastUpdate.HtmlFormat}}
+            </header>
+            <ul class="items">
+              {{range .Items}}
+                <li class="item" id="{{.ID}}">
+                  {{ if .Thumbnail }}
+                    <details>
+                      <summary>
+                        <h2><a rel="external" href="{{.Link}}">{{.Title}}</a></h2>
+                      </summary>
+                      <img src="{{.Thumbnail.URL}}" />
+                    </details>
+                    <p>{{.FilteredBody}}</p>
+                    <a class="timea" rel="external" href="{{.Link}}">{{.PubDate.HtmlFormat}}</a>
+                  {{ else }}
+                    <h2><a rel="external" href="{{.Link}}">{{.Title}}</a></h2>
+                    <p>{{.FilteredBody}}</p>
+                    <a class="timea" rel="external" href="{{.Link}}">{{.PubDate.HtmlFormat}}</a>
+                  {{ end }}
+                </li>
+              {{end}}
+            </ul>
+          </li>
+        {{end}}
+      </ul>
+
+      {{ template "footer.gotmpl" . }}
+    </div>
+  </body>
+</html>

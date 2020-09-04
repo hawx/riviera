@@ -4,8 +4,6 @@
 package river
 
 import (
-	"encoding/json"
-	"io"
 	"time"
 
 	"hawx.me/code/riviera/river/confluence"
@@ -20,10 +18,6 @@ const docsPath = "http://scripting.com/stories/2010/12/06/innovationRiverOfNewsI
 
 // A River aggregates feeds that it is subscribed to, and writes them in riverjs format.
 type River interface {
-	// Encode writes the river to w in json format. It does not write the json in
-	// a javascript callback function.
-	Encode(w io.Writer) error
-
 	Latest() (riverjs.River, error)
 
 	// Log returns a list of fetch events.
@@ -87,15 +81,6 @@ func (r *river) Latest() (riverjs.River, error) {
 		Metadata:     metadata,
 		UpdatedFeeds: updatedFeeds,
 	}, nil
-}
-
-func (r *river) Encode(w io.Writer) error {
-	latest, err := r.Latest()
-	if err != nil {
-		return err
-	}
-
-	return json.NewEncoder(w).Encode(latest)
 }
 
 func (r *river) Add(uri string) {

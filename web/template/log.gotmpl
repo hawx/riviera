@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Rivelin</title>
+    <link rel="stylesheet" href="/public/styles.css" />
+  </head>
+  <body>
+    <div class="container">
+
+      <ul class="blocks">
+        {{ range . }}
+          <li class="block">
+            <header class="block-title">
+              <h1><a href="#">{{.Header}}</a></h1>
+            </header>
+            <ul class="items">
+              {{ range .Items }}
+                <li class="item">
+                  <h2><a href="{{.URI}}">{{.URI}}</a> <span class="code {{.Status}}">{{.Code}}</span></h2>
+                </li>
+              {{ end }}
+            </ul>
+          </li>
+        {{ end }}
+      </ul>
+
+      {{ template "footer.gotmpl" . }}
+    </div>
+  </body>
+</html>
