@@ -1,13 +1,29 @@
 :root {
-    --foreground: hsl(0 0% 0%);
+    /* https://www.colourlovers.com/palette/4654317/V_O_G_U_E_%E2%80%A2_1928 */
+    --a: hsl(13, 74%, 59%);
+    --b: hsl(5, 79%, 38%);
+    --c: hsl(345, 50%, 2%);
+    --d: hsl(46, 26%, 71%);
+    --e: hsl(37, 78%, 89%);
+
     --background: hsl(0 0% 100%);
-          --link: hsl(220 52% 44%);
-         --link2: hsl(208 56% 38%);
-         --faint: hsl(0 0% 93%);
-        --faint2: hsl(0 0% 87%);
-           --mid: hsl(0 0% 73%);
-          --dark: hsl(0 0% 47%);
-         --dark2: hsl(0 0% 40%);
+    --foreground: hsl(0 0% 0%);
+    --primary: hsl(220 52% 44%);
+    --secondary: hsl(208 56% 38%);
+    --faint: hsl(0 0% 40%);
+    --fainter: hsl(0 0% 73%);
+    --faintish: hsl(0 0% 47%);
+
+    /* --background: var(--e); */
+    /* --foreground: var(--c); */
+    /* --primary: var(--b); */
+    /* --secondary: var(--a); */
+    /* --faint: hsl(42, 65%, 20%); */
+    /* --faintish: hsl(42, 60%, 33%); */
+    /* --fainter: var(--d); */
+    
+    --monospace: 'Droid Sans Mono', monospace;
+    --sans: 'Signika Negative', Verdana, Geneva, sans-serif;
 }
 
 html, body {
@@ -16,32 +32,38 @@ html, body {
 }
 
 body {
-    font: 1em/1.3 Verdana, Geneva, sans-serif;
+    font: 1em/1.3 var(--sans);
     color: var(--foreground);
     background: var(--background);
 }
 
 @media (prefers-color-scheme: dark) {
     :root {
-        --foreground: hsl(0 0% 100%);
-        --background: hsl(0 0% 0%);
-              --link: hsl(220 52% 56%);
-             --link2: hsl(208 56% 62%);
-             --faint: hsl(0 0% 7%);
-            --faint2: hsl(0 0% 13%);
-               --mid: hsl(0 0% 27%);
-              --dark: hsl(0 0% 53%);
-             --dark2: hsl(0 0% 60%);
+
+        --background: var(--c);
+        --foreground: var(--e);
+        --primary: var(--a);
+        --secondary: var(--b);
+        --faint: var(--d);
+        --faintish: hsl(46, 26%, 51%);
+        --fainter: hsl(46, 26%, 11%);
+    }
+
+    body {
+        text-shadow: 1px 1px 2px black;
     }
 }
 
-a, a:visited {
+a {
     text-decoration: none;
-    color: var(--link);
+    color: var(--primary);
+}
+a:visited {
+    color: var(--foreground);
 }
 a:hover, a:focus, a:active {
     text-decoration: underline;
-    color: var(--link2);
+    color: var(--secondary);
 }
 
 .container {
@@ -57,7 +79,7 @@ a:hover, a:focus, a:active {
 
 .page-title {
     background: var(--faint);
-    border-bottom: 1px solid var(--faint2);
+    border-bottom: 1px solid var(--fainter);
     padding: 0;
     margin: 0;
 }
@@ -82,7 +104,7 @@ ul { list-style: none; padding: 0; }
 .block {
     clear: both;
     padding: .5rem 0 0;
-    border-top: 1px solid var(--faint2);
+    border-top: 1px solid var(--fainter);
     margin: 1.1rem 0 0;
 }
 .block-title h1, .block-title time {
@@ -93,6 +115,7 @@ ul { list-style: none; padding: 0; }
     font-weight: normal;
     background: var(--background);
 }
+.block-title time { font-family: var(--monospace); }
 .block-title .icon {
     position: relative;
     float: left;
@@ -103,7 +126,8 @@ ul { list-style: none; padding: 0; }
 .block-title time {
     float: right;
     padding: 0 0 0 .5rem;
-    color: var(--dark);
+    font-family: var(--monospace);
+    color: var(--faint);
 }
 
 .item {
@@ -130,7 +154,8 @@ ul { list-style: none; padding: 0; }
     clear: both;
     margin: 0 1.5rem 0 0;
     font-size: .6875rem;
-    color: var(--dark2);
+    color: var(--faint);
+    font-family: var(--monospace);
 }
 .item img {
     max-width: 100%;
@@ -145,14 +170,25 @@ ul { list-style: none; padding: 0; }
 .item .code.unknown  { color: black; }
 
 footer {
+    color: var(--faintish);
+    opacity: .5;
+    font-size: 0.8rem;
+    margin: 5rem auto;
+    transition: .3s;
     text-align: center;
-    padding-bottom: 3rem;
-    font-size: .6875rem;
-    color: var(--mid);
 }
-footer a, footer a:hover, footer a:visited, footer a:focus, footer a:active {
-    color: var(--mid);
+
+footer:hover {
+    opacity: 1;
+}
+
+footer a, footer a:visited {
+    color: var(--faint);
     text-decoration: underline;
+}
+
+footer a:hover, footer a:focus, footer a:active {
+    color: var(--foreground);
 }
 
 @media screen and (max-width: 40rem) {
